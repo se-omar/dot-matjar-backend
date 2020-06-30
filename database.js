@@ -1,5 +1,5 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('ecommercedb', 'root', '', {
+const sequelize = new Seq('project', 'root', '', {
     host: 'localhost',
     dialect: 'mysql'
 });
@@ -9,4 +9,4 @@ module.exports = {
     business: sequelize.import('./models/business'),
     product_categories: sequelize.import('./models/product_categories'),
     requests: sequelize.import('./models/requests')
-}
+} 

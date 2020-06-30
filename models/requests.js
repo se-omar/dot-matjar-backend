@@ -16,7 +16,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },
-    request_numberr: {
+    request_number: {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },
