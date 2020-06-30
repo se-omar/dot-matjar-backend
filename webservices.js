@@ -2,10 +2,76 @@ const express = require('express');
 const db = require('./database');
 const app = express();
 const bodyParser = require('body-parser');
+const bcrypt = require('bcrypt');
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(bodyParser.json());
+
+
+
+
+app.use(function (req, res, next) {
+    res.header("Access-Control-Allow-Origin", "*");
+    res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization");
+    res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
+    next();
+});
+
+//=============================================
+//LOGIN WEBSERVICE
+app.post('/api/login', (req, res) => {
+    if (!req.body.email || !req.body.password) {
+        return res.send('please enter email and password')
+    }
+    db.users.findOne({
+        where: {
+            email: req.body.email
+        }
+    }).then(user => {
+        if (user == null) {
+            return res.status(400).json({
+                message: 'wrong email or password'
+            })
+        };
+        if (req.body.password != user.password) {
+            return res.status(500).send('wrong password')
+        }
+        return res.status(200).send('authenitcation succesfull');
+
+    });
+
+});
+
+//=============================================
+//SIGN UP WEBSERVICE
+app.post('/api/signup', (req, res) => {
+    bcrypt.hash(req.body.password, 10, (err, hash) => {
+        if (err) {
+            return res.status(500).send(err);
+        } else {
+            db.users.findOne({
+                where: {
+                    email: req.body.email
+                }
+            }).then(user => {
+                if (!user) {
+                    db.users.create({
+                        email: req.body.email,
+                        national_number: req.body.national_number,
+                        password: hash,
+                        mobile_number: req.body.mobile,
+                        full_arabic_name: req.body.full_arabic_name,
+                        gender: req.body.gender,
+                    })
+                    return res.status(200).send('user created succesfully');
+                } else {
+                    return res.status(400).send('user already exists');
+                }
+            })
+        }
+    })
+})
 
 
 
