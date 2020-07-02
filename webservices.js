@@ -30,12 +30,10 @@ app.post('/api/login', (req, res) => {
         }
     }).then(user => {
         if (user == null) {
-            return res.status(400).json({
-                message: 'wrong email or password'
-            })
+            return res.send('wrong email')
         };
         if (req.body.password != user.password) {
-            return res.status(500).send('wrong password')
+            return res.send('wrong password')
         }
         return res.status(200).send('authenitcation succesfull');
 
@@ -262,9 +260,16 @@ app.delete('api/business/:bussiness_id', async (req, res) => {
 //===========================================================
 //PRODUCTS TABLE
 app.get('/api/products', (req, res) => {
-    db.products.findAll().then((data) => {
+    db.products.findAll({
+        include: [{
+            model: db.business
+        }]
+    }).then((data) => {
         res.send(data);
     })
+
+
+
 })
 
 app.get('/api/products/:product_id', async (req, res) => {
@@ -321,15 +326,15 @@ app.get('/api/products/color/:color', async (req, res) => {
     res.send(product)
 })
 
-app.get('/api/products/hscode/:HS_code',async (req,res)=>{
+app.get('/api/products/hscode/:HS_code', async (req, res) => {
 
-var product = await db.products.findAll({
-    where: {
-        HS_code : req.params.HS_code
-    }
+    var product = await db.products.findAll({
+        where: {
+            HS_code: req.params.HS_code
+        }
 
-})
-res.send(product)
+    })
+    res.send(product)
 
 })
 
@@ -355,41 +360,41 @@ app.post('/api/products', (req, res) => {
 
 //PUT METHOD
 
-app.put('/api/products/:product_id',async(req,res)=>{
-    var product= await db.products.findOne({
-        where:{ 
-            product_id : req.params.product_id
+app.put('/api/products/:product_id', async (req, res) => {
+    var product = await db.products.findOne({
+        where: {
+            product_id: req.params.product_id
         }
     })
     product.update({
-        category:req.body.category,
-        bussiness_id : req.body.bussiness_id,
-        pending_status : req.body.pending_status,
-        product_name : req.body.product_name,
-        product_code : req.body.product_code,
-        HS_code : req.body.HS_code,
-        min_units_per_order : req.body.min_units_per_order,
-        description : req.body.description ,
-        unit_price : req.body.unit_price ,
-        size : req.body.size ,
-        color : req.body.color ,
-        unit_weight : req.body.unit_weight ,
-        main_picture : req.body.main_picture,
-        extra_picture1 : req.body.extra_picture1 ,
-        extra_picture2 : req.body.extra_picture2 , 
-        has_discount : req.body.has_discount ,
-        discount_amount : req.body.discount_amount ,
-        availability : req.body.availability,
-        product_rating : req.body.product_rating
+        category: req.body.category,
+        bussiness_id: req.body.bussiness_id,
+        pending_status: req.body.pending_status,
+        product_name: req.body.product_name,
+        product_code: req.body.product_code,
+        HS_code: req.body.HS_code,
+        min_units_per_order: req.body.min_units_per_order,
+        description: req.body.description,
+        unit_price: req.body.unit_price,
+        size: req.body.size,
+        color: req.body.color,
+        unit_weight: req.body.unit_weight,
+        main_picture: req.body.main_picture,
+        extra_picture1: req.body.extra_picture1,
+        extra_picture2: req.body.extra_picture2,
+        has_discount: req.body.has_discount,
+        discount_amount: req.body.discount_amount,
+        availability: req.body.availability,
+        product_rating: req.body.product_rating
 
     })
     res.send("ROW UPDATED")
 })
 
-app.delete('/api/products/:product_id',async (req,res)=>{
-    var product= await db.products.findOne({
+app.delete('/api/products/:product_id', async (req, res) => {
+    var product = await db.products.findOne({
         where: {
-            product_id : req.params.product_id
+            product_id: req.params.product_id
         }
     })
     product.destroy();
@@ -401,134 +406,135 @@ app.delete('/api/products/:product_id',async (req,res)=>{
 //=======================
 //PRODUCT CATEGORIES
 
-app.get('/api/product_categories',async(req,res)=>{
-    var product= await db.product_categories.findAll();
+app.get('/api/product_categories', async (req, res) => {
+    var product = await db.product_categories.findAll();
     res.send(product);
 })
 
-app.get('/api/product_categories_id/:category_id',async(req,res)=>{
-    var product=await db.product_categories.findOne({
-        where:{
-           category_id : req.params.category_id
+app.get('/api/product_categories_id/:category_id', async (req, res) => {
+    var product = await db.product_categories.findOne({
+        where: {
+            category_id: req.params.category_id
         }
     })
     res.send(product);
 })
 
-app.get('/api/product_categories_name/:category_name',async(req,res)=>{
+app.get('/api/product_categories_name/:category_name', async (req, res) => {
     var product = await db.product_categories.findAll({
-        where:{ category_name : req.params.category_name
+        where: {
+            category_name: req.params.category_name
         }
-        })
-res.send(product);
+    })
+    res.send(product);
 
 })
-app.post('/api/product_categories',(req,res)=>{
-     db.product_categories.create({
-        category_name : req.body.category_name,
-        description : req.body.description,
-        picture : req.body.picture,
-        has_products : req.body.has_products
+app.post('/api/product_categories', (req, res) => {
+    db.product_categories.create({
+        category_name: req.body.category_name,
+        description: req.body.description,
+        picture: req.body.picture,
+        has_products: req.body.has_products
     })
     res.send("ROW CREATED SUCCESFULY");
 })
-app.put('/api/product_categories/:category_id',async(req,res)=>{
-   var product= await db.product_categories.findOne({
-where : {
-    category_id : req.params.category_id
-}
-   })
+app.put('/api/product_categories/:category_id', async (req, res) => {
+    var product = await db.product_categories.findOne({
+        where: {
+            category_id: req.params.category_id
+        }
+    })
     product.update({
-        category_name : req.body.category_name,
-        description : req.body.description,
-        picture : req.body.picture,
-        has_products : req.body.has_products
+        category_name: req.body.category_name,
+        description: req.body.description,
+        picture: req.body.picture,
+        has_products: req.body.has_products
     })
     res.send("ROW UPDATED")
 })
 
-app.delete('/api/product_categories/:category_id',async (req,res)=>{
-    var product= await db.product_categories.findOne({
-        where : {
-            category_id : req.params.category_id 
+app.delete('/api/product_categories/:category_id', async (req, res) => {
+    var product = await db.product_categories.findOne({
+        where: {
+            category_id: req.params.category_id
         }
     })
     product.destroy();
     res.send("ROW DELETED");
-    
+
 })
 
 //=================
 //  REQUESTS TABLE
 
-app.get('/api/requests',async(req,res)=>{
-    var request=await db.requests.findAll();
+app.get('/api/requests', async (req, res) => {
+    var request = await db.requests.findAll();
     res.send(request);
 })
 
-app.get('/api/requests/:requests_id',async(req,res)=>{
+app.get('/api/requests/:requests_id', async (req, res) => {
     var request = await db.requests.findOne({
         where: {
-            requests_id : req.params.requests_id
-        }   
+            requests_id: req.params.requests_id
+        }
     })
     res.send(request);
 })
 
-app.get('/api/requests_user_id/:by_user_id',async(req,res)=>{
-var request = await db.requests.findOne({
-    where : {
-    by_user_id : req.params.by_user_id
-    }
-})
-res.send(request);
-})
-app.get('/api/requests_number/:request_number',async(req,res)=>{
-    var request= await db.requests.findOne({
-        where : {
-            request_number : req.params.request_number
+app.get('/api/requests_user_id/:by_user_id', async (req, res) => {
+    var request = await db.requests.findOne({
+        where: {
+            by_user_id: req.params.by_user_id
         }
     })
-res.send(request);
+    res.send(request);
+})
+app.get('/api/requests_number/:request_number', async (req, res) => {
+    var request = await db.requests.findOne({
+        where: {
+            request_number: req.params.request_number
+        }
+    })
+    res.send(request);
 })
 
 
-app.put('/api/requests/:requests_id',async(req,res)=>{
-    var request =await db.requests.findOne({
-        where : {
-            requests_id : req.params.requests_id
+app.put('/api/requests/:requests_id', async (req, res) => {
+    var request = await db.requests.findOne({
+        where: {
+            requests_id: req.params.requests_id
         }
     })
     request.update({
-        by_user_id : req.body.by_user_id,
-        to_user_id : req.body.to_user_id,
-        request_number : req.body.request_number,
-        request_status : req.body.request_status,
-        request_details : req.body.request_details,
-        request_date : req.body.request_date 
+        by_user_id: req.body.by_user_id,
+        to_user_id: req.body.to_user_id,
+        request_number: req.body.request_number,
+        request_status: req.body.request_status,
+        request_details: req.body.request_details,
+        request_date: req.body.request_date
 
     })
     res.send("ROW UPDATED");
 })
 
 
-app.post('/api/requests',(req,res)=>{
-db.requests.create({
-    by_user_id : req.body.by_user_id,
-    to_user_id : req.body.to_user_id,
-    request_number : req.body.request_number,
-    request_status : req.body.request_status,
-    request_details : req.body.request_details,
-    request_date : req.body.request_date 
+app.post('/api/requests', (req, res) => {
+    db.requests.create({
+        by_user_id: req.body.by_user_id,
+        to_user_id: req.body.to_user_id,
+        request_number: req.body.request_number,
+        request_status: req.body.request_status,
+        request_details: req.body.request_details,
+        request_date: req.body.request_date
 
-})
-res.send("ROW ADDED");
+    })
+    res.send("ROW ADDED");
 })
 
-app.delete('/api/requests/:requests_id',async(req,res)=>{
+app.delete('/api/requests/:requests_id', async (req, res) => {
     var request = await db.requests.findOne({
-        where : {
-            requests_id : req.params.requests_id
+        where: {
+            requests_id: req.params.requests_id
         }
     })
     request.destroy();
