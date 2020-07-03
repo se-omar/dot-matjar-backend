@@ -20,6 +20,7 @@ app.use(function (req, res, next) {
 
 //=============================================
 //LOGIN WEBSERVICE
+
 app.post('/api/login', (req, res) => {
     if (!req.body.email || !req.body.password) {
         return res.send('please enter email and password')
@@ -87,7 +88,7 @@ app.get('/api/users', async (req, res) => {
 
 
 
-app.get('/api/users/:user_id', async (req, res) => {
+app.get('/api/users/:user_id', async (req, res) => { 
     var user = await db.users.findOne({
         where: {
             user_id: req.params.user_id
