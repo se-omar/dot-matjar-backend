@@ -76,7 +76,11 @@ app.post('/api/signup', (req, res) => {
 //==============================================
 //USERS TABLE
 app.get('/api/users', async (req, res) => {
-    await db.users.findAll().then((data) => {
+    await db.users.findAll({
+        include: [{
+            model: db.business
+        }]
+    }).then((data) => {
         res.send(data);
     })
 })
@@ -189,7 +193,11 @@ app.delete('/api/users/:user_id', async (req, res) => {
 //===============================================================
 //BUSINESS TABLE
 app.get('/api/business/', (req, res) => {
-    db.business.findAll().then((data) => {
+    db.business.findAll({
+        include: [{
+            model: db.users
+        }]
+    }).then((data) => {
         res.send(data);
     })
 })
@@ -262,7 +270,10 @@ app.delete('api/business/:bussiness_id', async (req, res) => {
 app.get('/api/products', (req, res) => {
     db.products.findAll({
         include: [{
-            model: db.business
+            model: db.business,
+            include: [{
+                model: db.users
+            }]
         }]
     }).then((data) => {
         res.send(data);
