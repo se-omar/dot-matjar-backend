@@ -3,13 +3,16 @@ const db = require('./database');
 const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+const crypto = require('crypto');
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(bodyParser.json());
 
 
-
+const token = crypto.randomBytes(20).toString('hex');
+var hashLink = 'http://localhost:8080/updatePassword/' + token;
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -40,6 +43,85 @@ app.post('/api/login', (req, res) => {
     });
 
 });
+
+//=============================================
+app.post('/api/resetpassword/:hash', (req, res) => {
+
+});
+//RESET PASSWORD WEBSERVICE
+app.post('/api/resetpassword', (req, res) => {
+    if (!req.body.email || !req.body.national_number) {
+        return res.send('please enter email and national number')
+    }
+    db.users.findOne({
+        where: {
+            email: req.body.email
+        }
+    }).then(user => {
+        if (user == null) {
+            return res.send('wrong email')
+        };
+        if (req.body.national_number != user.national_number) {
+            return res.send('wrong national number')
+        }
+
+        user.update({
+            password_reset_token: hashLink
+        })
+        return res.status(200).send('authentication succesfull');
+
+    });
+
+});
+
+
+app.post('/api/sendResetPassword', (req, res) => {
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
+        auth: {
+            user: 'miroayman6198@gmail.com',
+            pass: 'eshta123'
+        }
+    });
+
+    var mailOptions = {
+        from: 'miroayman6198@gmail.com',
+        to: req.body.email,
+        subject: 'password reset email',
+        text: 'click on the link to reset password ' + hashLink
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+    res.send(hashLink)
+});
+
+
+app.post('/api/sendResetPassword/:token', (req, res) => {
+    db.users.findOne({
+        where: {
+            password_reset_token: 'http://localhost:8080/updatePassword/' + req.params.token
+        }
+    }).then(user => {
+        if (!user) {
+            return res.send(user + 'user not found with this hash')
+        }
+        if (!req.body.password) {
+            return res.send('you must enter a password')
+        }
+        user.update({
+            password: req.body.password
+        })
+        return res.send(hashLink)
+    })
+})
+
+
 
 //=============================================
 //SIGN UP WEBSERVICE
