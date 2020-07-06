@@ -3,10 +3,25 @@ const db = require('./database');
 const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
+const cors= require('cors')
+const jwt=require('jsonwebtoken')
+const crypto = require('crypto');
+require("dotenv").config();
+// const exphbs = requrie('express-handlebars')
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(bodyParser.json());
+app.use(cors());
+// app.use('/api',authRoutes);
+
+
+
+//======= EngineView
+
+
+app.set('view engine','handlebars' );
 
 
 
@@ -20,6 +35,10 @@ app.use(function (req, res, next) {
 
 //=============================================
 //LOGIN WEBSERVICE
+
+var hash = crypto.randomBytes(20).toString('hex');
+
+
 
 app.post('/api/login', (req, res) => {
     if (!req.body.email || !req.body.password) {
@@ -42,9 +61,156 @@ app.post('/api/login', (req, res) => {
 
 });
 
+//================================= TESTTT
+
+app.get('/api/test',(req,res)=>{
+    
+ const email=req.body.email
+const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'20m'},(emailtoken,err)=>{
+    const url = `http://localhost:3000/api/test/`;
+    
+    let transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user:'johann89@ethereal.email', // generated ethereal user
+          pass: 'GRpXSvvQ3tF8ZyK8ph', // generated ethereal password
+        },
+        tls:{
+            regectUnauthorized:false
+        }
+      });
+    
+    
+    
+    
+    
+    transporter. sendMail( {
+        from: '"Mada" <mada6198@yahoo.com>', // sender address
+        to: req.body.email,  // list of receivers
+        subject: "space", // Subject line
+        text: "Hello world?", // plain text body
+        html: 
+        `  <a href="${url}+${hash}">Click to ACTIVATE</a> `
+        
+        
+        
+      });
+});
+
+
+
+
+ // create reusable transporter object using the default SMTP transport
+ 
+
+  // send mail with defined transport object
+   
+
+  console.log("Message sent: %s", info.messageId);
+  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
+
+  // Preview only available when sending through an Ethereal account
+  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
+  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+})
+
+    
+
+//============================
+
+
+app.post('/api/activate',(req,res)=>{
+    const {token}=req.body;
+    if(token) {
+ jwt.verify(token,process.env.JWT_KEY,(decodedtoken,err)=>{
+if(err) res.json({error:"eroorrrrrr"}) 
+
+ db.users.create({
+    email: {email},
+   
+
+}).then(res.send("Account Verified"))
+
+
+ })
+    
+    
+}
+else{ res.json({error:"ERROR"})}
+
+})
+
+
+
+
+
+
+
+
 //=============================================
 //SIGN UP WEBSERVICE
 app.post('/api/signup', (req, res) => {
+
+
+
+//================= Sending email verfication
+
+
+  const crypto=req.body.Crypto;
+const email=req.body.email
+const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'20m'},(emailtoken,err)=>{
+    const url = `http://localhost:8080/activation`;
+    
+    let transporter = nodemailer.createTransport({
+        host: "smtp.ethereal.email",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+          user:'quinten.senger91@ethereal.email', // generated ethereal user
+          pass: 'tz2qgnqxngVe9NQWgX', // generated ethereal password
+        },
+        tls:{
+            regectUnauthorized:false
+        }
+      });
+    
+    
+    
+    
+    
+    transporter. sendMail( {
+        from: '"Owners" <E-commerce@yahoo.com>', // sender address
+        to: req.body.email,  // list of receivers
+        subject: "spaceX", // Subject line
+        text: "Hello world?", // plain text body
+        html: 
+        `  <a href="${url}">Click to ACTIVATE </a> <br/>
+        <p>Your Secret token is : ${crypto}</p>
+        `
+        
+        
+        
+      });
+});
+
+
+
+
+ // create reusable transporter object using the default SMTP transport
+ 
+
+  // send mail with defined transport object
+   
+
+  
+  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+
+
+
+
+    //==========================Creating account in database
     bcrypt.hash(req.body.password, 10, (err, hash) => {
         if (err) {
             return res.status(500).send(err);
@@ -59,18 +225,51 @@ app.post('/api/signup', (req, res) => {
                         email: req.body.email,
                         national_number: req.body.national_number,
                         password: hash,
-                        mobile_number: req.body.mobile,
+                        mobile_number: req.body.mobile_number,
                         full_arabic_name: req.body.full_arabic_name,
                         gender: req.body.gender,
+                        crypto: req.body.Crypto,
+                        
                     })
                     return res.status(200).send('user created succesfully');
                 } else {
                     return res.status(400).send('user already exists');
-                }
+                } 
             })
         }
     })
 })
+//===========================================
+//Complete Data
+app.put("/api/completedata/:user_id",async(req,res)=>{
+    var user= await db.users.findOne({
+        where:{ user_id:req.params.user_id }
+    })
+  
+        user.update({
+            national_number:req.body.national_number,
+            gender:req.body.gender,
+            full_arabic_name:req.body.full_arabic_name,
+            full_english_name:req.body.full_english_name,
+            birthdate:req.body.birthdate,
+            qualifications:req.body.qualifications,
+            job:req.body.job,
+            governorate:req.body.governorate,
+            village:req.body.village,
+            center:req.body.center,
+            telephone_number:req.body.telephone_number,
+            phone_number:req.body.phone_number,
+            fax:req.body.fax,
+            facebook_account:req.body.facebook_account,
+            linkedin:req.body.linkedin,
+            website:req.body.website,
+            address:req.body.address
+         })
+         res.send(user)
+    })
+  
+    
+
 
 
 
@@ -175,6 +374,28 @@ app.put('/api/users/:user_id', async (req, res) => {
     })
     res.send('row updated');
 })
+
+//============ Activation
+app.post('/api/activate',async(req,res)=>{
+   var user= await db.users.findOne({
+        where:{
+            crypto:req.body.Crypto
+        }
+    })
+    console.log("user:",user)
+    if(user){
+        
+    user.update({
+        active : 1
+    })   
+    res.flash("done")
+}
+else{
+
+}
+})
+
+
 
 app.delete('/api/users/:user_id', async (req, res) => {
     var user = await db.users.findOne({

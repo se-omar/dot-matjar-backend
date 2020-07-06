@@ -69,6 +69,11 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(15),
       allowNull: true
     },
+    telephone_number: {
+      type: DataTypes.INTEGER(15),
+      allowNull: true
+    },
+    
     fax: {
       type: DataTypes.INTEGER(15),
       allowNull: true
@@ -87,6 +92,14 @@ module.exports = function (sequelize, DataTypes) {
     },
     address: {
       type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    crypto: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    active: {
+      type: DataTypes.INTEGER(1),
       allowNull: true
     }
   }, {
