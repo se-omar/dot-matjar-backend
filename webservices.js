@@ -12,7 +12,7 @@ app.use(bodyParser.json());
 
 
 const token = crypto.randomBytes(20).toString('hex');
-var hashLink = 'http://localhost:8080/updatePassword/' + token;
+var hashLink = 'http://localhost:8080/updateForgottenPassword/' + token;
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -33,21 +33,25 @@ app.post('/api/login', (req, res) => {
         }
     }).then(user => {
         if (user == null) {
-            return res.send('wrong email')
+            return res.json({
+                message: 'wrong email'
+            })
         };
         if (req.body.password != user.password) {
-            return res.send('wrong password')
+            return res.json({
+                message: 'wrong password'
+            })
         }
-        return res.status(200).send('authenitcation succesfull');
+        return res.status(200).json({
+            message: 'authentication successful',
+            data: user
+        });
 
     });
 
 });
 
 //=============================================
-app.post('/api/resetpassword/:hash', (req, res) => {
-
-});
 //RESET PASSWORD WEBSERVICE
 app.post('/api/resetpassword', (req, res) => {
     if (!req.body.email || !req.body.national_number) {
@@ -105,19 +109,40 @@ app.post('/api/sendResetPassword', (req, res) => {
 app.post('/api/sendResetPassword/:token', (req, res) => {
     db.users.findOne({
         where: {
-            password_reset_token: 'http://localhost:8080/updatePassword/' + req.params.token
+            password_reset_token: 'http://localhost:8080/updateForgottenPassword/' + req.params.token
         }
     }).then(user => {
         if (!user) {
-            return res.send(user + 'user not found with this hash')
+            return res.send('user not found with this hash')
         }
         if (!req.body.password) {
             return res.send('you must enter a password')
         }
+        if (req.body.password === user.password) {
+            return res.send('the new password cant be the old password')
+        }
         user.update({
             password: req.body.password
         })
-        return res.send(hashLink)
+        return res.send('password updated successfully')
+    })
+})
+
+app.post('/api/updatePassword', (req, res) => {
+    db.users.findOne({
+        where: {
+            email: req.body.email,
+            password: req.body.password,
+        }
+    }).then(user => {
+        if (!user) {
+            return res.send('user not found with this password')
+        }
+        console.log(user)
+        user.update({
+            password: req.body.newPassword
+        })
+        return res.send('password updated successfully')
     })
 })
 
