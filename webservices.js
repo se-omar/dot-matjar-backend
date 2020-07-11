@@ -7,7 +7,14 @@ const nodemailer = require('nodemailer');
 const cors= require('cors')
 const jwt=require('jsonwebtoken')
 const crypto = require('crypto');
+const randomstring=require('randomstring')
 require("dotenv").config();
+
+var hash = crypto.randomBytes(10).toString('hex');
+// var hash=randomstring.generate(5);
+var cryptoo=randomstring.generate(10)
+console.log(cryptoo);
+
 // const exphbs = requrie('express-handlebars')
 app.use(bodyParser.urlencoded({
     extended: false
@@ -24,7 +31,8 @@ app.use(cors());
 app.set('view engine','handlebars' );
 
 
-
+const token = crypto.randomBytes(20).toString('hex');
+var hashLink = 'http://localhost:8080/updatePassword/' + token;
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -33,16 +41,78 @@ app.use(function (req, res, next) {
     next();
 });
 
+
+//====================================
+app.post('/api/image',(req,res)=>{
+    console.log("The IMAGE is :",req.body)
+    res.send("succesded")
+})
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 //=============================================
 //LOGIN WEBSERVICE
 
-var hash = crypto.randomBytes(20).toString('hex');
+
 
 
 
 app.post('/api/login', (req, res) => {
     if (!req.body.email || !req.body.password) {
         return res.send('please enter email and password')
+    }
+    var user=db.users.findOne({
+        where: {
+            email: req.body.email
+        }
+    }).then(user => {
+        
+      if(user){
+        if(user.active == 0){ return res.send("Please activate your account")}
+        else if(user.active ==1){
+        if (user == null) {
+            return res.send('wrong email')
+        };
+        // if (req.body.password != user.password) {
+        //     return res.send('wrong password')
+        // }
+        if(bcrypt.compareSync(req.body.password, user.password)) {
+            res.status(200).send('authenitcation succesfull');
+            console.log("password match=========================")
+           } else {
+            res.send("Password doesnt match")
+           }
+        
+    }
+}
+else{res.send("Please Signup first")}
+    });
+
+});
+
+
+
+
+
+//=============================================
+app.post('/api/resetpassword/:hash', (req, res) => {
+
+});
+//RESET PASSWORD WEBSERVICE
+app.post('/api/resetpassword', (req, res) => {
+    if (!req.body.email || !req.body.national_number) {
+        return res.send('please enter email and national number')
     }
     db.users.findOne({
         where: {
@@ -52,100 +122,65 @@ app.post('/api/login', (req, res) => {
         if (user == null) {
             return res.send('wrong email')
         };
-        if (req.body.password != user.password) {
-            return res.send('wrong password')
+        if (req.body.national_number != user.national_number) {
+            return res.send('wrong national number')
         }
-        return res.status(200).send('authenitcation succesfull');
+
+        user.update({
+            password_reset_token: hashLink
+        })
+        return res.status(200).send('authentication succesfull');
 
     });
 
 });
 
-//================================= TESTTT
 
-app.get('/api/test',(req,res)=>{
-    
- const email=req.body.email
-const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'20m'},(emailtoken,err)=>{
-    const url = `http://localhost:3000/api/test/`;
-    
-    let transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false, // true for 465, false for other ports
+app.post('/api/sendResetPassword', (req, res) => {
+    var transporter = nodemailer.createTransport({
+        service: 'gmail',
         auth: {
-          user:'johann89@ethereal.email', // generated ethereal user
-          pass: 'GRpXSvvQ3tF8ZyK8ph', // generated ethereal password
-        },
-        tls:{
-            regectUnauthorized:false
+            user: 'miroayman6198@gmail.com',
+            pass: 'eshta123'
         }
-      });
-    
-    
-    
-    
-    
-    transporter. sendMail( {
-        from: '"Mada" <mada6198@yahoo.com>', // sender address
-        to: req.body.email,  // list of receivers
-        subject: "space", // Subject line
-        text: "Hello world?", // plain text body
-        html: 
-        `  <a href="${url}+${hash}">Click to ACTIVATE</a> `
-        
-        
-        
-      });
+    });
+
+    var mailOptions = {
+        from: 'miroayman6198@gmail.com',
+        to: req.body.email,
+        subject: 'password reset email',
+        text: 'click on the link to reset password ' + hashLink
+    };
+
+    transporter.sendMail(mailOptions, function (error, info) {
+        if (error) {
+            console.log(error);
+        } else {
+            console.log('Email sent: ' + info.response);
+        }
+    });
+    res.send(hashLink)
 });
 
 
-
-
- // create reusable transporter object using the default SMTP transport
- 
-
-  // send mail with defined transport object
-   
-
-  console.log("Message sent: %s", info.messageId);
-  // Message sent: <b658f8ca-6296-ccf4-8306-87d57a0b4321@example.com>
-
-  // Preview only available when sending through an Ethereal account
-  console.log("Preview URL: %s", nodemailer.getTestMessageUrl(info));
-  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+app.post('/api/sendResetPassword/:token', (req, res) => {
+    db.users.findOne({
+        where: {
+            password_reset_token: 'http://localhost:8080/updatePassword/' + req.params.token
+        }
+    }).then(user => {
+        if (!user) {
+            return res.send(user + 'user not found with this hash')
+        }
+        if (!req.body.password) {
+            return res.send('you must enter a password')
+        }
+        user.update({
+            password: req.body.password
+        })
+        return res.send(hashLink)
+    })
 })
-
-    
-
-//============================
-
-
-app.post('/api/activate',(req,res)=>{
-    const {token}=req.body;
-    if(token) {
- jwt.verify(token,process.env.JWT_KEY,(decodedtoken,err)=>{
-if(err) res.json({error:"eroorrrrrr"}) 
-
- db.users.create({
-    email: {email},
-   
-
-}).then(res.send("Account Verified"))
-
-
- })
-    
-    
-}
-else{ res.json({error:"ERROR"})}
-
-})
-
-
-
-
-
 
 
 
@@ -158,18 +193,18 @@ app.post('/api/signup', (req, res) => {
 //================= Sending email verfication
 
 
-  const crypto=req.body.Crypto;
+ 
 const email=req.body.email
-const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'20m'},(emailtoken,err)=>{
-    const url = `http://localhost:8080/activation`;
+const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'60m'},(emailtoken,err)=>{
+    const url = `http://localhost:8080/activation/`+cryptoo;
     
     let transporter = nodemailer.createTransport({
         host: "smtp.ethereal.email",
         port: 587,
         secure: false, // true for 465, false for other ports
         auth: {
-          user:'quinten.senger91@ethereal.email', // generated ethereal user
-          pass: 'tz2qgnqxngVe9NQWgX', // generated ethereal password
+          user:'lillian.armstrong74@ethereal.email', // generated ethereal user
+          pass: 'WRptD7wkjA4GS3WtX4', // generated ethereal password
         },
         tls:{
             regectUnauthorized:false
@@ -183,11 +218,11 @@ const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'20m'},(email
     transporter. sendMail( {
         from: '"Owners" <E-commerce@yahoo.com>', // sender address
         to: req.body.email,  // list of receivers
-        subject: "spaceX", // Subject line
-        text: "Hello world?", // plain text body
+        subject: "Testing", // Subject line
+        text: "Welcome", // plain text body
         html: 
-        `  <a href="${url}">Click to ACTIVATE </a> <br/>
-        <p>Your Secret token is : ${crypto}</p>
+        `  <a href="${url}">Click to ACTIVATE</a> <br/>
+       
         `
         
         
@@ -221,6 +256,7 @@ const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'20m'},(email
                 }
             }).then(user => {
                 if (!user) {
+                    console.log("BODY",req.body.national_number);
                     db.users.create({
                         email: req.body.email,
                         national_number: req.body.national_number,
@@ -228,7 +264,8 @@ const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'20m'},(email
                         mobile_number: req.body.mobile_number,
                         full_arabic_name: req.body.full_arabic_name,
                         gender: req.body.gender,
-                        crypto: req.body.Crypto,
+                        crypto:cryptoo
+                       
                         
                     })
                     return res.status(200).send('user created succesfully');
@@ -276,7 +313,11 @@ app.put("/api/completedata/:user_id",async(req,res)=>{
 //==============================================
 //USERS TABLE
 app.get('/api/users', async (req, res) => {
-    await db.users.findAll().then((data) => {
+    await db.users.findAll({
+        include: [{
+            model: db.business
+        }]
+    }).then((data) => {
         res.send(data);
     })
 })
@@ -376,22 +417,23 @@ app.put('/api/users/:user_id', async (req, res) => {
 })
 
 //============ Activation
-app.post('/api/activate',async(req,res)=>{
+app.put('/api/activate',async(req,res)=>{
+   
    var user= await db.users.findOne({
         where:{
-            crypto:req.body.Crypto
+            crypto:cryptoo
         }
     })
-    console.log("user:",user)
+   
     if(user){
         
     user.update({
         active : 1
     })   
-    res.flash("done")
+    res.send("User activated")
 }
 else{
-
+res.send("Some thing went wrong!!!!!")
 }
 })
 
@@ -411,7 +453,11 @@ app.delete('/api/users/:user_id', async (req, res) => {
 //===============================================================
 //BUSINESS TABLE
 app.get('/api/business/', (req, res) => {
-    db.business.findAll().then((data) => {
+    db.business.findAll({
+        include: [{
+            model: db.users
+        }]
+    }).then((data) => {
         res.send(data);
     })
 })
@@ -484,7 +530,10 @@ app.delete('api/business/:bussiness_id', async (req, res) => {
 app.get('/api/products', (req, res) => {
     db.products.findAll({
         include: [{
-            model: db.business
+            model: db.business,
+            include: [{
+                model: db.users
+            }]
         }]
     }).then((data) => {
         res.send(data);

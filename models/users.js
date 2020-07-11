@@ -18,7 +18,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true
     },
     national_number: {
-      type: DataTypes.INTEGER(20),
+      type: DataTypes.STRING(14),
       allowNull: true
     },
     full_arabic_name: {
@@ -95,11 +95,15 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true
     },
     crypto: {
-      type: DataTypes.STRING(255),
+      type: DataTypes.STRING(50),
       allowNull: true
     },
     active: {
       type: DataTypes.INTEGER(1),
+      allowNull: true
+    },
+    password_reset_token: {
+      type: DataTypes.STRING(255),
       allowNull: true
     }
   }, {
