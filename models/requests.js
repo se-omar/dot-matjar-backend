@@ -10,13 +10,17 @@ module.exports = function (sequelize, DataTypes) {
     },
     by_user_id: {
       type: DataTypes.INTEGER(10),
-      allowNull: true
+
     },
     to_user_id: {
       type: DataTypes.INTEGER(10),
-      allowNull: true
+
     },
-    request_number: {
+    product_id: {
+      type: DataTypes.INTEGER(10),
+      allowNull: false
+    },
+    request_numberr: {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },

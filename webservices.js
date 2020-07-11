@@ -585,8 +585,37 @@ app.delete('/api/product_categories/:category_id', async (req, res) => {
 //=================
 //  REQUESTS TABLE
 
-app.get('/api/requests', async (req, res) => {
-    var request = await db.requests.findAll();
+app.post('/api/recievedRequests', (req, res) => {
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id
+        },
+        include: [{
+            model: db.requests,
+            as: "recievedRequests",
+            include: [{
+                    model: db.products,
+                },
+                {
+                    model: db.users,
+                    as: 'sendingUser'
+                }
+            ],
+
+        }]
+    }).then(response => {
+        return res.send(response);
+    });
+
+})
+
+app.get('/api/sentRequests', async (req, res) => {
+    var request = await db.users.findAll({
+        include: [{
+            model: db.users,
+            as: "sentByUser"
+        }]
+    });
     res.send(request);
 })
 
