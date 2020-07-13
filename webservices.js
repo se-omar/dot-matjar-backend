@@ -609,14 +609,27 @@ app.post('/api/recievedRequests', (req, res) => {
 
 })
 
-app.get('/api/sentRequests', async (req, res) => {
-    var request = await db.users.findAll({
+app.post('/api/sentRequests', (req, res) => {
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id
+        },
         include: [{
-            model: db.users,
-            as: "sentByUser"
+            model: db.requests,
+            as: "sentRequests",
+            include: [{
+                    model: db.products,
+                },
+                {
+                    model: db.users,
+                    as: 'recievingUser'
+                }
+            ],
+
         }]
+    }).then(response => {
+        return res.send(response);
     });
-    res.send(request);
 })
 
 app.get('/api/requests/:requests_id', async (req, res) => {
