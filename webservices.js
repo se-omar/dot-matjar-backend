@@ -14,6 +14,14 @@ app.use(bodyParser.json());
 const token = crypto.randomBytes(20).toString('hex');
 var hashLink = 'http://localhost:8080/updateForgottenPassword/' + token;
 
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'miroayman6198@gmail.com',
+        pass: 'eshta123'
+    }
+});
+
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization");
@@ -80,13 +88,6 @@ app.post('/api/resetpassword', (req, res) => {
 
 
 app.post('/api/sendResetPassword', (req, res) => {
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'miroayman6198@gmail.com',
-            pass: 'eshta123'
-        }
-    });
 
     var mailOptions = {
         from: 'miroayman6198@gmail.com',
@@ -678,17 +679,50 @@ app.put('/api/requests/:requests_id', async (req, res) => {
 })
 
 
-app.post('/api/requests', (req, res) => {
+app.post('/api/sendRequest', (req, res) => {
     db.requests.create({
         by_user_id: req.body.by_user_id,
         to_user_id: req.body.to_user_id,
-        request_number: req.body.request_number,
-        request_status: req.body.request_status,
         request_details: req.body.request_details,
-        request_date: req.body.request_date
+        request_date: req.body.request_date,
+        product_id: req.body.product_id,
+        request_status: 'pending'
 
+    });
+
+    // var mailOptions = {
+    //     from: 'miroayman6198@gmail.com',
+    //     to: req.body.email,
+    //     subject: 'new request for you',
+    //     text: 'لقد قام صاحب مشروع بارسال طلب لك بيانات الطلب: ' + req.body.request_details
+    // };
+
+    // transporter.sendMail(mailOptions, function (error, info) {
+    //     if (error) {
+    //         console.log(error);
+    //     } else {
+    //         console.log('Email sent: ' + info.response);
+    //     }
+    // });
+
+    res.status(200).send(" ROW ADDED");
+});
+
+app.post('/api/sendRequestResponse', (req, res) => {
+    db.requests.findOne({
+        where: {
+            requests_id: req.body.requests_id
+        }
+    }).then(request => {
+        if (!request) {
+            res.send('request not found');
+            return
+        }
+        request.update({
+            request_response: req.body.request_response
+        })
+        res.send('response added successfully')
     })
-    res.send("ROW ADDED");
 })
 
 app.delete('/api/requests/:requests_id', async (req, res) => {
@@ -700,29 +734,6 @@ app.delete('/api/requests/:requests_id', async (req, res) => {
     request.destroy();
     res.send("ROW DELETED");
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

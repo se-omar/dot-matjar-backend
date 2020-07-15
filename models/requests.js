@@ -20,6 +20,12 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(10),
       allowNull: false
     },
+
+    request_response: {
+      type: DataTypes.TEXT,
+      allowNull: true
+    },
+
     request_numberr: {
       type: DataTypes.INTEGER(10),
       allowNull: true
