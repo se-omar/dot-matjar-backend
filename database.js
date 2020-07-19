@@ -53,6 +53,13 @@ db.products.belongsTo(db.business, {
     foreignKey: 'bussiness_id'
 });
 
+db.users.hasMany(db.products, {
+    foreignKey: 'user_id'
+});
+db.products.belongsTo(db.users, {
+    foreignKey: 'user_id'
+});
+
 db.product_categories.hasMany(db.products, {
     foreignKey: 'category_id'
 });

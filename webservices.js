@@ -5,6 +5,18 @@ const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
+var multer = require('multer')
+
+var storage = multer.diskStorage({
+    destination: './uploads/',
+    filename: function (req, file, cb) {
+        cb(null, 'Image-' + Date.now() + ".jpg");
+    }
+});
+var upload = multer({
+    storage: storage
+});
+
 app.use(bodyParser.urlencoded({
     extended: false
 }));
@@ -38,7 +50,10 @@ app.post('/api/login', (req, res) => {
     db.users.findOne({
         where: {
             email: req.body.email
-        }
+        },
+        include: [{
+            model: db.business
+        }]
     }).then(user => {
         if (user == null) {
             return res.json({
@@ -389,7 +404,28 @@ app.get('/api/products', (req, res) => {
 
 
 
-})
+});
+
+app.post('/api/myProducts', (req, res) => {
+    db.products.findAll({
+        where: {
+            user_id: req.body.user_id
+        },
+        include: [{
+            model: db.business,
+            include: [{
+                model: db.users
+            }]
+        }]
+    }).then(response => {
+        if (!response) {
+            res.send('no products found for this user')
+            return
+        } else {
+            res.send(response)
+        }
+    })
+});
 
 app.get('/api/products/:product_id', async (req, res) => {
     var product = await db.products.findOne({
@@ -459,22 +495,32 @@ app.get('/api/products/hscode/:HS_code', async (req, res) => {
 
 //POST METHOD
 
-app.post('/api/products', (req, res) => {
-    db.products.create({
-        product_name: req.body.product_name,
-        product_code: req.body.product_code,
-        HS_code: req.body.HS_code,
-        min_units_per_order: req.body.min_units_per_order,
-        unit_price: req.body.unit_price,
-        size: req.body.size,
-        color: req.body.color,
-        unit_weight: req.body.unit_weight,
-        has_discount: req.body.has_discount,
-        discount_amount: req.body.discount_amount,
-        availability: req.body.availability,
-        product_rating: req.body.product_rating
-    })
-    res.send('row created successfully')
+app.post('/api/product', upload.array('files'), (req, res, next) => {
+    console.log('uploaded files', req.files);
+
+    // db.products.create({
+    //     product_name: req.body.product_name,
+    //     product_code: req.body.product_code,
+    //     user_id: req.body.user_id,
+    //     bussiness_id: req.body.bussiness_id,
+    //     HS_code: req.body.HS_code,
+    //     min_units_per_order: req.body.min_units_per_order,
+    //     unit_price: req.body.unit_price,
+    //     size: req.body.size,
+    //     color: req.body.color,
+    //     describtion: req.body.description,
+    //     unit_weight: req.body.unit_weight,
+    //     has_discount: req.body.has_discount,
+    //     discount_amount: req.body.discount_amount,
+    //     availability: req.body.availability,
+    //     product_rating: req.body.product_rating,
+    //     main_picture: req.file.path
+
+    // }).then(response => {
+
+    //     res.send(response)
+    // })
+
 })
 
 //PUT METHOD
