@@ -8,7 +8,24 @@ const cors= require('cors')
 const jwt=require('jsonwebtoken')
 const crypto = require('crypto');
 const randomstring=require('randomstring')
+const multer = require('multer')
+
+const storage = multer.diskStorage({
+    destination:'./uploads/',
+
+    filename:function(req,file,cb){
+cb(null, file.originalname )
+    }
+});
+
+const path = require("path")
 require("dotenv").config();
+
+const upload = multer({
+storage:storage    
+    // dest:'/uploads'
+})
+
 
 var hash = crypto.randomBytes(10).toString('hex');
 // var hash=randomstring.generate(5);
@@ -32,7 +49,7 @@ app.set('view engine','handlebars' );
 
 
 const token = crypto.randomBytes(20).toString('hex');
-var hashLink = 'http://localhost:8080/updatePassword/' + token;
+var hashLink = 'http://localhost:8080/updateForgottenPassword/' + token;
 
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
@@ -43,10 +60,24 @@ app.use(function (req, res, next) {
 
 
 //====================================
-app.post('/api/image',(req,res)=>{
-    console.log("The IMAGE is :",req.body)
-    res.send("succesded")
+app.post('/api/image',upload.single("file"),(req,res,next)=>{
+    console.log("The IMAGE is :",req.file)
+    res.json({
+        file:req.file
+    })
 })
+
+app.get('/uploads/:imagefile',(req,res)=>{
+    res.sendFile(__dirname + "/uploads/"+req.params.imagefile);
+});
+
+app.get('/',(req,res)=>{
+    res.send(req.protocol+"://" + req.hostname+":3000/uploads/"+"pwell.jpg");
+})
+
+
+
+
 
 
 
@@ -82,22 +113,30 @@ app.post('/api/login', (req, res) => {
         if(user.active == 0){ return res.send("Please activate your account")}
         else if(user.active ==1){
         if (user == null) {
-            return res.send('wrong email')
+            return res.json({
+                message: 'wrong email'
+            })
         };
+    }
         // if (req.body.password != user.password) {
         //     return res.send('wrong password')
+        //     console.log(user.password , "======================")
         // }
         if(bcrypt.compareSync(req.body.password, user.password)) {
-            res.status(200).send('authenitcation succesfull');
-            console.log("password match=========================")
+            res.json({message:"authenitcation succesfull",
+            data:user
+            }
+        );
+            console.log(user)
+            
            } else {
             res.send("Password doesnt match")
            }
-        
-    }
-}
+        } 
+    
+    
 else{res.send("Please Signup first")}
-    });
+});  
 
 });
 
@@ -106,9 +145,6 @@ else{res.send("Please Signup first")}
 
 
 //=============================================
-app.post('/api/resetpassword/:hash', (req, res) => {
-
-});
 //RESET PASSWORD WEBSERVICE
 app.post('/api/resetpassword', (req, res) => {
     if (!req.body.email || !req.body.national_number) {
@@ -166,19 +202,40 @@ app.post('/api/sendResetPassword', (req, res) => {
 app.post('/api/sendResetPassword/:token', (req, res) => {
     db.users.findOne({
         where: {
-            password_reset_token: 'http://localhost:8080/updatePassword/' + req.params.token
+            password_reset_token: 'http://localhost:8080/updateForgottenPassword/' + req.params.token
         }
     }).then(user => {
         if (!user) {
-            return res.send(user + 'user not found with this hash')
+            return res.send('user not found with this hash')
         }
         if (!req.body.password) {
             return res.send('you must enter a password')
         }
+        if (req.body.password === user.password) {
+            return res.send('the new password cant be the old password')
+        }
         user.update({
             password: req.body.password
         })
-        return res.send(hashLink)
+        return res.send('password updated successfully')
+    })
+})
+
+app.post('/api/updatePassword', (req, res) => {
+    db.users.findOne({
+        where: {
+            email: req.body.email,
+            password: req.body.password,
+        }
+    }).then(user => {
+        if (!user) {
+            return res.send('user not found with this password')
+        }
+        console.log(user)
+        user.update({
+            password: req.body.newPassword
+        })
+        return res.send('password updated successfully')
     })
 })
 
@@ -203,8 +260,8 @@ const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'60m'},(email
         port: 587,
         secure: false, // true for 465, false for other ports
         auth: {
-          user:'lillian.armstrong74@ethereal.email', // generated ethereal user
-          pass: 'WRptD7wkjA4GS3WtX4', // generated ethereal password
+          user:'deshaun.hayes@ethereal.email', // generated ethereal user
+          pass: 'MuWx9wAHp6zE84BaX6', // generated ethereal password
         },
         tls:{
             regectUnauthorized:false
