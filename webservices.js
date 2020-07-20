@@ -735,31 +735,33 @@ app.get('/api/products/hscode/:HS_code', async (req, res) => {
 
 //POST METHOD
 
-app.post('/api/product', upload.array('files'), (req, res, next) => {
-    console.log('uploaded files', req.files);
+app.post('/api/product', upload.array('file', 12), (req, res, next) => {
+    console.log('uploaded file', req.files);
 
-    // db.products.create({
-    //     product_name: req.body.product_name,
-    //     product_code: req.body.product_code,
-    //     user_id: req.body.user_id,
-    //     bussiness_id: req.body.bussiness_id,
-    //     HS_code: req.body.HS_code,
-    //     min_units_per_order: req.body.min_units_per_order,
-    //     unit_price: req.body.unit_price,
-    //     size: req.body.size,
-    //     color: req.body.color,
-    //     describtion: req.body.description,
-    //     unit_weight: req.body.unit_weight,
-    //     has_discount: req.body.has_discount,
-    //     discount_amount: req.body.discount_amount,
-    //     availability: req.body.availability,
-    //     product_rating: req.body.product_rating,
-    //     main_picture: req.file.path
+    db.products.create({
+        product_name: req.body.product_name,
+        product_code: req.body.product_code,
+        user_id: req.body.user_id,
+        bussiness_id: req.body.bussiness_id,
+        HS_code: req.body.HS_code,
+        min_units_per_order: req.body.min_units_per_order,
+        unit_price: req.body.unit_price,
+        size: req.body.size,
+        color: req.body.color,
+        describtion: req.body.describtion,
+        unit_weight: req.body.unit_weight,
+        has_discount: req.body.has_discount,
+        discount_amount: req.body.discount_amount,
+        availability: req.body.availability,
+        product_rating: req.body.product_rating,
+        main_picture: req.files[0].path,
+        extra_picture1: req.files[1].path,
+        extra_picture2: req.files[2].path,
 
-    // }).then(response => {
+    }).then(response => {
 
-    //     res.send(response)
-    // })
+        res.send(response)
+    })
 
 })
 

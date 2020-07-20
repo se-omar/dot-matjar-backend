@@ -18,7 +18,7 @@ module.exports = function (sequelize, DataTypes) {
     },
     user_id: {
       type: DataTypes.INTEGER(10),
-      allowNull: false
+      allowNull: true
     },
     pending_status: {
       type: "BINARY(1)",
