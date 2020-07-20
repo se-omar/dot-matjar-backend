@@ -14,7 +14,7 @@ const storage = multer.diskStorage({
     destination:'./uploads/',
 
     filename:function(req,file,cb){
-cb(null, file.originalname )
+cb(null,file.originalname + Date.now() + '.jpg' )
     }
 });
 
@@ -33,6 +33,18 @@ var cryptoo=randomstring.generate(10)
 console.log(cryptoo);
 
 // const exphbs = requrie('express-handlebars')
+
+
+var storage2 = multer.diskStorage({
+    destination: './uploads2/',
+    filename: function (req, file, cb) {
+        cb(null, 'Image-' + Date.now() + ".jpg");
+    }
+});
+var upload2 = multer({
+    storage: storage
+});
+
 app.use(bodyParser.urlencoded({
     extended: false
 }));
@@ -51,6 +63,14 @@ app.set('view engine','handlebars' );
 const token = crypto.randomBytes(20).toString('hex');
 var hashLink = 'http://localhost:8080/updateForgottenPassword/' + token;
 
+var transporter = nodemailer.createTransport({
+    service: 'gmail',
+    auth: {
+        user: 'miroayman6198@gmail.com',
+        pass: 'eshta123'
+    }
+});
+
 app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Origin", "*");
     res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept, authorization");
@@ -60,12 +80,19 @@ app.use(function (req, res, next) {
 
 
 //====================================
-app.post('/api/image',upload.single("file"),(req,res,next)=>{
-    console.log("The IMAGE is :",req.file)
-    res.json({
-        file:req.file
-    })
-})
+// app.post('/api/image',upload.array("file"),(req,res,next)=>{
+//     console.log("The IMAGEs are :",req.files)
+//     res.json({
+//         file:req.files
+//     })
+//     db.business.create({
+//         commercial_register:req.files[0].path,
+//         tax_card:req.files[1].path,
+//         operating_license:req.files[2].path
+
+    
+//     })
+// })
 
 app.get('/uploads/:imagefile',(req,res)=>{
     res.sendFile(__dirname + "/uploads/"+req.params.imagefile);
@@ -77,7 +104,28 @@ app.get('/',(req,res)=>{
 
 
 
+app.post('/api/businessOwnerData',upload.array("file"),(req,res,next)=>{
+    console.log("The IMAGEs are :",req.files)
+    res.json({
+        file:req.files
+    })
+    db.business.create({
+        user_id:req.body.user_id,
+        enterprice_national_number:req.body.enterprice_national_number,
+        bussiness_name:req.body.bussiness_name,
+        bussiness_activity:req.body.bussiness_activity  ,
+        commercial_register:req.files[0].path,
+        tax_card:req.files[1].path,
+        operating_license:req.files[2].path
 
+    })
+        res.json({
+            message:"You are now a Business owner"
+        })
+       
+   
+
+})
 
 
 
@@ -106,7 +154,10 @@ app.post('/api/login', (req, res) => {
     var user=db.users.findOne({
         where: {
             email: req.body.email
-        }
+        },
+        include: [{
+            model: db.business
+        }]
     }).then(user => {
         
       if(user){
@@ -122,7 +173,7 @@ app.post('/api/login', (req, res) => {
         //     return res.send('wrong password')
         //     console.log(user.password , "======================")
         // }
-        if(bcrypt.compareSync(req.body.password, user.password)) {
+        if(user.password == req.body.password) {
             res.json({message:"authenitcation succesfull",
             data:user
             }
@@ -173,13 +224,6 @@ app.post('/api/resetpassword', (req, res) => {
 
 
 app.post('/api/sendResetPassword', (req, res) => {
-    var transporter = nodemailer.createTransport({
-        service: 'gmail',
-        auth: {
-            user: 'miroayman6198@gmail.com',
-            pass: 'eshta123'
-        }
-    });
 
     var mailOptions = {
         from: 'miroayman6198@gmail.com',
@@ -302,11 +346,13 @@ const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'60m'},(email
 
 
 
-    //==========================Creating account in database
-    bcrypt.hash(req.body.password, 10, (err, hash) => {
-        if (err) {
-            return res.status(500).send(err);
-        } else {
+    // //==========================Creating account in database
+
+    
+    // bcrypt.hash(req.body.password, 10, (err, hash) => {
+    //     if (err) {
+    //         return res.status(500).send(err);
+    //     } else {
             db.users.findOne({
                 where: {
                     email: req.body.email
@@ -330,8 +376,8 @@ const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'60m'},(email
                     return res.status(400).send('user already exists');
                 } 
             })
-        }
-    })
+    //     }
+    // })
 })
 //===========================================
 //Complete Data
@@ -598,7 +644,28 @@ app.get('/api/products', (req, res) => {
 
 
 
-})
+});
+
+app.post('/api/myProducts', (req, res) => {
+    db.products.findAll({
+        where: {
+            user_id: req.body.user_id
+        },
+        include: [{
+            model: db.business,
+            include: [{
+                model: db.users
+            }]
+        }]
+    }).then(response => {
+        if (!response) {
+            res.send('no products found for this user')
+            return
+        } else {
+            res.send(response)
+        }
+    })
+});
 
 app.get('/api/products/:product_id', async (req, res) => {
     var product = await db.products.findOne({
@@ -668,22 +735,32 @@ app.get('/api/products/hscode/:HS_code', async (req, res) => {
 
 //POST METHOD
 
-app.post('/api/products', (req, res) => {
-    db.products.create({
-        product_name: req.body.product_name,
-        product_code: req.body.product_code,
-        HS_code: req.body.HS_code,
-        min_units_per_order: req.body.min_units_per_order,
-        unit_price: req.body.unit_price,
-        size: req.body.size,
-        color: req.body.color,
-        unit_weight: req.body.unit_weight,
-        has_discount: req.body.has_discount,
-        discount_amount: req.body.discount_amount,
-        availability: req.body.availability,
-        product_rating: req.body.product_rating
-    })
-    res.send('row created successfully')
+app.post('/api/product', upload.array('files'), (req, res, next) => {
+    console.log('uploaded files', req.files);
+
+    // db.products.create({
+    //     product_name: req.body.product_name,
+    //     product_code: req.body.product_code,
+    //     user_id: req.body.user_id,
+    //     bussiness_id: req.body.bussiness_id,
+    //     HS_code: req.body.HS_code,
+    //     min_units_per_order: req.body.min_units_per_order,
+    //     unit_price: req.body.unit_price,
+    //     size: req.body.size,
+    //     color: req.body.color,
+    //     describtion: req.body.description,
+    //     unit_weight: req.body.unit_weight,
+    //     has_discount: req.body.has_discount,
+    //     discount_amount: req.body.discount_amount,
+    //     availability: req.body.availability,
+    //     product_rating: req.body.product_rating,
+    //     main_picture: req.file.path
+
+    // }).then(response => {
+
+    //     res.send(response)
+    // })
+
 })
 
 //PUT METHOD
@@ -795,9 +872,51 @@ app.delete('/api/product_categories/:category_id', async (req, res) => {
 //=================
 //  REQUESTS TABLE
 
-app.get('/api/requests', async (req, res) => {
-    var request = await db.requests.findAll();
-    res.send(request);
+app.post('/api/recievedRequests', (req, res) => {
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id
+        },
+        include: [{
+            model: db.requests,
+            as: "recievedRequests",
+            include: [{
+                    model: db.products,
+                },
+                {
+                    model: db.users,
+                    as: 'sendingUser'
+                }
+            ],
+
+        }]
+    }).then(response => {
+        return res.send(response);
+    });
+
+})
+
+app.post('/api/sentRequests', (req, res) => {
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id
+        },
+        include: [{
+            model: db.requests,
+            as: "sentRequests",
+            include: [{
+                    model: db.products,
+                },
+                {
+                    model: db.users,
+                    as: 'recievingUser'
+                }
+            ],
+
+        }]
+    }).then(response => {
+        return res.send(response);
+    });
 })
 
 app.get('/api/requests/:requests_id', async (req, res) => {
@@ -846,17 +965,50 @@ app.put('/api/requests/:requests_id', async (req, res) => {
 })
 
 
-app.post('/api/requests', (req, res) => {
+app.post('/api/sendRequest', (req, res) => {
     db.requests.create({
         by_user_id: req.body.by_user_id,
         to_user_id: req.body.to_user_id,
-        request_number: req.body.request_number,
-        request_status: req.body.request_status,
         request_details: req.body.request_details,
-        request_date: req.body.request_date
+        request_date: req.body.request_date,
+        product_id: req.body.product_id,
+        request_status: 'pending'
 
+    });
+
+    // var mailOptions = {
+    //     from: 'miroayman6198@gmail.com',
+    //     to: req.body.email,
+    //     subject: 'new request for you',
+    //     text: 'لقد قام صاحب مشروع بارسال طلب لك بيانات الطلب: ' + req.body.request_details
+    // };
+
+    // transporter.sendMail(mailOptions, function (error, info) {
+    //     if (error) {
+    //         console.log(error);
+    //     } else {
+    //         console.log('Email sent: ' + info.response);
+    //     }
+    // });
+
+    res.status(200).send(" ROW ADDED");
+});
+
+app.post('/api/sendRequestResponse', (req, res) => {
+    db.requests.findOne({
+        where: {
+            requests_id: req.body.requests_id
+        }
+    }).then(request => {
+        if (!request) {
+            res.send('request not found');
+            return
+        }
+        request.update({
+            request_response: req.body.request_response
+        })
+        res.send('response added successfully')
     })
-    res.send("ROW ADDED");
 })
 
 app.delete('/api/requests/:requests_id', async (req, res) => {
@@ -868,29 +1020,6 @@ app.delete('/api/requests/:requests_id', async (req, res) => {
     request.destroy();
     res.send("ROW DELETED");
 })
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

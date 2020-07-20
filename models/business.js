@@ -37,7 +37,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true
     },
     bussiness_activity: {
-      type: "BINARY(1)",
+      type: DataTypes.STRING(255),
       allowNull: true
     },
     enterprice_national_number: {
@@ -49,11 +49,11 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true
     },
     tax_card: {
-      type: DataTypes.INTEGER(10),
+      type: DataTypes.STRING(255),
       allowNull: true
     },
     operating_license: {
-      type: "BINARY(1)",
+      type:  DataTypes.STRING(255),
       allowNull: true
     }
   }, {
