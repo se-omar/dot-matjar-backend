@@ -4,36 +4,25 @@ const app = express();
 const bodyParser = require('body-parser');
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
-const cors= require('cors')
-const jwt=require('jsonwebtoken')
+const cors = require('cors')
+const path = require("path")
+const jwt = require('jsonwebtoken')
 const crypto = require('crypto');
-const randomstring=require('randomstring')
-const multer = require('multer')
+const randomstring = require('randomstring')
+const multer = require('multer');
+var uploadDir = path.join(__dirname, '/allUploads');
+app.use(express.static(uploadDir));
 
 const storage = multer.diskStorage({
-    destination:'./uploads/',
-
-    filename:function(req,file,cb){
-cb(null,file.originalname + Date.now() + '.jpg' )
+    destination: './uploads/',
+    filename: function (req, file, cb) {
+        cb(null, file.originalname + Date.now() + '.jpg')
     }
 });
-
-const path = require("path")
 require("dotenv").config();
-
 const upload = multer({
-storage:storage    
-    // dest:'/uploads'
+    storage: storage
 })
-
-
-var hash = crypto.randomBytes(10).toString('hex');
-// var hash=randomstring.generate(5);
-var cryptoo=randomstring.generate(10)
-console.log(cryptoo);
-
-// const exphbs = requrie('express-handlebars')
-
 
 var storage2 = multer.diskStorage({
     destination: './uploads2/',
@@ -41,24 +30,26 @@ var storage2 = multer.diskStorage({
         cb(null, 'Image-' + Date.now() + ".jpg");
     }
 });
-var upload2 = multer({
-    storage: storage
+const upload2 = multer({
+    storage: storage2
 });
+
+
+var hash = crypto.randomBytes(10).toString('hex');
+// var hash=randomstring.generate(5);
+var cryptoo = randomstring.generate(10)
+console.log(cryptoo);
+
+// const exphbs = requrie('express-handlebars')
 
 app.use(bodyParser.urlencoded({
     extended: false
 }));
 app.use(bodyParser.json());
 app.use(cors());
-// app.use('/api',authRoutes);
 
 
-
-//======= EngineView
-
-
-app.set('view engine','handlebars' );
-
+app.set('view engine', 'handlebars');
 
 const token = crypto.randomBytes(20).toString('hex');
 var hashLink = 'http://localhost:8080/updateForgottenPassword/' + token;
@@ -79,51 +70,36 @@ app.use(function (req, res, next) {
 });
 
 
-//====================================
-// app.post('/api/image',upload.array("file"),(req,res,next)=>{
-//     console.log("The IMAGEs are :",req.files)
-//     res.json({
-//         file:req.files
-//     })
-//     db.business.create({
-//         commercial_register:req.files[0].path,
-//         tax_card:req.files[1].path,
-//         operating_license:req.files[2].path
-
-    
-//     })
-// })
-
-app.get('/uploads/:imagefile',(req,res)=>{
-    res.sendFile(__dirname + "/uploads/"+req.params.imagefile);
+app.get('/uploads/:imagefile', (req, res) => {
+    res.sendFile(__dirname + "/uploads/" + req.params.imagefile);
 });
 
-app.get('/',(req,res)=>{
-    res.send(req.protocol+"://" + req.hostname+":3000/uploads/"+"pwell.jpg");
+app.get('/', (req, res) => {
+    res.send(req.protocol + "://" + req.hostname + ":3000/uploads/" + "pwell.jpg");
 })
 
 
 
-app.post('/api/businessOwnerData',upload.array("file"),(req,res,next)=>{
-    console.log("The IMAGEs are :",req.files)
+app.post('/api/businessOwnerData', upload.array("file"), (req, res, next) => {
+    console.log("The IMAGEs are :", req.files)
     res.json({
-        file:req.files
+        file: req.files
     })
     db.business.create({
-        user_id:req.body.user_id,
-        enterprice_national_number:req.body.enterprice_national_number,
-        bussiness_name:req.body.bussiness_name,
-        bussiness_activity:req.body.bussiness_activity  ,
-        commercial_register:req.files[0].path,
-        tax_card:req.files[1].path,
-        operating_license:req.files[2].path
+        user_id: req.body.user_id,
+        enterprice_national_number: req.body.enterprice_national_number,
+        bussiness_name: req.body.bussiness_name,
+        bussiness_activity: req.body.bussiness_activity,
+        commercial_register: req.files[0].path,
+        tax_card: req.files[1].path,
+        operating_license: req.files[2].path
 
     })
-        res.json({
-            message:"You are now a Business owner"
-        })
-       
-   
+    res.json({
+        message: "You are now a Business owner"
+    })
+
+
 
 })
 
@@ -151,7 +127,7 @@ app.post('/api/login', (req, res) => {
     if (!req.body.email || !req.body.password) {
         return res.send('please enter email and password')
     }
-    var user=db.users.findOne({
+    var user = db.users.findOne({
         where: {
             email: req.body.email
         },
@@ -159,35 +135,35 @@ app.post('/api/login', (req, res) => {
             model: db.business
         }]
     }).then(user => {
-        
-      if(user){
-        if(user.active == 0){ return res.send("Please activate your account")}
-        else if(user.active ==1){
-        if (user == null) {
-            return res.json({
-                message: 'wrong email'
-            })
-        };
-    }
-        // if (req.body.password != user.password) {
-        //     return res.send('wrong password')
-        //     console.log(user.password , "======================")
-        // }
-        if(user.password == req.body.password) {
-            res.json({message:"authenitcation succesfull",
-            data:user
+
+        if (user) {
+            if (user.active == 0) {
+                return res.send("Please activate your account")
+            } else if (user.active == 1) {
+                if (user == null) {
+                    return res.json({
+                        message: 'wrong email'
+                    })
+                };
             }
-        );
-            console.log(user)
-            
-           } else {
-            res.send("Password doesnt match")
-           }
-        } 
-    
-    
-else{res.send("Please Signup first")}
-});  
+            // if (req.body.password != user.password) {
+            //     return res.send('wrong password')
+            //     console.log(user.password , "======================")
+            // }
+            if (user.password == req.body.password) {
+                res.json({
+                    message: "authenitcation succesfull",
+                    data: user
+                });
+                console.log(user)
+
+            } else {
+                res.send("Password doesnt match")
+            }
+        } else {
+            res.send("Please Signup first")
+        }
+    });
 
 });
 
@@ -291,124 +267,127 @@ app.post('/api/signup', (req, res) => {
 
 
 
-//================= Sending email verfication
+    //================= Sending email verfication
 
 
- 
-const email=req.body.email
-const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'60m'},(emailtoken,err)=>{
-    const url = `http://localhost:8080/activation/`+cryptoo;
-    
-    let transporter = nodemailer.createTransport({
-        host: "smtp.ethereal.email",
-        port: 587,
-        secure: false, // true for 465, false for other ports
-        auth: {
-          user:'deshaun.hayes@ethereal.email', // generated ethereal user
-          pass: 'MuWx9wAHp6zE84BaX6', // generated ethereal password
-        },
-        tls:{
-            regectUnauthorized:false
-        }
-      });
-    
-    
-    
-    
-    
-    transporter. sendMail( {
-        from: '"Owners" <E-commerce@yahoo.com>', // sender address
-        to: req.body.email,  // list of receivers
-        subject: "Testing", // Subject line
-        text: "Welcome", // plain text body
-        html: 
-        `  <a href="${url}">Click to ACTIVATE</a> <br/>
+
+    const email = req.body.email
+    const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
+        expiresIn: '60m'
+    }, (emailtoken, err) => {
+        const url = `http://localhost:8080/activation/` + cryptoo;
+
+        let transporter = nodemailer.createTransport({
+            host: "smtp.ethereal.email",
+            port: 587,
+            secure: false, // true for 465, false for other ports
+            auth: {
+                user: 'litzy9@ethereal.email', // generated ethereal user
+                pass: '35dMWwUVm441sTscZC', // generated ethereal password
+            },
+            tls: {
+                regectUnauthorized: false
+            }
+        });
+
+
+
+
+
+        transporter.sendMail({
+            from: '"Owners" <E-commerce@yahoo.com>', // sender address
+            to: req.body.email, // list of receivers
+            subject: "Testing", // Subject line
+            text: "Welcome", // plain text body
+            html: `  <a href="${url}">Click to ACTIVATE</a> <br/>
        
         `
-        
-        
-        
-      });
-});
+
+
+
+        });
+    });
 
 
 
 
- // create reusable transporter object using the default SMTP transport
- 
+    // create reusable transporter object using the default SMTP transport
 
-  // send mail with defined transport object
-   
 
-  
-  // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
+    // send mail with defined transport object
+
+
+
+    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
 
 
 
 
     // //==========================Creating account in database
 
-    
+
     // bcrypt.hash(req.body.password, 10, (err, hash) => {
     //     if (err) {
     //         return res.status(500).send(err);
     //     } else {
-            db.users.findOne({
-                where: {
-                    email: req.body.email
-                }
-            }).then(user => {
-                if (!user) {
-                    console.log("BODY",req.body.national_number);
-                    db.users.create({
-                        email: req.body.email,
-                        national_number: req.body.national_number,
-                        password: hash,
-                        mobile_number: req.body.mobile_number,
-                        full_arabic_name: req.body.full_arabic_name,
-                        gender: req.body.gender,
-                        crypto:cryptoo
-                       
-                        
-                    })
-                    return res.status(200).send('user created succesfully');
-                } else {
-                    return res.status(400).send('user already exists');
-                } 
+    db.users.findOne({
+        where: {
+            email: req.body.email
+        }
+    }).then(user => {
+        if (!user) {
+            console.log("BODY", req.body.national_number);
+            db.users.create({
+                email: req.body.email,
+                national_number: req.body.national_number,
+                password: hash,
+                mobile_number: req.body.mobile_number,
+                full_arabic_name: req.body.full_arabic_name,
+                gender: req.body.gender,
+                crypto: cryptoo
+
+
             })
+            return res.status(200).send('user created succesfully');
+        } else {
+            return res.status(400).send('user already exists');
+        }
+    })
     //     }
     // })
 })
 //===========================================
 //Complete Data
-app.put("/api/completedata/:user_id",async(req,res)=>{
-    var user= await db.users.findOne({
-        where:{ user_id:req.params.user_id }
+app.put("/api/completedata/:user_id", async (req, res) => {
+    var user = await db.users.findOne({
+        where: {
+            user_id: req.params.user_id
+        }
     })
-  
-        user.update({
-            national_number:req.body.national_number,
-            gender:req.body.gender,
-            full_arabic_name:req.body.full_arabic_name,
-            full_english_name:req.body.full_english_name,
-            birthdate:req.body.birthdate,
-            qualifications:req.body.qualifications,
-            job:req.body.job,
-            governorate:req.body.governorate,
-            village:req.body.village,
-            center:req.body.center,
-            telephone_number:req.body.telephone_number,
-            phone_number:req.body.phone_number,
-            fax:req.body.fax,
-            facebook_account:req.body.facebook_account,
-            linkedin:req.body.linkedin,
-            website:req.body.website,
-            address:req.body.address
-         })
-         res.send(user)
+
+    user.update({
+        national_number: req.body.national_number,
+        gender: req.body.gender,
+        full_arabic_name: req.body.full_arabic_name,
+        full_english_name: req.body.full_english_name,
+        birthdate: req.body.birthdate,
+        qualifications: req.body.qualifications,
+        job: req.body.job,
+        governorate: req.body.governorate,
+        village: req.body.village,
+        center: req.body.center,
+        telephone_number: req.body.telephone_number,
+        phone_number: req.body.phone_number,
+        fax: req.body.fax,
+        facebook_account: req.body.facebook_account,
+        linkedin: req.body.linkedin,
+        website: req.body.website,
+        address: req.body.address
     })
-  
-    
+    res.send(user)
+})
+
+
 
 
 
@@ -429,7 +408,7 @@ app.get('/api/users', async (req, res) => {
 
 
 
-app.get('/api/users/:user_id', async (req, res) => { 
+app.get('/api/users/:user_id', async (req, res) => {
     var user = await db.users.findOne({
         where: {
             user_id: req.params.user_id
@@ -520,24 +499,23 @@ app.put('/api/users/:user_id', async (req, res) => {
 })
 
 //============ Activation
-app.put('/api/activate',async(req,res)=>{
-   
-   var user= await db.users.findOne({
-        where:{
-            crypto:cryptoo
+app.put('/api/activate', async (req, res) => {
+
+    var user = await db.users.findOne({
+        where: {
+            crypto: cryptoo
         }
     })
-   
-    if(user){
-        
-    user.update({
-        active : 1
-    })   
-    res.send("User activated")
-}
-else{
-res.send("Some thing went wrong!!!!!")
-}
+
+    if (user) {
+
+        user.update({
+            active: 1
+        })
+        res.send("User activated")
+    } else {
+        res.send("Some thing went wrong!!!!!")
+    }
 })
 
 
@@ -735,7 +713,7 @@ app.get('/api/products/hscode/:HS_code', async (req, res) => {
 
 //POST METHOD
 
-app.post('/api/product', upload.array('file', 12), (req, res, next) => {
+app.post('/api/product', upload2.array('file', 12), (req, res, next) => {
     console.log('uploaded file', req.files);
 
     db.products.create({
