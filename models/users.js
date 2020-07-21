@@ -77,7 +77,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(15),
       allowNull: true
     },
-    
+
     fax: {
       type: DataTypes.INTEGER(15),
       allowNull: true
@@ -109,7 +109,7 @@ module.exports = function (sequelize, DataTypes) {
     password_reset_token: {
       type: DataTypes.STRING(255),
       allowNull: true
-    }
+    } 
   }, {
     tableName: 'users',
     timestamps: false
