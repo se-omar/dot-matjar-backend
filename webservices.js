@@ -25,7 +25,7 @@ const upload = multer({
 })
 
 var storage2 = multer.diskStorage({
-    destination: './uploads2/',
+    destination: './allUploads/productImages',
     filename: function (req, file, cb) {
         cb(null, 'Image-' + Date.now() + ".jpg");
     }
@@ -732,15 +732,51 @@ app.post('/api/product', upload2.array('file', 12), (req, res, next) => {
         discount_amount: req.body.discount_amount,
         availability: req.body.availability,
         product_rating: req.body.product_rating,
-        main_picture: req.files[0].path,
-        extra_picture1: req.files[1].path,
-        extra_picture2: req.files[2].path,
+        main_picture: req.files[0] ? req.files[0].path.substr(11) : null,
+        extra_picture1: req.files[1] ? req.files[1].path.substr(11) : null,
+        extra_picture2: req.files[2] ? req.files[2].path.substr(11) : null,
 
     }).then(response => {
 
         res.send(response)
     })
 
+});
+
+app.post('/api/updateProduct', upload2.array('file', 12), (req, res, next) => {
+    console.log('uploaded file', req.files);
+    db.products.findOne({
+        where: {
+            product_id: req.body.product_id
+        }
+    }).then(product => {
+        if (product) {
+            product.update({
+                product_name: req.body.product_name,
+                product_code: req.body.product_code,
+                user_id: req.body.user_id,
+                bussiness_id: req.body.bussiness_id,
+                HS_code: req.body.HS_code,
+                min_units_per_order: req.body.min_units_per_order,
+                unit_price: req.body.unit_price,
+                size: req.body.size,
+                color: req.body.color,
+                describtion: req.body.describtion,
+                unit_weight: req.body.unit_weight,
+                has_discount: req.body.has_discount,
+                discount_amount: req.body.discount_amount,
+                availability: req.body.availability,
+                product_rating: req.body.product_rating,
+                main_picture: req.files[0] ? req.files[0].path.substr(11) : product.main_picture,
+                extra_picture1: req.files[1] ? req.files[1].path.substr(11) : product.extra_picture1,
+                extra_picture2: req.files[2] ? req.files[2].path.substr(11) : product.extra_picture2,
+            }).then(response => {
+                res.send(response)
+            })
+        } else {
+            res.send('cant find product')
+        }
+    })
 })
 
 //PUT METHOD
@@ -776,14 +812,16 @@ app.put('/api/products/:product_id', async (req, res) => {
     res.send("ROW UPDATED")
 })
 
-app.delete('/api/products/:product_id', async (req, res) => {
-    var product = await db.products.findOne({
+app.delete('/api/removeProduct/:product_id', (req, res) => {
+    db.products.findOne({
         where: {
             product_id: req.params.product_id
         }
+    }).then(product => {
+        product.destroy();
+        res.send("ROW DELETED")
     })
-    product.destroy();
-    res.send("ROW DELETED")
+
 })
 
 
