@@ -9,16 +9,20 @@ const jwt=require('jsonwebtoken')
 const crypto = require('crypto');
 const randomstring=require('randomstring')
 const multer = require('multer')
+const path = require("path")
+
+var imagedir = path.join(__dirname, '/allUploads/'); 
+app.use(express.static(imagedir));
 
 const storage = multer.diskStorage({
-    destination:'./uploads/',
+    destination:'./allUploads/uploads/',
 
     filename:function(req,file,cb){
 cb(null,file.originalname + Date.now() + '.jpg' )
     }
 });
 
-const path = require("path")
+
 require("dotenv").config();
 
 const upload = multer({
@@ -94,35 +98,78 @@ app.use(function (req, res, next) {
 //     })
 // })
 
-app.get('/uploads/:imagefile',(req,res)=>{
-    res.sendFile(__dirname + "/uploads/"+req.params.imagefile);
-});
+app.post('/api/profilePhoto',upload.single("profile"),async(req,res,next)=>{
+console.log("The Image is: ",req.file)
 
-app.get('/',(req,res)=>{
-    res.send(req.protocol+"://" + req.hostname+":3000/uploads/"+"pwell.jpg");
+var user= await db.users.findOne({
+    where:{
+        email:req.body.email
+    }
+})
+if(!user) {console.log("User is not found ===================")
+res.json({message:"Error happened"})
+}
+else{
+user.update({
+    profile_photo:req.file.path.substr(11)
+
+})
+res.json({
+    data:user.profile_photo,
+    message:"Image Uploaded to database"
 })
 
+console.log("Image Path =======================",user.profile_photo)
+}
+}
+)
 
 
-app.post('/api/businessOwnerData',upload.array("file"),(req,res,next)=>{
-    console.log("The IMAGEs are :",req.files)
-    res.json({
-        file:req.files
-    })
+
+
+
+
+
+app.post('/api/businessOwnerData',upload.array("file"),async(req,res,next)=>{
+    console.log("The IMAGES are :",req.files)
+    
     db.business.create({
-        user_id:req.body.user_id,
+        user_id:req.body.user_id, 
         enterprice_national_number:req.body.enterprice_national_number,
         bussiness_name:req.body.bussiness_name,
         bussiness_activity:req.body.bussiness_activity  ,
-        commercial_register:req.files[0].path,
-        tax_card:req.files[1].path,
-        operating_license:req.files[2].path
+        commercial_register:req.files[0] ? req.files[0].path.substr(11) : null,
+        tax_card:req.files[1] ? req.files[1].path.substr(11) : null,
+        operating_license:req.files[2] ? req.files[2].path.substr(11) : null
 
     })
         res.json({
-            message:"You are now a Business owner"
+            message:"You are now a Business owner",
+            data:req.files
+        })
+        var user= await db.users.findOne({
+            where:{
+                email:req.body.email
+            }
+        
         })
        
+        if(! user) res.json({message2:"User not found"})
+        
+         user.update({
+            full_arabic_name:req.body.full_arabic_name,
+            national_number:req.body.national_number,
+            job:req.body.job,
+            fax:req.body.fax,
+            address:req.body.address,
+            website:req.body.website,
+            mobile_number:req.body.mobile_number,
+            user_type:"business"
+            
+
+        })
+        res.json({user:user})
+        console.log(user)
    
 
 })
@@ -381,9 +428,9 @@ const token=jwt.sign(req.body.email,process.env.JWT_KEY,{expiresIn:'60m'},(email
 })
 //===========================================
 //Complete Data
-app.put("/api/completedata/:user_id",async(req,res)=>{
+app.put("/api/completedata",async(req,res)=>{
     var user= await db.users.findOne({
-        where:{ user_id:req.params.user_id }
+        where:{ email:req.body.email }
     })
   
         user.update({
@@ -397,15 +444,18 @@ app.put("/api/completedata/:user_id",async(req,res)=>{
             governorate:req.body.governorate,
             village:req.body.village,
             center:req.body.center,
-            telephone_number:req.body.telephone_number,
             phone_number:req.body.phone_number,
+            mobile_number:req.body.mobile_number,
             fax:req.body.fax,
             facebook_account:req.body.facebook_account,
             linkedin:req.body.linkedin,
             website:req.body.website,
             address:req.body.address
          })
-         res.send(user)
+         res.json({
+             message:"user successfully UPDATED",
+             data:user
+         })
     })
   
     

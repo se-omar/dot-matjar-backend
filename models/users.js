@@ -17,6 +17,10 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
+    profile_photo:{
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
     national_number: {
       type: DataTypes.STRING(14),
       allowNull: true
