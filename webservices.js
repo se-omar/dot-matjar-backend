@@ -326,27 +326,37 @@ app.post('/api/updatePassword', (req, res) => {
 
 //=============================================
 //SIGN UP WEBSERVICE
-app.post('/api/signup', (req, res) => {
+app.post('/api/signup', async(req, res) => {
 
 
 
-    //================= Sending email verfication
+    // bcrypt.hash(req.body.password, 10, (err, hash) => {
+    //     if (err) {
+    //         return res.status(500).send(err);
+    //     } else {
 
 
+   var user= await db.users.findOne({
+        where: {
+            email: req.body.email
+        }
+    }) .then(user=>{
+    
+    if (!user) {
 
-    const email = req.body.email
-    const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
+// sending email to req.body
+       const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
         expiresIn: '60m'
     }, (emailtoken, err) => {
         const url = `http://localhost:8080/activation/` + cryptoo;
 
         let transporter = nodemailer.createTransport({
-            host: "smtp.ethereal.email",
-            port: 587,
+            service: "gmail",
+         
             secure: false, // true for 465, false for other ports
             auth: {
-                user: 'litzy9@ethereal.email', // generated ethereal user
-                pass: '35dMWwUVm441sTscZC', // generated ethereal password
+                user: 'alphieethan@gmail.com', // generated ethereal user
+                pass: '4523534m', // generated ethereal password
             },
             tls: {
                 regectUnauthorized: false
@@ -357,49 +367,27 @@ app.post('/api/signup', (req, res) => {
 
 
 
-        transporter.sendMail({
-            from: '"Owners" <E-commerce@yahoo.com>', // sender address
+        let mailOptions={
+            from: ' alphieethan@gmail.com', // sender address
             to: req.body.email, // list of receivers
-            subject: "Testing", // Subject line
-            text: "Welcome", // plain text body
+            subject: "Project almost DONE", // Subject line
+            text: "Please activate from here", // plain text body
             html: `  <a href="${url}">Click to ACTIVATE</a> <br/>
        
         `
 
 
-
-        });
+        };
+transporter.sendMail(mailOptions,function(data,err){
+    if(err){
+        console.log("error happened")
+    }
+    else{
+        console.log("email sent!!!!")
+    }
+})
     });
-
-
-
-
-    // create reusable transporter object using the default SMTP transport
-
-
-    // send mail with defined transport object
-
-
-
-    // Preview URL: https://ethereal.email/message/WaQKMgKddxQDoou...
-
-
-
-
-    // //==========================Creating account in database
-
-
-    // bcrypt.hash(req.body.password, 10, (err, hash) => {
-    //     if (err) {
-    //         return res.status(500).send(err);
-    //     } else {
-    db.users.findOne({
-        where: {
-            email: req.body.email
-        }
-    }).then(user => {
-        if (!user) {
-            console.log("BODY", req.body.national_number);
+            // Creating record in DATABASE
             db.users.create({
                 email: req.body.email,
                 national_number: req.body.national_number,
@@ -411,14 +399,16 @@ app.post('/api/signup', (req, res) => {
 
 
             })
-            return res.status(200).send('user created succesfully');
+            return res.json({message:"a message is sent to your email , please verify "});
         } else {
-            return res.status(400).send('user already exists');
+            return res.json({message:"user already exists"});
         }
     })
-    //     }
-    // })
-})
+    .catch(err=>{console.log(err)})
+    })
+    
+   
+
 //===========================================
 //Complete Data
 app.put("/api/completedata",async(req,res)=>{
