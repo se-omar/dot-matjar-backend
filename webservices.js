@@ -8,18 +8,19 @@ const cors = require('cors')
 const path = require("path")
 const jwt = require('jsonwebtoken')
 const crypto = require('crypto');
-const randomstring=require('randomstring')
+const randomstring = require('randomstring')
 const multer = require('multer')
+const stripe = require('stripe')('sk_test_51H97oICdSDXTIUwz1HsESGMmCODSWE7Ct0hUQ1sRzeSU1rEi0qS5x6n0SYdUmoiXjQeMQAB58xDuvsWp0XjuT2sk00DAVbX0l9')
 
 
-var imagedir = path.join(__dirname, '/allUploads/'); 
+var imagedir = path.join(__dirname, '/allUploads/');
 app.use(express.static(imagedir));
 
 const storage = multer.diskStorage({
-    destination:'./allUploads/uploads/',
+    destination: './allUploads/uploads/',
 
-    filename:function(req,file,cb){
-cb(null,file.originalname + Date.now() + '.jpg' )
+    filename: function (req, file, cb) {
+        cb(null, file.originalname + Date.now() + '.jpg')
     }
 });
 
@@ -86,35 +87,36 @@ app.use(function (req, res, next) {
 //         tax_card:req.files[1].path,
 //         operating_license:req.files[2].path
 
-    
+
 //     })
 // })
 
-app.post('/api/profilePhoto',upload.single("profile"),async(req,res,next)=>{
-console.log("The Image is: ",req.file)
+app.post('/api/profilePhoto', upload.single("profile"), async (req, res, next) => {
+    console.log("The Image is: ", req.file)
 
-var user= await db.users.findOne({
-    where:{
-        email:req.body.email
+    var user = await db.users.findOne({
+        where: {
+            email: req.body.email
+        }
+    })
+    if (!user) {
+        console.log("User is not found ===================")
+        res.json({
+            message: "Error happened"
+        })
+    } else {
+        user.update({
+            profile_photo: req.file.path.substr(11)
+
+        })
+        res.json({
+            data: user.profile_photo,
+            message: "Image Uploaded to database"
+        })
+
+        console.log("Image Path =======================", user.profile_photo)
     }
 })
-if(!user) {console.log("User is not found ===================")
-res.json({message:"Error happened"})
-}
-else{
-user.update({
-    profile_photo:req.file.path.substr(11)
-
-})
-res.json({
-    data:user.profile_photo,
-    message:"Image Uploaded to database"
-})
-
-console.log("Image Path =======================",user.profile_photo)
-}
-}
-)
 
 
 
@@ -122,47 +124,51 @@ console.log("Image Path =======================",user.profile_photo)
 
 
 
-app.post('/api/businessOwnerData',upload.array("file"),async(req,res,next)=>{
-    console.log("The IMAGES are :",req.files)
-    
+app.post('/api/businessOwnerData', upload.array("file"), async (req, res, next) => {
+    console.log("The IMAGES are :", req.files)
+
     db.business.create({
-        user_id:req.body.user_id, 
-        enterprice_national_number:req.body.enterprice_national_number,
-        bussiness_name:req.body.bussiness_name,
-        bussiness_activity:req.body.bussiness_activity  ,
-        commercial_register:req.files[0] ? req.files[0].path.substr(11) : null,
-        tax_card:req.files[1] ? req.files[1].path.substr(11) : null,
-        operating_license:req.files[2] ? req.files[2].path.substr(11) : null
+        user_id: req.body.user_id,
+        enterprice_national_number: req.body.enterprice_national_number,
+        bussiness_name: req.body.bussiness_name,
+        bussiness_activity: req.body.bussiness_activity,
+        commercial_register: req.files[0] ? req.files[0].path.substr(11) : null,
+        tax_card: req.files[1] ? req.files[1].path.substr(11) : null,
+        operating_license: req.files[2] ? req.files[2].path.substr(11) : null
 
     })
-        res.json({
-            message:"You are now a Business owner",
-            data:req.files
-        })
-        var user= await db.users.findOne({
-            where:{
-                email:req.body.email
-            }
-        
-        })
-       
-        if(! user) res.json({message2:"User not found"})
-        
-         user.update({
-            full_arabic_name:req.body.full_arabic_name,
-            national_number:req.body.national_number,
-            job:req.body.job,
-            fax:req.body.fax,
-            address:req.body.address,
-            website:req.body.website,
-            mobile_number:req.body.mobile_number,
-            user_type:"business"
-            
+    res.json({
+        message: "You are now a Business owner",
+        data: req.files
+    })
+    var user = await db.users.findOne({
+        where: {
+            email: req.body.email
+        }
 
-        })
-        res.json({user:user})
-        console.log(user)
-   
+    })
+
+    if (!user) res.json({
+        message2: "User not found"
+    })
+
+    user.update({
+        full_arabic_name: req.body.full_arabic_name,
+        national_number: req.body.national_number,
+        job: req.body.job,
+        fax: req.body.fax,
+        address: req.body.address,
+        website: req.body.website,
+        mobile_number: req.body.mobile_number,
+        user_type: "business"
+
+
+    })
+    res.json({
+        user: user
+    })
+    console.log(user)
+
 
 })
 
@@ -326,7 +332,7 @@ app.post('/api/updatePassword', (req, res) => {
 
 //=============================================
 //SIGN UP WEBSERVICE
-app.post('/api/signup', async(req, res) => {
+app.post('/api/signup', async (req, res) => {
 
 
 
@@ -336,110 +342,117 @@ app.post('/api/signup', async(req, res) => {
     //     } else {
 
 
-   var user= await db.users.findOne({
-        where: {
-            email: req.body.email
-        }
-    }) .then(user=>{
-    
-    if (!user) {
-
-// sending email to req.body
-       const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
-        expiresIn: '60m'
-    }, (emailtoken, err) => {
-        const url = `http://localhost:8080/activation/` + cryptoo;
-
-        let transporter = nodemailer.createTransport({
-            service: "gmail",
-         
-            secure: false, // true for 465, false for other ports
-            auth: {
-                user: 'alphieethan@gmail.com', // generated ethereal user
-                pass: '4523534m', // generated ethereal password
-            },
-            tls: {
-                regectUnauthorized: false
+    var user = await db.users.findOne({
+            where: {
+                email: req.body.email
             }
-        });
+        }).then(user => {
+
+            if (!user) {
+
+                // sending email to req.body
+                const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
+                    expiresIn: '60m'
+                }, (emailtoken, err) => {
+                    const url = `http://localhost:8080/activation/` + cryptoo;
+
+                    let transporter = nodemailer.createTransport({
+                        service: "gmail",
+
+                        secure: false, // true for 465, false for other ports
+                        auth: {
+                            user: 'alphieethan@gmail.com', // generated ethereal user
+                            pass: '4523534m', // generated ethereal password
+                        },
+                        tls: {
+                            regectUnauthorized: false
+                        }
+                    });
 
 
 
 
 
-        let mailOptions={
-            from: ' alphieethan@gmail.com', // sender address
-            to: req.body.email, // list of receivers
-            subject: "Project almost DONE", // Subject line
-            text: "Please activate from here", // plain text body
-            html: `  <a href="${url}">Click to ACTIVATE</a> <br/>
+                    let mailOptions = {
+                        from: ' alphieethan@gmail.com', // sender address
+                        to: req.body.email, // list of receivers
+                        subject: "Project almost DONE", // Subject line
+                        text: "Please activate from here", // plain text body
+                        html: `  <a href="${url}">Click to ACTIVATE</a> <br/>
        
         `
 
 
-        };
-transporter.sendMail(mailOptions,function(data,err){
-    if(err){
-        console.log("error happened")
-    }
-    else{
-        console.log("email sent!!!!")
-    }
+                    };
+                    transporter.sendMail(mailOptions, function (data, err) {
+                        if (err) {
+                            console.log("error happened")
+                        } else {
+                            console.log("email sent!!!!")
+                        }
+                    })
+                });
+                // Creating record in DATABASE
+                db.users.create({
+                    email: req.body.email,
+                    national_number: req.body.national_number,
+                    password: hash,
+                    mobile_number: req.body.mobile_number,
+                    full_arabic_name: req.body.full_arabic_name,
+                    gender: req.body.gender,
+                    crypto: cryptoo
+
+
+                })
+                return res.json({
+                    message: "a message is sent to your email , please verify "
+                });
+            } else {
+                return res.json({
+                    message: "user already exists"
+                });
+            }
+        })
+        .catch(err => {
+            console.log(err)
+        })
 })
-    });
-            // Creating record in DATABASE
-            db.users.create({
-                email: req.body.email,
-                national_number: req.body.national_number,
-                password: hash,
-                mobile_number: req.body.mobile_number,
-                full_arabic_name: req.body.full_arabic_name,
-                gender: req.body.gender,
-                crypto: cryptoo
 
 
-            })
-            return res.json({message:"a message is sent to your email , please verify "});
-        } else {
-            return res.json({message:"user already exists"});
-        }
-    })
-    .catch(err=>{console.log(err)})
-    })
-    
-   
 
 //===========================================
 //Complete Data
-app.put("/api/completedata",async(req,res)=>{
-    var user= await db.users.findOne({
-        where:{ email:req.body.email }
+app.put("/api/completedata", async (req, res) => {
+    var user = await db.users.findOne({
+        where: {
+            email: req.body.email
+        }
     })
-  
-        user.update({
-            national_number:req.body.national_number,
-            gender:req.body.gender,
-            full_arabic_name:req.body.full_arabic_name,
-            full_english_name:req.body.full_english_name,
-            birthdate:req.body.birthdate,
-            qualifications:req.body.qualifications,
-            job:req.body.job,
-            governorate:req.body.governorate,
-            village:req.body.village,
-            center:req.body.center,
-            phone_number:req.body.phone_number,
-            mobile_number:req.body.mobile_number,
-            fax:req.body.fax,
-            facebook_account:req.body.facebook_account,
-            linkedin:req.body.linkedin,
-            website:req.body.website,
-            address:req.body.address
-         })
-         res.json({
-             message:"user successfully UPDATED",
-             data:user
-         })
-   
+
+    user.update({
+        national_number: req.body.national_number,
+        gender: req.body.gender,
+        full_arabic_name: req.body.full_arabic_name,
+        full_english_name: req.body.full_english_name,
+        birthdate: req.body.birthdate,
+        qualifications: req.body.qualifications,
+        job: req.body.job,
+        governorate: req.body.governorate,
+        village: req.body.village,
+        center: req.body.center,
+        phone_number: req.body.phone_number,
+        mobile_number: req.body.mobile_number,
+        fax: req.body.fax,
+        facebook_account: req.body.facebook_account,
+        linkedin: req.body.linkedin,
+        website: req.body.website,
+        address: req.body.address
+    })
+    res.json({
+        message: "user successfully UPDATED",
+        data: user
+    })
+
     res.send(user)
 })
 
@@ -1093,6 +1106,58 @@ app.delete('/api/requests/:requests_id', async (req, res) => {
     })
     request.destroy();
     res.send("ROW DELETED");
+});
+
+app.post('/api/checkout', (req, res) => {
+    db.products.findOne({
+        where: {
+            product_id: req.body.product_id
+        }
+    }).then((product) => {
+        console.log(product)
+
+        stripe.checkout.sessions.create({
+            payment_method_types: ['card'],
+            line_items: [{
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: product.product_name,
+                        },
+                        unit_amount: product.unit_price,
+                    },
+                    quantity: 1,
+                },
+                {
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: product.product_name,
+                        },
+                        unit_amount: product.unit_price,
+                    },
+                    quantity: 3,
+                },
+                {
+                    price_data: {
+                        currency: 'usd',
+                        product_data: {
+                            name: product.product_name,
+                        },
+                        unit_amount: product.unit_price,
+                    },
+                    quantity: 1,
+                }
+            ],
+            mode: 'payment',
+            success_url: 'http://localhost:8080/home',
+            cancel_url: 'https://example.com/cancel',
+        }).then((session) => {
+            res.json({
+                session_id: session.id
+            })
+        });
+    })
 })
 
 
