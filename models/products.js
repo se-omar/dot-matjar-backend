@@ -1,28 +1,33 @@
 /* jshint indent: 2 */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('products', {
     product_id: {
       type: DataTypes.INTEGER(10),
       allowNull: false,
-      autoIncrement: true,
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
     },
     category_id: {
       type: DataTypes.INTEGER(10),
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'product_categories',
+        key: 'category_id'
+      }
     },
     bussiness_id: {
       type: DataTypes.INTEGER(10),
-      allowNull: true
-    },
-    user_id: {
-      type: DataTypes.INTEGER(10),
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'bussiness',
+        key: 'bussiness_id'
+      }
     },
     pending_status: {
-      type: "BINARY(1)",
-      allowNull: true
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      defaultValue: 'pending'
     },
     product_name: {
       type: DataTypes.STRING(255),
@@ -87,9 +92,23 @@ module.exports = function (sequelize, DataTypes) {
     product_rating: {
       type: DataTypes.STRING(255),
       allowNull: true
-    }
+    },
+    user_id: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true
+    },
+    cart_id: {
+      type: DataTypes.INTEGER(10),
+      allowNull: true,
+     
+    },
+    quantity: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true,
+      defaultValue: 1
+    },
   }, {
     tableName: 'products',
-    timestamps: false
+    timestamps:false
   });
 };

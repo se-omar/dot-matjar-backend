@@ -1,6 +1,6 @@
 /* jshint indent: 2 */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('bussiness', {
     bussiness_id: {
       type: DataTypes.INTEGER(10),
@@ -10,7 +10,11 @@ module.exports = function (sequelize, DataTypes) {
     },
     user_id: {
       type: DataTypes.INTEGER(10),
-      allowNull: true
+      allowNull: true,
+      references: {
+        model: 'users',
+        key: 'user_id'
+      }
     },
     bussiness_name: {
       type: DataTypes.STRING(255),
@@ -53,11 +57,11 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true
     },
     operating_license: {
-      type:  DataTypes.STRING(255),
+      type: DataTypes.STRING(255),
       allowNull: true
     }
   }, {
     tableName: 'bussiness',
-    timestamps: false
+    timestamps:false
   });
 };
