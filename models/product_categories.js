@@ -27,5 +27,6 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     tableName: 'product_categories',
     timestamps:false
+
   });
 };

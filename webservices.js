@@ -1099,18 +1099,20 @@ app.delete('/api/requests/:requests_id', async (req, res) => {
 
 
 app.post('/api/cart',async(req,res)=>{
-console.log(req.body.product_id)
-    var cart=  db.cart.findOne({
+
+
+      var cart = await db.cart.findOne({
         where:{
             user_id:req.body.user_id
         }
-    }).then( cart=>{
+    })
         if(!cart){
             db.cart.create({
                 user_id:req.body.user_id,
                 cart_activity:1
             })
         }
+        console.log('==========',cart.cart_id)
  db.products.findOne({
     where:{
         product_id:req.body.product_id
@@ -1129,40 +1131,104 @@ console.log(cart.cart_id)
             message:"Done",
 
         })
-    })
+    
 
  
 })
-app.put('/api/table',async (req,res)=>{
-    console.log(req.body.user_id)
-    var cart=  await db.cart.findOne({
+app.post('/api/table', async(req,res)=>{
+    
+      var cart = await db.cart.findOne({
         where:{
         user_id:req.body.user_id
         }})
-        var product = db.products.findAll({
-            where:({
-                cart_id:cart.cart_id
-
+        if(!cart){
+           cart= await db.cart.create({
+                user_id:req.body.user_id,
+                cart_activity:1
             })
-        }).then(product=>{
-            res.json({data:product,
-                message:"product is sent"})
-                console.log('Cart isssss',cart)
+        }
+        db.products.findOne({
+            where:{
+                product_id:req.body.product_id
+            }
+        }).then((product)=>{product.update({in_cart:1})})
+        
+
+        db.cart_products.findOne({
+            where:{
+                product_id:req.body.product_id,
+                cart_id:cart.cart_id
+            }
+        }).then((product)=>{
+            console.log('product======',product)
+            if(! product){
+                db.cart_products.create({
+            
+                    cart_id:cart.cart_id,
+                    product_id:req.body.product_id
                 
-        })
-        console.log('quantityyyyyyy',product.quantity)
+            })
+            
     
+            }
+            else{
+                res.json({message:"product exists"})
+            }
+        })
+       
+
+
+
+            //  db.products.findOne({
+            //     where:{
+            //         product_id:req.body.product_id
+            //     }
+            // }).then((product)=>{
+            //     product.update({
+            //         cart_id:cart.cart_id
+            //     })
+            // })
+      
+     
+       
+})
+
+app.put('/api/getProducts',async(req,res)=>{
+    var cart= await db.cart.findOne({
+        where:{
+            user_id:req.body.user_id
+        }
+    })
+    db.cart_products.findAll({
+        where:{
+            cart_id:cart.cart_id
+        },
+        include:[db.products]
+    }).then((products)=>{
+       var map= products.map((e)=>{return e.product})
+       res.json({data:map})
+    })
+
+    // db.products.findAll({
+    //     where:{
+    //         cart_id:cart.cart_id
+    //     }
+    // }).then((products)=>{
+    //     console.log('products is =================',products)
+    //     res.json({data:products})
+    // })
 })
 
 app.put('/api/remove',async(req,res)=>{
-    var product= await db.products.findOne({
+    db.cart_products.findOne({
         where:{
             product_id:req.body.product_id
         }
+    }).then((product)=>{
+        product.destroy()
+        res.send("product removed")
     })
-    product.update({
-        cart_id:null
-    })
+   
 })
 
 
