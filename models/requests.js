@@ -1,32 +1,22 @@
 /* jshint indent: 2 */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('requests', {
     requests_id: {
       type: DataTypes.INTEGER(10),
       allowNull: false,
-      defaultValue: '0',
-      primaryKey: true
+      primaryKey: true,
+      autoIncrement: true
     },
     by_user_id: {
       type: DataTypes.INTEGER(10),
-
+      allowNull: true
     },
     to_user_id: {
       type: DataTypes.INTEGER(10),
-
-    },
-    product_id: {
-      type: DataTypes.INTEGER(10),
-      allowNull: false
-    },
-
-    request_response: {
-      type: DataTypes.TEXT,
       allowNull: true
     },
-
-    request_numberr: {
+    request_number: {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },
@@ -39,11 +29,11 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true
     },
     request_date: {
-      type: DataTypes.DATEONLY,
+      type: DataTypes.DATE,
       allowNull: true
     }
   }, {
     tableName: 'requests',
-    timestamps: false
+    timestamps:false
   });
 };

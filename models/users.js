@@ -1,6 +1,6 @@
 /* jshint indent: 2 */
 
-module.exports = function (sequelize, DataTypes) {
+module.exports = function(sequelize, DataTypes) {
   return sequelize.define('users', {
     user_id: {
       type: DataTypes.INTEGER(10),
@@ -17,7 +17,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    profile_photo:{
+    profile_photo: {
       type: DataTypes.STRING(255),
       allowNull: true
     },
@@ -30,7 +30,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true
     },
     password: {
-      type: DataTypes.INTEGER(11),
+      type: DataTypes.STRING(255),
       allowNull: true
     },
     mobile_number: {
@@ -69,15 +69,14 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    phone_number: {
-      type: DataTypes.INTEGER(15),
-      allowNull: true
-    },
     telephone_number: {
-      type: DataTypes.INTEGER(15),
+      type: DataTypes.INTEGER(11),
       allowNull: true
     },
-
+    phone_number: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true
+    },
     fax: {
       type: DataTypes.INTEGER(15),
       allowNull: true
@@ -104,14 +103,23 @@ module.exports = function (sequelize, DataTypes) {
     },
     active: {
       type: DataTypes.INTEGER(1),
-      allowNull: true
+      allowNull: true,
+      defaultValue: '0'
     },
     password_reset_token: {
       type: DataTypes.STRING(255),
       allowNull: true
-    } 
+    },
+    cart_id: {
+      type: DataTypes.INTEGER(10),
+      allowNull: true,
+      references: {
+        model: 'cart',
+        key: 'cart_id'
+      }
+    }
   }, {
     tableName: 'users',
-    timestamps: false
+    timestamps:false
   });
 };

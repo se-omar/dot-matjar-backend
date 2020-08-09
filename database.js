@@ -1,14 +1,15 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('ecommerce-shipping', 'root', '', {
+const sequelize = new Seq('ecommercecart', 'root', '', {
     host: 'localhost',
     dialect: 'mysql'
 });
 const db = {
     users: sequelize.import('./models/users'),
     products: sequelize.import('./models/products'),
-    business: sequelize.import('./models/business'),
+    business: sequelize.import('./models/bussiness'),
     product_categories: sequelize.import('./models/product_categories'),
-    requests: sequelize.import('./models/requests')
+    requests: sequelize.import('./models/requests'),
+    cart: sequelize.import('./models/cart')
 }
 
 db.users.hasMany(db.requests, {
@@ -66,6 +67,17 @@ db.product_categories.hasMany(db.products, {
 db.products.belongsTo(db.product_categories, {
     foreignKey: 'category_id'
 });
-
+db.cart.hasMany(db.products, {
+    foreignKey: 'cart_id'
+})
+db.cart.hasOne(db.users, {
+    foreignKey: 'cart_id'
+})
+db.products.belongsTo(db.cart, {
+    foreignKey: 'cart_id'
+})
+db.users.belongsTo(db.cart, {
+    foreignKey: 'cart_id'
+})
 
 module.exports = db;

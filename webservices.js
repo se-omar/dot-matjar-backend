@@ -1160,6 +1160,91 @@ app.post('/api/checkout', (req, res) => {
     })
 })
 
+// Cart TABLE =======================
+
+
+app.post('/api/cart', async (req, res) => {
+    console.log(req.body.product_id)
+    var cart = db.cart.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(cart => {
+        if (!cart) {
+            db.cart.create({
+                user_id: req.body.user_id,
+                cart_activity: 1
+            })
+        }
+        db.products.findOne({
+            where: {
+                product_id: req.body.product_id
+            }
+        }).then(product => {
+            product.update({
+                cart_id: cart.cart_id
+            })
+            console.log(cart.cart_id)
+
+        })
+
+
+
+        res.json({
+            message: "Done",
+
+        })
+    })
+
+
+})
+app.put('/api/table', (req, res) => {
+    console.log(req.body.user_id)
+    db.cart.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(cart => {
+
+        db.products.findAll({
+            where: ({
+                cart_id: cart.cart_id
+
+            })
+        }).then(product => {
+            res.json({
+                data: product,
+                message: "product is sent"
+            })
+            console.log('Cart isssss', cart)
+
+        })
+
+
+    })
+
+})
+
+app.put('/api/remove', async (req, res) => {
+    var product = await db.products.findOne({
+        where: {
+            product_id: req.body.product_id
+        }
+    })
+    product.update({
+        cart_id: null
+    })
+})
+
+
+
+
+
+
+
+
+
+
 
 
 
