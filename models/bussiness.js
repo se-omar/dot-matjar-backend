@@ -63,5 +63,6 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     tableName: 'bussiness',
     timestamps:false
+
   });
 };

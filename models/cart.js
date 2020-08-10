@@ -12,7 +12,6 @@ module.exports = function(sequelize, DataTypes) {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },
-   
     cart_activity: {
       type: DataTypes.INTEGER(1),
       allowNull: false,
@@ -21,5 +20,6 @@ module.exports = function(sequelize, DataTypes) {
   }, {
     tableName: 'cart',
     timestamps:false
+
   });
 };
