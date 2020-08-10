@@ -89,7 +89,7 @@ db.cart.hasMany(db.cart_products, {
     foreignKey: 'cart_id'
 });
 db.cart_products.belongsTo(db.cart, { foreignKey: 'cart_id' });
-db.products.hasMany(db.cart_products, { foreignKey: 'product_id' });
+db.products.hasMany(db.cart_products, { foreignKey: 'product_id' }, { onDelete: 'cascade' });
 db.cart_products.belongsTo(db.products, { foreignKey: 'product_id' });
 
 
