@@ -1,7 +1,10 @@
 const Seq = require('sequelize').Sequelize;
 const sequelize = new Seq('ecommerce-4-august', 'root', '', {
     host: 'localhost',
-    dialect: 'mysql'
+    dialect: 'mysql',
+    define: {
+        timestamps: false
+    }
 });
 const db = {
     users: sequelize.import('./models/users'),
