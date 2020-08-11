@@ -1,6 +1,6 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('bussiness', {
     bussiness_id: {
       type: DataTypes.INTEGER(10),
@@ -62,7 +62,6 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     tableName: 'bussiness',
-    timestamps:false
 
   });
 };

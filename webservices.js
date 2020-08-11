@@ -4,22 +4,22 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 
 
-const usersRoute = require('./routes/users.js');
+const usersRoute = require('./routes/usersRoute.js');
 app.use(usersRoute);
 
-const productsRoute = require('./routes/products.js');
+const productsRoute = require('./routes/productsRoute.js');
 app.use(productsRoute);
 
-const loginSignupRoute = require('./routes/login-signup.js');
+const loginSignupRoute = require('./routes/loginSignupRoute.js');
 app.use(loginSignupRoute);
 
-const passwordUpdateRoute = require('./routes/passwordUpdate.js');
+const passwordUpdateRoute = require('./routes/passwordUpdateRoute.js');
 app.use(passwordUpdateRoute);
 
-const requestsRoute = require('./routes/requests.js');
+const requestsRoute = require('./routes/requestsRoute.js');
 app.use(requestsRoute);
 
-const cartRoute = require('./routes/cart.js');
+const cartRoute = require('./routes/cartRoute.js');
 app.use(cartRoute);
 
 require("dotenv").config();

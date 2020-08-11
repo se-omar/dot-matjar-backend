@@ -4,8 +4,11 @@ const db = require('../database');
 const stripe = require('stripe')('sk_test_51H97oICdSDXTIUwz1HsESGMmCODSWE7Ct0hUQ1sRzeSU1rEi0qS5x6n0SYdUmoiXjQeMQAB58xDuvsWp0XjuT2sk00DAVbX0l9')
 const bodyParser = require('body-parser');
 const cors = require('cors')
+const crypto = require('crypto');
 router.use(bodyParser.json());
 router.use(cors());
+
+const token = crypto.randomBytes(10).toString('hex');
 
 
 router.post('/api/checkout', (req, res) => {
@@ -36,13 +39,14 @@ router.post('/api/checkout', (req, res) => {
             stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
                 mode: 'payment',
-                success_url: 'http://localhost:8080/home',
+                success_url: 'http://localhost:8080/successfulPayment/' + token,
                 cancel_url: 'https://example.com/cancel',
                 line_items: itemsArray,
 
             }).then((session) => {
                 res.json({
-                    session_id: session.id
+                    session_id: session.id,
+                    token: token
                 })
             });
 
