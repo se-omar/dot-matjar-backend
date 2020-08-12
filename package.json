@@ -12,6 +12,7 @@
   "license": "ISC",
   "dependencies": {
     "@hapi/joi": "^17.1.1",
+    "@stripe/stripe-js": "^1.8.0",
     "bcrypt": "^5.0.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -30,6 +31,7 @@
     "sequelize": "^5.21.13",
     "sequelize-auto": "^0.5.3",
     "sqlite3": "^5.0.0",
+    "stripe": "^8.79.0",
     "tedious": "^8.3.0"
   }
 }

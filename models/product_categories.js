@@ -1,6 +1,6 @@
 /* jshint indent: 2 */
 
-module.exports = function(sequelize, DataTypes) {
+module.exports = function (sequelize, DataTypes) {
   return sequelize.define('product_categories', {
     category_id: {
       type: DataTypes.INTEGER(10),
@@ -26,7 +26,6 @@ module.exports = function(sequelize, DataTypes) {
     }
   }, {
     tableName: 'product_categories',
-    timestamps:false
 
   });
 };
