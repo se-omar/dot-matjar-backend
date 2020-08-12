@@ -769,8 +769,20 @@ app.get('/api/products/hscode/:HS_code', async (req, res) => {
 
 //POST METHOD
 
-app.post('/api/product', upload2.array('file', 12), (req, res, next) => {
+app.post('/api/product', upload2.array('file', 12), async(req, res, next) => {
     console.log('uploaded file', req.files);
+
+    var category= await db.product_categories.findOne({
+        where:{
+            category_name:req.body.category_name    
+        }
+    })
+    if(!category){
+      await  db.product_categories.create({
+            category_name:req.body.category_name
+        })
+    }
+   
 
     db.products.create({
         product_name: req.body.product_name,
@@ -791,6 +803,7 @@ app.post('/api/product', upload2.array('file', 12), (req, res, next) => {
         main_picture: req.files[0] ? req.files[0].path.substr(11) : null,
         extra_picture1: req.files[1] ? req.files[1].path.substr(11) : null,
         extra_picture2: req.files[2] ? req.files[2].path.substr(11) : null,
+        category_id:category.category_id
 
     }).then(response => {
 
