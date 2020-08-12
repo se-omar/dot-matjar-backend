@@ -4,14 +4,18 @@ const db = require('../database');
 const multer = require('multer')
 const bodyParser = require('body-parser');
 const cors = require('cors')
+const path = require("path")
+
 router.use(bodyParser.json());
 router.use(cors());
 
 
-
+var imagedir = path.join(__dirname.substr(0, __dirname.length - 6), '/allUploads/');
+router.use(express.static(imagedir));
+console.log(__dirname.substr(0, __dirname.length - 6))
 
 var storage2 = multer.diskStorage({
-    destination: './allUploads/productImages',
+    destination: '../allUploads/productImages',
     filename: function (req, file, cb) {
         cb(null, 'Image-' + Date.now() + ".jpg");
     }

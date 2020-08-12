@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors')
+const crypto = require('crypto');
+
+
 
 
 const usersRoute = require('./routes/usersRoute.js');
@@ -21,6 +24,9 @@ app.use(requestsRoute);
 
 const cartRoute = require('./routes/cartRoute.js');
 app.use(cartRoute);
+
+const ordersRoute = require('./routes/ordersRoute.js');
+app.use(ordersRoute);
 
 require("dotenv").config();
 

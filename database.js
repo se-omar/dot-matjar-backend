@@ -13,7 +13,9 @@ const db = {
     product_categories: sequelize.import('./models/product_categories'),
     requests: sequelize.import('./models/requests'),
     cart: sequelize.import('./models/cart'),
-    cart_products: sequelize.import('./models/cart_products')
+    cart_products: sequelize.import('./models/cart_products'),
+    orders: sequelize.import('./models/orders'),
+    products_orders: sequelize.import('./models/products_orders')
 }
 
 db.users.hasMany(db.requests, {
@@ -88,14 +90,18 @@ db.users.belongsTo(db.cart, {
 
 db.cart.belongsToMany(db.products, { through: 'db.cart_products' });
 db.products.belongsToMany(db.cart, { through: 'db.cart_products' });
-db.cart.hasMany(db.cart_products, {
-    foreignKey: 'cart_id'
-});
+db.cart.hasMany(db.cart_products, { foreignKey: 'cart_id' });
 db.cart_products.belongsTo(db.cart, { foreignKey: 'cart_id' });
 db.products.hasMany(db.cart_products, { foreignKey: 'product_id' }, { onDelete: 'cascade' });
 db.cart_products.belongsTo(db.products, { foreignKey: 'product_id' });
 
 
+db.products.belongsToMany(db.orders, { through: 'db.products_orders' });
+db.orders.belongsToMany(db.products, { through: 'db.products_orders' });
+db.products.hasMany(db.products_orders, { foreignKey: 'product_id' });
+db.products_orders.belongsTo(db.products, { foreignKey: 'product_id' });
+db.orders.hasMany(db.products_orders, { foreignKey: 'order_id' });
+db.products_orders.belongsTo(db.orders, { foreignKey: 'order_id' });
 
 
 module.exports = db;
