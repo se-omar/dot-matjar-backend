@@ -165,6 +165,26 @@ router.put('/api/remove', (req, res) => {
 
 })
 
+router.put('/api/cleanCart', (req, res) => {
+    db.cart.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(cart => {
+        db.cart_products.findAll({
+            where: {
+                cart_id: cart.cart_id
+            }
+        }).then((products) => {
+            products.map(e => {
+                return e.destroy()
+            })
+            res.json({ message: "cart cleaned" })
+        })
+    })
+})
+
+
 
 
 module.exports = router;

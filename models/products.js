@@ -114,7 +114,8 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(1),
       allowNull: false,
       defaultValue: 0
-    }
+    },
+
   }, {
     tableName: 'products',
 

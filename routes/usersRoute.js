@@ -12,7 +12,7 @@ router.use(cors());
 
 
 const storage = multer.diskStorage({
-    destination: '../allUploads/uploads/',
+    destination: './allUploads/uploads/',
 
     filename: function (req, file, cb) {
         cb(null, file.originalname + Date.now() + '.jpg')
@@ -47,8 +47,10 @@ router.post('/api/profilePhoto', upload.single("profile"), async (req, res, next
     } else {
         user.update({
             profile_photo: req.file.path.substr(11)
+        
 
         })
+        console.log('User profile',user.profile_photo)
         res.json({
             data: user.profile_photo,
             message: "Image Uploaded to database"
