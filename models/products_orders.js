@@ -1,7 +1,7 @@
 /* jshint indent: 2 */
 
 module.exports = function (sequelize, DataTypes) {
-  return sequelize.define('productsOrders', {
+  return sequelize.define('products_orders', {
     products_orders_id: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -19,7 +19,11 @@ module.exports = function (sequelize, DataTypes) {
     quantity: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
-    }
+    },
+    purchase_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
   }, {
     tableName: 'products_orders'
   });

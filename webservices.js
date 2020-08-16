@@ -28,6 +28,9 @@ app.use(cartRoute);
 const ordersRoute = require('./routes/ordersRoute.js');
 app.use(ordersRoute);
 
+const dashboardRoute = require('./routes/dashboardRoute.js');
+app.use(dashboardRoute);
+
 require("dotenv").config();
 
 app.use(bodyParser.urlencoded({

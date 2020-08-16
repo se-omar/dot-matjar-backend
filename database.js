@@ -3,10 +3,13 @@ const sequelize = new Seq('ecommerce-4-august', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
-        timestamps: false
-    }
+        timestamps: false,
+
+    },
+
 });
 const db = {
+    sequelize: sequelize,
     users: sequelize.import('./models/users'),
     products: sequelize.import('./models/products'),
     business: sequelize.import('./models/bussiness'),
@@ -96,8 +99,9 @@ db.products.hasMany(db.cart_products, { foreignKey: 'product_id' }, { onDelete: 
 db.cart_products.belongsTo(db.products, { foreignKey: 'product_id' });
 
 
-db.products.belongsToMany(db.orders, { through: 'db.products_orders' });
-db.orders.belongsToMany(db.products, { through: 'db.products_orders' });
+db.products.belongsToMany(db.orders, { as: 'orders', through: db.products_orders, foreignKey: 'product_id' });
+db.orders.belongsToMany(db.products, { as: 'products', through: db.products_orders, foreignKey: 'order_id' });
+
 db.products.hasMany(db.products_orders, { foreignKey: 'product_id' });
 db.products_orders.belongsTo(db.products, { foreignKey: 'product_id' });
 db.orders.hasMany(db.products_orders, { foreignKey: 'order_id' });

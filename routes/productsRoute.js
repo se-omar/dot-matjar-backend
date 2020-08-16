@@ -53,7 +53,11 @@ router.post('/api/myProducts', (req, res) => {
             include: [{
                 model: db.users
             }]
-        }]
+        },
+        {
+            model: db.product_categories,
+        },
+        ]
     }).then(response => {
         if (!response) {
             res.send('no products found for this user')
