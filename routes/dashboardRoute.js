@@ -4,16 +4,17 @@ const db = require('../database');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const Sequelize = require('sequelize');
-const { where } = require('sequelize');
 const Op = Sequelize.Op;
 
 // sequelize.where(sequelize.fn("month", sequelize.col("fromDate")), fromMonth)
 router.post('/api/monthlySales', (req, res) => {
     db.orders.findAll({
         include: [{
-            model: db.products_orders,
-            group: db.sequelize.fn("MONTH", db.sequelize.col("purchase_date")),
-        }, { model: db.products, as: 'products' }]
+            model: db.products, as: 'products',
+            where: {
+                user_id: req.body.user_id
+            }
+        }]
     }).then(products => {
         res.send(products)
     })

@@ -31,6 +31,9 @@ app.use(ordersRoute);
 const dashboardRoute = require('./routes/dashboardRoute.js');
 app.use(dashboardRoute);
 
+const date = new Date()
+console.log(date.getMonth())
+
 require("dotenv").config();
 
 app.use(bodyParser.urlencoded({

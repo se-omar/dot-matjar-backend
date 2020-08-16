@@ -35,6 +35,10 @@ module.exports = function (sequelize, DataTypes) {
     total_price: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
+    },
+    order_month: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true,
     }
   }, {
     tableName: 'orders'

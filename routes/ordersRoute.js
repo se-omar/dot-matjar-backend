@@ -6,7 +6,7 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const crypto = require('crypto');
 const orderid = require('order-id')('mysecret')
-
+const date = new Date();
 router.use(bodyParser.json());
 router.use(cors());
 
@@ -21,7 +21,8 @@ router.post('/api/placeOrder', (req, res) => {
             total_price: req.body.total_price,
             status: 'pending',
             order_date: new Date(),
-            order_number: orderid.generate()
+            order_number: orderid.generate(),
+            order_month: date.getMonth()
         }).then(order => {
             console.log(req.body.quantity)
             console.log(orderid.generate())
