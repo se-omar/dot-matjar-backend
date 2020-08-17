@@ -5,24 +5,27 @@ const multer = require('multer')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const {
+    cart
+} = require('../database');
 router.use(bodyParser.json());
 router.use(cors());
 
 
 var imagedir = path.join(__dirname.substr(0, __dirname.length - 6), '/allUploads/');
-router.use(express.static(imagedir)); 
+router.use(express.static(imagedir));
 
 
 var storage2 = multer.diskStorage({
-    destination: '../allUploads/productImages',
+    destination: './allUploads/productImages',
     filename: function (req, file, cb) {
-        cb(null, 'Image-' + Date.now() + ".jpg");
+        cb(null, file.originalname + Date.now() + '.jpg')
     }
 });
 const upload2 = multer({
     storage: storage2
 });
-    
+
 
 //===========================================================
 //PRODUCTS TABLE
@@ -66,11 +69,19 @@ router.post('/api/myProducts', (req, res) => {
 
 //POST METHOD
 
-router.post('/api/product', upload2.array('file', 12), (req, res, next) => {
+router.post('/api/product', upload2.array('file', 12), async (req, res, next) => {
     console.log('uploaded file', req.files);
+    var cat = db.product_categories.findOne({
+        where: {
+            category_name: req.body.category_name
+        }
+    })
+
+
 
     db.products.create({
         product_name: req.body.product_name,
+        category_id: cat.category_id,
         product_code: req.body.product_code,
         user_id: req.body.user_id,
         bussiness_id: req.body.bussiness_id,
@@ -146,8 +157,7 @@ router.delete('/api/removeProduct/:product_id', (req, res) => {
             if (!row) {
                 product.destroy();
                 res.send("ROW DELETED")
-            }
-            else {
+            } else {
                 row.destroy();
                 product.destroy();
                 res.send("ROW DELETED")
@@ -155,6 +165,84 @@ router.delete('/api/removeProduct/:product_id', (req, res) => {
         })
 
     })
+
+})
+
+
+router.get('/api/selectCategory', async (req, res) => {
+    var cat = await db.product_categories.findAll()
+    res.json({
+        data: cat
+    })
+
+})
+
+router.put('/api/filterProducts', async (req, res) => {
+    console.log('product name=======', req.body.product_name)
+    console.log('category name=======', req.body.category_name)
+
+    if (!req.body.category_name) {
+        console.log('product entered')
+
+        db.products.findAll({
+            where: {
+                product_name: req.body.product_name
+            },
+            include: [{
+                model: db.business
+            }]
+        }).then(products => {
+            res.json({
+                data: products,
+                message: 'searched by productName'
+            })
+        })
+    } else if (!req.body.product_name) {
+        console.log('category entered')
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_name: req.body.category_name
+            }
+        })
+        db.products.findAll({
+            where: {
+                category_id: cat.category_id
+            },
+            include: [{
+                model: db.business
+            }]
+        }).then(products => {
+            res.json({
+                data: products,
+                message: 'searched by category'
+            })
+            console.log(products.length)
+        })
+    } else {
+        console.log('both entered')
+
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_name: req.body.category_name
+            }
+        })
+        var products = await db.products.findAll({
+            where: {
+                category_id: cat.category_id,
+                product_name: req.body.product_name
+
+            },
+            include: [{
+                model: db.business
+            }]
+        })
+        res.json({
+            data: products,
+            message: 'searched by both'
+        })
+
+    }
+
 
 })
 
