@@ -158,7 +158,7 @@ router.put('/api/remove', (req, res) => {
         where: {
             product_id: req.body.product_id
         }
-    }).then((product) => {
+    }).then(product => {
         product.destroy()
         res.send("product removed")
     })
