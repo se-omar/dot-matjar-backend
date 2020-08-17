@@ -1,10 +1,10 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('ecommerce-4-august', 'root', '', {
+const sequelize = new Seq('test', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
         timestamps: false,
-
+        underscored: true
     },
 
 });
@@ -91,21 +91,50 @@ db.users.belongsTo(db.cart, {
 
 
 
-db.cart.belongsToMany(db.products, { through: 'db.cart_products' });
-db.products.belongsToMany(db.cart, { through: 'db.cart_products' });
-db.cart.hasMany(db.cart_products, { foreignKey: 'cart_id' });
-db.cart_products.belongsTo(db.cart, { foreignKey: 'cart_id' });
-db.products.hasMany(db.cart_products, { foreignKey: 'product_id' }, { onDelete: 'cascade' });
-db.cart_products.belongsTo(db.products, { foreignKey: 'product_id' });
+db.cart.belongsToMany(db.products, {
+    through: 'db.cart_products'
+});
+db.products.belongsToMany(db.cart, {
+    through: 'db.cart_products'
+});
+db.cart.hasMany(db.cart_products, {
+    foreignKey: 'cart_id'
+});
+db.cart_products.belongsTo(db.cart, {
+    foreignKey: 'cart_id'
+});
+db.products.hasMany(db.cart_products, {
+    foreignKey: 'product_id'
+}, {
+    onDelete: 'cascade'
+});
+db.cart_products.belongsTo(db.products, {
+    foreignKey: 'product_id'
+});
 
 
-db.products.belongsToMany(db.orders, { as: 'orders', through: db.products_orders, foreignKey: 'product_id' });
-db.orders.belongsToMany(db.products, { as: 'products', through: db.products_orders, foreignKey: 'order_id' });
 
-db.products.hasMany(db.products_orders, { foreignKey: 'product_id' });
-db.products_orders.belongsTo(db.products, { foreignKey: 'product_id' });
-db.orders.hasMany(db.products_orders, { foreignKey: 'order_id' });
-db.products_orders.belongsTo(db.orders, { foreignKey: 'order_id' });
+db.orders.belongsToMany(db.products, {
+    through: 'db.products_orders'
+});
+db.products.belongsToMany(db.orders, {
+    through: 'db.products_orders'
+});
+db.orders.hasMany(db.products_orders, {
+    foreignKey: 'order_id'
+});
+db.products_orders.belongsTo(db.orders, {
+    foreignKey: 'order_id'
+});
+db.products.hasMany(db.products_orders, {
+    foreignKey: 'product_id'
+}, {
+    onDelete: 'cascade'
+});
+db.products_orders.belongsTo(db.products, {
+    foreignKey: 'product_id'
+});
+
 
 
 module.exports = db;

@@ -53,4 +53,43 @@ router.post('/api/placeOrder', (req, res) => {
     })
 })
 
+
+
+
+router.put('/api/getOrders', (req, res) => {
+    db.orders.findAll({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(orders => {
+        res.json({
+            data: orders
+        })
+    }).catch(err => {
+        console.log(err)
+    })
+})
+
+
+
+
+router.put('/api/getOrderProducts', async (req, res) => {
+    if (req.body.order_id) {
+        db.products_orders.findAll({
+            where: {
+                order_id: req.body.order_id
+            },
+            include: [{
+                model: db.products
+            }]
+        }).then(orders => {
+            res.send(orders)
+        })
+    }
+})
+
+
+
+
+
 module.exports = router;

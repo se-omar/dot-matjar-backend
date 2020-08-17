@@ -25,7 +25,9 @@ router.post('/api/checkout', (req, res) => {
             },
             include: [db.products]
         }).then((products) => {
-            var map = products.map((e) => { return e.product })
+            var map = products.map((e) => {
+                return e.product
+            })
 
             map.forEach((element, index) => {
                 const data = {};
@@ -39,7 +41,7 @@ router.post('/api/checkout', (req, res) => {
             stripe.checkout.sessions.create({
                 payment_method_types: ['card'],
                 mode: 'payment',
-                success_url: 'http://localhost:8080/successfulPayment/' + token,
+                success_url: 'http://localhost:8085/successfulPayment/' + token,
                 cancel_url: 'https://example.com/cancel',
                 line_items: itemsArray,
 
@@ -106,7 +108,11 @@ router.post('/api/table', async (req, res) => {
         where: {
             product_id: req.body.product_id
         }
-    }).then((product) => { product.update({ in_cart: 1 }) })
+    }).then((product) => {
+        product.update({
+            in_cart: 1
+        })
+    })
 
 
     db.cart_products.findOne({
@@ -125,9 +131,10 @@ router.post('/api/table', async (req, res) => {
             })
 
 
-        }
-        else {
-            res.json({ message: "product exists" })
+        } else {
+            res.json({
+                message: "product exists"
+            })
         }
     })
 
@@ -146,8 +153,12 @@ router.put('/api/getProducts', (req, res) => {
             },
             include: [db.products]
         }).then((products) => {
-            var map = products.map((e) => { return e.product })
-            res.json({ data: map })
+            var map = products.map((e) => {
+                return e.product
+            })
+            res.json({
+                data: map
+            })
         })
     })
 
@@ -165,23 +176,26 @@ router.put('/api/remove', (req, res) => {
 
 })
 
-router.put('/api/cleanCart', (req, res) => {
-    db.cart.findOne({
+router.put('/api/cleanCart', async (req, res) => {
+    var cart = await db.cart.findOne({
         where: {
             user_id: req.body.user_id
         }
-    }).then(cart => {
-        db.cart_products.findAll({
-            where: {
-                cart_id: cart.cart_id
-            }
-        }).then((products) => {
-            products.map(e => {
-                return e.destroy()
-            })
-            res.json({ message: "cart cleaned" })
+    })
+    db.cart_products.findAll({
+        where: {
+            cart_id: cart.cart_id
+        }
+    }).then((products) => {
+        products.map(e => {
+            return e.destroy()
+        })
+
+        res.json({
+            message: "cart cleaned"
         })
     })
+
 })
 
 

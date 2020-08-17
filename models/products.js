@@ -115,6 +115,15 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0
     },
+    category_name: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    buy_number: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false,
+      defaultValue: 0
+    },
 
     buy_counter: {
       type: DataTypes.INTEGER(11),

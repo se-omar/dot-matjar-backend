@@ -36,7 +36,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },
-    HQ_governorate: {
+    hq_governorate: {
       type: DataTypes.STRING(255),
       allowNull: true
     },
