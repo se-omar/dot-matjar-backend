@@ -27,7 +27,11 @@ module.exports = function (sequelize, DataTypes) {
     quantity: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
-    }
+    },
+    purchase_date: {
+      type: DataTypes.DATEONLY,
+      allowNull: true,
+    },
   }, {
     tableName: 'products_orders'
   });

@@ -2,6 +2,9 @@ const express = require('express');
 const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors')
+const crypto = require('crypto');
+
+
 
 
 const usersRoute = require('./routes/usersRoute.js');
@@ -24,6 +27,12 @@ app.use(cartRoute);
 
 const ordersRoute = require('./routes/ordersRoute.js');
 app.use(ordersRoute);
+
+const dashboardRoute = require('./routes/dashboardRoute.js');
+app.use(dashboardRoute);
+
+const date = new Date()
+console.log(date.getMonth())
 
 require("dotenv").config();
 

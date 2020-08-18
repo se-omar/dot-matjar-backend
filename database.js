@@ -3,10 +3,13 @@ const sequelize = new Seq('test', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
-        timestamps: false
-    }
+        timestamps: false,
+        underscored: true
+    },
+
 });
 const db = {
+    sequelize: sequelize,
     users: sequelize.import('./models/users'),
     products: sequelize.import('./models/products'),
     business: sequelize.import('./models/bussiness'),

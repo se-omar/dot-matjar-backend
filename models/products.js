@@ -37,7 +37,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },
-    HS_code: {
+    hs_code: {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },
@@ -124,6 +124,13 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0
     },
+
+    buy_counter: {
+      type: DataTypes.INTEGER(11),
+      allowNull: false,
+      defaultValue: 0
+    },
+
   }, {
     tableName: 'products',
 
