@@ -1,5 +1,5 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('test', 'root', '', {
+const sequelize = new Seq('ecommerce-4-august', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
@@ -92,10 +92,10 @@ db.users.belongsTo(db.cart, {
 
 
 db.cart.belongsToMany(db.products, {
-    through: 'db.cart_products'
+    through: 'cart_products'
 });
 db.products.belongsToMany(db.cart, {
-    through: 'db.cart_products'
+    through: 'cart_products'
 });
 db.cart.hasMany(db.cart_products, {
     foreignKey: 'cart_id'
@@ -115,10 +115,10 @@ db.cart_products.belongsTo(db.products, {
 
 
 db.orders.belongsToMany(db.products, {
-    through: 'db.products_orders'
+    through: 'products_orders', foreignKey: 'order_id'
 });
 db.products.belongsToMany(db.orders, {
-    through: 'db.products_orders'
+    through: 'products_orders', foreignKey: 'product_id'
 });
 db.orders.hasMany(db.products_orders, {
     foreignKey: 'order_id'

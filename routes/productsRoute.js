@@ -4,6 +4,8 @@ const db = require('../database');
 const multer = require('multer')
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
 const path = require('path');
 const {
     cart
@@ -51,14 +53,14 @@ router.post('/api/myProducts', (req, res) => {
             user_id: req.body.user_id
         },
         include: [{
-                model: db.business,
-                include: [{
-                    model: db.users
-                }]
-            },
-            {
-                model: db.product_categories,
-            },
+            model: db.business,
+            include: [{
+                model: db.users
+            }]
+        },
+        {
+            model: db.product_categories,
+        },
         ]
     }).then(response => {
         if (!response) {
@@ -244,10 +246,55 @@ router.put('/api/filterProducts', async (req, res) => {
             data: products,
             message: 'searched by both'
         })
-
     }
+})
 
 
+
+router.put('/api/filterSuppliers', (req, res) => {
+
+    if (!req.body.location) {
+        console.log('name search')
+        db.users.findAll({
+            where: {
+                user_type: 'business',
+                full_arabic_name: {
+                    [Op.substring]: req.body.name
+                }
+            }
+        }).then(users => {
+            res.json({
+                users: users,
+            })
+        })
+    } else if (!req.body.name) {
+        console.log('location search')
+        db.users.findAll({
+            where: {
+                user_type: 'business',
+                location: {
+                    [Op.substring]: req.body.location
+                }
+            }
+        }).then(users => {
+            res.json({
+                users: users
+            })
+        })
+    } else {
+        console.log('both search')
+        db.users.findAll({
+            where: {
+                user_type: 'business',
+                location: req.body.location,
+                full_arabic_name: req.body.name
+            }.then(users => {
+                res.json({
+                    users: users
+                })
+            })
+        })
+    }
 })
 
 

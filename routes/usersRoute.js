@@ -6,6 +6,9 @@ const path = require("path")
 const multer = require('multer')
 const bodyParser = require('body-parser');
 const cors = require('cors')
+const Sequelize = require('sequelize');
+const Op = Sequelize.Op;
+
 router.use(bodyParser.json());
 router.use(cors());
 
@@ -47,10 +50,10 @@ router.post('/api/profilePhoto', upload.single("profile"), async (req, res, next
     } else {
         user.update({
             profile_photo: req.file.path.substr(11)
-        
+
 
         })
-        console.log('User profile',user.profile_photo)
+        console.log('User profile', user.profile_photo)
         res.json({
             data: user.profile_photo,
             message: "Image Uploaded to database"
@@ -59,7 +62,6 @@ router.post('/api/profilePhoto', upload.single("profile"), async (req, res, next
         console.log("Image Path =======================", user.profile_photo)
     }
 })
-
 
 router.post('/api/businessOwnerData', upload.array("file"), async (req, res, next) => {
     console.log("The IMAGES are :", req.files)
@@ -107,6 +109,38 @@ router.post('/api/businessOwnerData', upload.array("file"), async (req, res, nex
     console.log(user)
 
 
+})
+
+router.post('/api/getSuppliers', (req, res) => {
+    console.log(req.body.user_id)
+    if (!req.body.user_id) {
+        db.users.findAll({
+            where: {
+                user_type: 'business'
+            },
+            limit: 30
+        }).then(users => {
+            res.json({
+                users: users
+            })
+        })
+    }
+    else {
+        console.log('entered here')
+        db.users.findAll({
+            where: {
+                user_id: {
+                    [Op.gt]: req.body.user_id
+                },
+                user_type: 'business'
+            },
+            limit: 20
+        }).then(users => {
+            res.json({
+                users: users
+            })
+        })
+    }
 })
 
 

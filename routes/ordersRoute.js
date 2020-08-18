@@ -73,19 +73,18 @@ router.put('/api/getOrders', (req, res) => {
 
 
 
-router.put('/api/getOrderProducts', async (req, res) => {
-    if (req.body.order_id) {
-        db.products_orders.findAll({
-            where: {
-                order_id: req.body.order_id
-            },
-            include: [{
-                model: db.products
-            }]
-        }).then(orders => {
-            res.send(orders)
-        })
-    }
+router.put('/api/getOrderProducts', (req, res) => {
+    db.products_orders.findAll({
+        where: {
+            order_id: req.body.order_id
+        },
+        include: [{
+            model: db.products
+        }]
+    }).then(orders => {
+        res.send(orders)
+    })
+
 })
 
 
