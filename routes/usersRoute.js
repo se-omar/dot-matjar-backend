@@ -143,6 +143,18 @@ router.post('/api/getSuppliers', (req, res) => {
     }
 })
 
+router.post('/api/refreshCurrentUser', (req, res) => {
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(user => {
+        res.json({
+            user: user
+        })
+    })
+})
+
 
 
 

@@ -35,8 +35,19 @@ router.post('/api/placeOrder', (req, res) => {
                     if (!product) {
                         return res.send('product not found')
                     }
+
                     product.update({
-                        buy_counter: product.buy_counter += req.body.quantity[index]
+                        buy_counter: product.buy_counter + req.body.quantity[index]
+                    })
+
+                    db.users.findOne({
+                        where: {
+                            user_id: product.user_id
+                        }
+                    }).then(user => {
+                        user.update({
+                            total_revenue: product.unit_price * product.buy_counter
+                        })
                     })
                 })
 
@@ -49,6 +60,8 @@ router.post('/api/placeOrder', (req, res) => {
             });
 
         })
+
+
         res.send('order placed sd')
     })
 })

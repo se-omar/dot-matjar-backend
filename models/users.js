@@ -121,7 +121,15 @@ module.exports = function (sequelize, DataTypes) {
         model: 'cart',
         key: 'cart_id'
       }
-    }
+    },
+    total_revenue: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true
+    },
+    revenue_recieved: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true
+    },
   }, {
     tableName: 'users',
   });
