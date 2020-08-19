@@ -37,6 +37,10 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(15),
       allowNull: true
     },
+    location: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
     gender: {
       type: DataTypes.STRING(10),
       allowNull: true
@@ -120,6 +124,13 @@ module.exports = function (sequelize, DataTypes) {
     },
     page_color: {
       type: DataTypes.STRING(255),
+    },
+    total_revenue: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true
+    },
+    revenue_recieved: {
+      type: DataTypes.INTEGER(11),
       allowNull: true
     },
   }, {

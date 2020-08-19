@@ -3,6 +3,8 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors')
 const crypto = require('crypto');
+// const faker = require('faker');
+const db = require('./database');
 
 
 
@@ -56,6 +58,22 @@ app.use(function (req, res, next) {
     res.header("Access-Control-Allow-Methods", "GET, POST, OPTIONS, PUT, DELETE");
     next();
 });
+
+app.post('/api/createFakeData', (req, res) => {
+    for (i = 0; i < 100; i++) {
+        db.users.create({
+            user_type: 'business',
+            email: faker.internet.email(),
+            profile_photo: faker.internet.avatar(),
+            national_number: 11111111111111,
+            full_arabic_name: faker.name.findName(),
+            password: faker.internet.password(),
+            mobile_number: faker.phone.phoneNumber(),
+
+        })
+    }
+    res.send('records created')
+})
 
 app.listen(3000, () => {
     console.log('listening on port 3000');

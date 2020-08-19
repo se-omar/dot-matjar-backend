@@ -18,7 +18,7 @@ router.post('/api/login', (req, res) => {
     if (!req.body.email || !req.body.password) {
         return res.send('please enter email and password')
     }
-    var user = db.users.findOne({
+    db.users.findOne({
         where: {
             email: req.body.email
         },

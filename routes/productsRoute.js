@@ -248,10 +248,55 @@ router.put('/api/filterProducts', async (req, res) => {
             data: products,
             message: 'searched by both'
         })
-
     }
+})
 
 
+
+router.put('/api/filterSuppliers', (req, res) => {
+
+    if (!req.body.location) {
+        console.log('name search')
+        db.users.findAll({
+            where: {
+                user_type: 'business',
+                full_arabic_name: {
+                    [Op.substring]: req.body.name
+                }
+            }
+        }).then(users => {
+            res.json({
+                users: users,
+            })
+        })
+    } else if (!req.body.name) {
+        console.log('location search')
+        db.users.findAll({
+            where: {
+                user_type: 'business',
+                location: {
+                    [Op.substring]: req.body.location
+                }
+            }
+        }).then(users => {
+            res.json({
+                users: users
+            })
+        })
+    } else {
+        console.log('both search')
+        db.users.findAll({
+            where: {
+                user_type: 'business',
+                location: req.body.location,
+                full_arabic_name: req.body.name
+            }.then(users => {
+                res.json({
+                    users: users
+                })
+            })
+        })
+    }
 })
 
 
