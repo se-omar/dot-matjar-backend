@@ -92,10 +92,10 @@ db.users.belongsTo(db.cart, {
 
 
 db.cart.belongsToMany(db.products, {
-    through: 'db.cart_products'
+    through: 'cart_products'
 });
 db.products.belongsToMany(db.cart, {
-    through: 'db.cart_products'
+    through: 'cart_products'
 });
 db.cart.hasMany(db.cart_products, {
     foreignKey: 'cart_id'

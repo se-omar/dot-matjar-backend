@@ -31,6 +31,11 @@ app.use(ordersRoute);
 const dashboardRoute = require('./routes/dashboardRoute.js');
 app.use(dashboardRoute);
 
+
+const supplierRoute = require('./routes/supplierRoute.js');
+app.use(supplierRoute);
+
+
 const date = new Date()
 console.log(date.getMonth())
 

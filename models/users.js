@@ -117,7 +117,11 @@ module.exports = function (sequelize, DataTypes) {
         model: 'cart',
         key: 'cart_id'
       }
-    }
+    },
+    page_color: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
   }, {
     tableName: 'users',
   });

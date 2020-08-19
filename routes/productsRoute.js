@@ -4,6 +4,8 @@ const db = require('../database');
 const multer = require('multer')
 const bodyParser = require('body-parser');
 const cors = require('cors');
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op;
 const path = require('path');
 const {
     cart
@@ -190,7 +192,9 @@ router.put('/api/filterProducts', async (req, res) => {
 
         db.products.findAll({
             where: {
-                product_name: req.body.product_name
+                product_name: {
+                    [Op.substring]: req.body.product_name
+                }
             },
             include: [{
                 model: db.business
