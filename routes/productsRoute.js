@@ -4,7 +4,7 @@ const db = require('../database');
 const multer = require('multer')
 const bodyParser = require('body-parser');
 const cors = require('cors');
-const Sequelize = require('sequelize');
+const Sequelize = require('sequelize')
 const Op = Sequelize.Op;
 const path = require('path');
 const {
@@ -53,14 +53,14 @@ router.post('/api/myProducts', (req, res) => {
             user_id: req.body.user_id
         },
         include: [{
-            model: db.business,
-            include: [{
-                model: db.users
-            }]
-        },
-        {
-            model: db.product_categories,
-        },
+                model: db.business,
+                include: [{
+                    model: db.users
+                }]
+            },
+            {
+                model: db.product_categories,
+            },
         ]
     }).then(response => {
         if (!response) {
@@ -192,7 +192,9 @@ router.put('/api/filterProducts', async (req, res) => {
 
         db.products.findAll({
             where: {
-                product_name: req.body.product_name
+                product_name: {
+                    [Op.substring]: req.body.product_name
+                }
             },
             include: [{
                 model: db.business

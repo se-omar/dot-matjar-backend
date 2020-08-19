@@ -126,10 +126,19 @@ router.post('/api/table', async (req, res) => {
             db.cart_products.create({
                 cart_id: cart.cart_id,
                 product_id: req.body.product_id
+<<<<<<< HEAD
             })
             res.json({
                 message: "product added successfully"
             })
+=======
+
+            }).then(res.json({
+                message: "product added successfully"
+            }))
+
+
+>>>>>>> 0404c46423d357de1b4b054d17bf830d5d8bd4e1
 
         } else {
             res.json({
@@ -141,28 +150,31 @@ router.post('/api/table', async (req, res) => {
 
 })
 
-router.put('/api/getProducts', (req, res) => {
-    db.cart.findOne({
+router.put('/api/getProducts', async (req, res) => {
+    var cart = await db.cart.findOne({
         where: {
             user_id: req.body.user_id
         }
-    }).then(cart => {
-        db.cart_products.findAll({
-            where: {
-                cart_id: cart.cart_id
-            },
-            include: [db.products]
-        }).then((products) => {
-            var map = products.map((e) => {
-                return e.product
-            })
-            res.json({
-                data: map
-            })
-        })
+    })
+
+    var products = await db.cart_products.findAll({
+        where: {
+            cart_id: cart.cart_id
+        },
+        include: [db.products]
+    })
+
+    var map = await products.map((e) => {
+        return e.product
+    })
+    res.json({
+        data: map,
+
     })
 
 })
+
+
 
 router.put('/api/remove', (req, res) => {
     db.cart_products.findOne({

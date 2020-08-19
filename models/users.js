@@ -122,6 +122,9 @@ module.exports = function (sequelize, DataTypes) {
         key: 'cart_id'
       }
     },
+    page_color: {
+      type: DataTypes.STRING(255),
+    },
     total_revenue: {
       type: DataTypes.INTEGER(11),
       allowNull: true

@@ -92,10 +92,12 @@ db.users.belongsTo(db.cart, {
 
 
 db.cart.belongsToMany(db.products, {
-    through: 'cart_products', foreignKey: 'cart_id'
+    through: 'cart_products',
+    foreignKey: 'cart_id'
 });
 db.products.belongsToMany(db.cart, {
-    through: 'cart_products', foreignKey: 'product_id'
+    through: 'cart_products',
+    foreignKey: 'product_id'
 });
 db.cart.hasMany(db.cart_products, {
     foreignKey: 'cart_id'
@@ -115,10 +117,12 @@ db.cart_products.belongsTo(db.products, {
 
 
 db.orders.belongsToMany(db.products, {
-    through: 'products_orders', foreignKey: 'order_id'
+    through: 'products_orders',
+    foreignKey: 'order_id'
 });
 db.products.belongsToMany(db.orders, {
-    through: 'products_orders', foreignKey: 'product_id'
+    through: 'products_orders',
+    foreignKey: 'product_id'
 });
 db.orders.hasMany(db.products_orders, {
     foreignKey: 'order_id'
