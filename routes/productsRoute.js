@@ -41,36 +41,14 @@ router.get('/api/products', (req, res) => {
         }]
     }).then((data) => {
         res.send(data);
+    }).catch(err => {
+        console.log(err)
     })
 
 
 
 });
 
-router.post('/api/myProducts', (req, res) => {
-    db.products.findAll({
-        where: {
-            user_id: req.body.user_id
-        },
-        include: [{
-                model: db.business,
-                include: [{
-                    model: db.users
-                }]
-            },
-            {
-                model: db.product_categories,
-            },
-        ]
-    }).then(response => {
-        if (!response) {
-            res.send('no products found for this user')
-            return
-        } else {
-            res.send(response)
-        }
-    })
-});
 
 
 //POST METHOD

@@ -12,16 +12,25 @@ router.use(bodyParser.json());
 router.use(cors());
 
 
-router.get('/api/supplierProducts', (req, res) => {
+router.put('/api/supplierProducts', (req, res) => {
+    console.log('user id issss', req.body.user_id)
     db.products.findAll({
             where: {
                 user_id: req.body.user_id
-            }
+            },
+            include: [{
+                model: db.business
+            }]
         })
         .then(products => {
+            console.log('supplier productsss', products)
             res.json({
                 data: products
+
             })
+        })
+        .catch(err => {
+            console.log(err)
         })
 })
 
@@ -32,11 +41,10 @@ router.put('/api/supplierPageColor', (req, res) => {
             user_id: req.body.user_id
         }
     }).then(user => {
-        if (user.user_type == 'supplier') {
+        if (user.user_type == 'business') {
             if (req.body.page_color) {
                 user.update({
                     page_color: req.body.page_color
-
                 })
             }
             res.json({
