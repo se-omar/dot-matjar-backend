@@ -35,7 +35,6 @@ router.put('/api/supplierProducts', (req, res) => {
 })
 
 router.put('/api/supplierPageColor', (req, res) => {
-    console.log('reqqqqqqqqqqqqqq', req.body.user_id, req.body.page_color)
     db.users.findOne({
         where: {
             user_id: req.body.user_id

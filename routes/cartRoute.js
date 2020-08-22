@@ -126,19 +126,10 @@ router.post('/api/table', async (req, res) => {
             db.cart_products.create({
                 cart_id: cart.cart_id,
                 product_id: req.body.product_id
-<<<<<<< HEAD
             })
             res.json({
                 message: "product added successfully"
             })
-=======
-
-            }).then(res.json({
-                message: "product added successfully"
-            }))
-
-
->>>>>>> 0404c46423d357de1b4b054d17bf830d5d8bd4e1
 
         } else {
             res.json({

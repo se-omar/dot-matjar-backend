@@ -3,7 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors')
 const crypto = require('crypto');
-const faker = require('faker');
+// const faker = require('faker');
 const db = require('./database');
 
 
