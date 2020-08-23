@@ -4,7 +4,15 @@ const router = express.Router();
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const cors = require('cors')
-router.use(bodyParser.json());
+
+router.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 router.use(cors());
 
 

@@ -20,6 +20,10 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },
+    product_id: {
+      type: DataTypes.INTEGER(10),
+      allowNull: true
+    },
     request_status: {
       type: DataTypes.STRING(255),
       allowNull: true

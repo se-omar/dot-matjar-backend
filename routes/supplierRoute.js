@@ -8,16 +8,24 @@ const path = require('path');
 const {
     cart
 } = require('../database');
-router.use(bodyParser.json());
+
+router.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 router.use(cors());
 
 
 router.get('/api/supplierProducts', (req, res) => {
     db.products.findAll({
-            where: {
-                user_id: req.body.user_id
-            }
-        })
+        where: {
+            user_id: req.body.user_id
+        }
+    })
         .then(products => {
             res.json({
                 data: products

@@ -5,66 +5,74 @@ const stripe = require('stripe')('sk_test_51H97oICdSDXTIUwz1HsESGMmCODSWE7Ct0hUQ
 const bodyParser = require('body-parser');
 const cors = require('cors')
 const crypto = require('crypto');
-const orderid = require('order-id')('mysecret')
-const date = new Date();
-router.use(bodyParser.json());
+
+
+
+router.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 router.use(cors());
 
-router.post('/api/placeOrder', (req, res) => {
-    db.users.findOne({
-        where: {
-            user_id: req.body.user_id
-        }
-    }).then(user => {
-        db.orders.create({
-            user_id: user.user_id,
-            total_price: req.body.total_price,
-            status: 'pending',
-            order_date: new Date(),
-            order_number: orderid.generate(),
-            order_month: date.getMonth()
-        }).then(order => {
-            console.log(req.body.quantity)
-            console.log(orderid.generate())
-            req.body.products.forEach((element, index) => {
-                db.products.findOne({
-                    where: {
-                        product_id: element.product_id
-                    }
-                }).then(product => {
-                    if (!product) {
-                        return res.send('product not found')
-                    }
+// router.post('/api/placeOrder', (req, res) => {
+//     db.users.findOne({
+//         where: {
+//             user_id: req.body.user_id
+//         }
+//     }).then(user => {
+//         db.orders.create({
+//             user_id: user.user_id,
+//             total_price: req.body.total_price,
+//             status: 'pending',
+//             order_date: new Date(),
+//             order_number: orderid.generate(),
+//             order_month: date.getMonth()
+//         }).then(order => {
+//             console.log(req.body.quantity)
+//             console.log(orderid.generate())
+//             req.body.products.forEach((element, index) => {
+//                 db.products.findOne({
+//                     where: {
+//                         product_id: element.product_id
+//                     }
+//                 }).then(product => {
+//                     if (!product) {
+//                         return res.send('product not found')
+//                     }
 
-                    product.update({
-                        buy_counter: product.buy_counter + req.body.quantity[index]
-                    })
+//                     product.update({
+//                         buy_counter: product.buy_counter + req.body.quantity[index]
+//                     })
 
-                    db.users.findOne({
-                        where: {
-                            user_id: product.user_id
-                        }
-                    }).then(user => {
-                        user.update({
-                            total_revenue: product.unit_price * product.buy_counter
-                        })
-                    })
-                })
+//                     db.users.findOne({
+//                         where: {
+//                             user_id: product.user_id
+//                         }
+//                     }).then(user => {
+//                         user.update({
+//                             total_revenue: product.unit_price * product.buy_counter
+//                         })
+//                     })
+//                 })
 
-                db.products_orders.create({
-                    order_id: order.order_id,
-                    quantity: req.body.quantity[index],
-                    product_id: element.product_id,
-                    purchase_date: new Date()
-                })
-            });
+//                 db.products_orders.create({
+//                     order_id: order.order_id,
+//                     quantity: req.body.quantity[index],
+//                     product_id: element.product_id,
+//                     purchase_date: new Date()
+//                 })
+//             });
 
-        })
+//         })
 
 
-        res.send('order placed sd')
-    })
-})
+//         res.send('order placed sd')
+//     })
+// })
 
 
 

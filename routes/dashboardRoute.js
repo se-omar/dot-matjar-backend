@@ -6,6 +6,14 @@ const cors = require('cors');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
+router.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 // sequelize.where(sequelize.fn("month", sequelize.col("fromDate")), fromMonth)
 router.post('/api/monthlySales', (req, res) => {
     db.orders.findAll({

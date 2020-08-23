@@ -8,8 +8,17 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
+const checkAuth = require('./check-auth')
 
-router.use(bodyParser.json());
+
+router.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 router.use(cors());
 
 
@@ -143,13 +152,20 @@ router.post('/api/getSuppliers', (req, res) => {
     }
 })
 
-router.post('/api/refreshCurrentUser', (req, res) => {
+router.post('/api/refreshCurrentUser', checkAuth, (req, res) => {
     db.users.findOne({
         where: {
-            user_id: req.body.user_id
+            user_id: req.userData.user_id
         }
     }).then(user => {
+        if (!user) {
+            return res.json({
+                message: 'user not found',
+            })
+        }
+
         res.json({
+            message: 'user sent successfully',
             user: user
         })
     })
