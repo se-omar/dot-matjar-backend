@@ -49,6 +49,8 @@ router.get('/api/products', (req, res) => {
         }]
     }).then((data) => {
         res.send(data);
+    }).catch(err => {
+        console.log(err)
     })
 
 

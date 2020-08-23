@@ -217,12 +217,10 @@ router.post('/api/table', async (req, res) => {
             db.cart_products.create({
                 cart_id: cart.cart_id,
                 product_id: req.body.product_id
-
-            }).then(res.json({
+            })
+            res.json({
                 message: "product added successfully"
-            }))
-
-
+            })
 
         } else {
             res.json({
