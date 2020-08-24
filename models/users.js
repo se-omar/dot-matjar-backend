@@ -65,7 +65,7 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    village: {
+    region: {
       type: DataTypes.STRING(255),
       allowNull: true
     },

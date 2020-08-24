@@ -5,14 +5,19 @@ const multer = require('multer')
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
+const fs = require('fs')
+
 const {
     cart
 } = require('../database');
 router.use(bodyParser.json());
 router.use(cors());
 
+router.use(bodyParser.json({limit: '100mb', extended: true}))
+router.use(bodyParser.urlencoded({limit: '100mb', extended: true}))
 
-router.put('/api/supplierProducts', (req, res) => {
+router.put('/api/supplierProducts/', (req, res) => {
+   
     console.log('user id issss', req.body.user_id)
     db.products.findAll({
             where: {
@@ -59,11 +64,62 @@ router.put('/api/supplierPageColor', (req, res) => {
     })
 })
 
+router.put('/api/getSupplier',(req,res)=>{
+  db.users.findOne({
+      where:{
+          user_id:req.body.user_id
+      }
+  }).then(user=>{
+      if(!user){res.json({message:"supplier not found"})}
+      else{
+      res.json({data:user})
+    }   
+    })
+})
+
+router.put('/api/getRegions',(req,res)=>{
+  console.log('asdasdasdas',req.body.governorate)  
+  var region
+fs.readFile('./countries.json', 'utf8',(err,data)=>{
+    if(err){
+        res.send('error')
+    }
+    else{
+var obj = JSON.parse(data);
 
 
+for(var i=0 ; i<obj.length;i++){
+if(obj[i].government == req.body.governorate){
+    region = obj[i].cities
+}
+}   
+res.json({data:region})
+    }
+})
+
+})
 
 
-
+router.put('/api/getGovernorate',(req,res)=>{
+    var governorate=[]
+    fs.readFile('./countries.json', 'utf8',(err,data)=>{
+        if(err){
+            res.send('error')
+        }
+        else{
+    var obj = JSON.parse(data);
+    
+    
+    for(var i=0 ; i<obj.length;i++){
+   
+        governorate .push (obj[i].government)
+   
+    }   
+    res.json({data:governorate})
+        }
+    })
+    
+    })
 
 
 

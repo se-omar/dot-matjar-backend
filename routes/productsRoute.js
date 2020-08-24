@@ -228,12 +228,12 @@ router.put('/api/filterProducts', async (req, res) => {
         })
     }
 })
+    
 
 
+router.put('/api/filterSuppliers', (req, res) => {  
 
-router.put('/api/filterSuppliers', (req, res) => {
-
-    if (!req.body.location) {
+    if (!req.body.governorate) {
         console.log('name search')
         db.users.findAll({
             where: {
@@ -247,33 +247,70 @@ router.put('/api/filterSuppliers', (req, res) => {
                 users: users,
             })
         })
-    } else if (!req.body.name) {
+    } 
+    else if(! req.body.name && !req.body.region){
+console.log('governorate srarch')
+db.users.findAll({
+    where:{
+        governorate:req.body.governorate
+    }
+}).then(users=>{
+    res.json({users:users})
+})
+    }
+    else if(!req.body.region){
+        console.log('name and governorate')
+        db.users.findAll({
+            where:{
+                governorate:req.body.governorate,
+                full_arabic_name: {
+                    [Op.substring]: req.body.name
+                }
+            }
+        }).then(users=>{
+            if(!users){res.json({message:'suppliers not found'})}
+            else{
+                res.json({users:users})
+            }
+        })
+    }
+    
+    else if (!req.body.name) {    
         console.log('location search')
         db.users.findAll({
             where: {
-                user_type: 'business',
-                location: {
-                    [Op.substring]: req.body.location
-                }
+              governorate:req.body.governorate,
+              region:req.body.region
             }
         }).then(users => {
+            if(!users){res.json({message:'No suppliers found'})}
+            else{
             res.json({
                 users: users
             })
+        }
         })
     } else {
         console.log('both search')
         db.users.findAll({
             where: {
                 user_type: 'business',
-                location: req.body.location,
-                full_arabic_name: req.body.name
-            }.then(users => {
+                governorate: req.body.governorate,
+                full_arabic_name: {
+                    [Op.substring]: req.body.name
+                },
+                region:req.body.region
+            }
+        })
+            .then(users => {
+                if(!users){res.json({message:'No suppliers found'})}
+                else{
                 res.json({
                     users: users
                 })
+            }
             })
-        })
+        
     }
 })
 
