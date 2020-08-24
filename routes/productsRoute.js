@@ -10,7 +10,15 @@ const path = require('path');
 const {
     cart
 } = require('../database');
-router.use(bodyParser.json());
+
+router.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 router.use(cors());
 
 
@@ -49,6 +57,29 @@ router.get('/api/products', (req, res) => {
 
 });
 
+router.post('/api/myProducts', (req, res) => {
+    db.products.findAll({
+        where: {
+            user_id: req.body.user_id
+        },
+        include: [{
+            model: db.business,
+            include: [{
+                model: db.users
+            }]
+        },
+        {
+            model: db.product_categories,
+        },
+        ]
+    }).then(response => {
+        if (!response) {
+            res.send('no products found for this user')
+            return
+        }
+        res.send(response)
+    })
+});
 
 
 //POST METHOD
@@ -68,7 +99,6 @@ router.post('/api/product', upload2.array('file', 12), async (req, res, next) =>
         category_id: cat.category_id,
         product_code: req.body.product_code,
         user_id: req.body.user_id,
-        bussiness_id: req.body.bussiness_id,
         HS_code: req.body.HS_code,
         min_units_per_order: req.body.min_units_per_order,
         unit_price: req.body.unit_price,
@@ -103,7 +133,6 @@ router.post('/api/updateProduct', upload2.array('file', 12), (req, res, next) =>
                 product_name: req.body.product_name,
                 product_code: req.body.product_code,
                 user_id: req.body.user_id,
-                bussiness_id: req.body.bussiness_id,
                 HS_code: req.body.HS_code,
                 min_units_per_order: req.body.min_units_per_order,
                 unit_price: req.body.unit_price,

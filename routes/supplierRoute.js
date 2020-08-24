@@ -10,7 +10,15 @@ const fs = require('fs')
 const {
     cart
 } = require('../database');
-router.use(bodyParser.json());
+
+router.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 router.use(cors());
 
 router.use(bodyParser.json({limit: '100mb', extended: true}))
@@ -20,13 +28,13 @@ router.put('/api/supplierProducts/', (req, res) => {
    
     console.log('user id issss', req.body.user_id)
     db.products.findAll({
-            where: {
-                user_id: req.body.user_id
-            },
-            include: [{
-                model: db.business
-            }]
-        })
+        where: {
+            user_id: req.body.user_id
+        },
+        include: [{
+            model: db.business
+        }]
+    })
         .then(products => {
             console.log('supplier productsss', products)
             res.json({

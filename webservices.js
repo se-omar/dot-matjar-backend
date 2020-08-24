@@ -39,14 +39,23 @@ app.use(supplierRoute);
 
 
 const date = new Date()
-console.log(date.getMonth())
+console.log(date.getMonth() + 1)
 
 require("dotenv").config();
 
-app.use(bodyParser.urlencoded({
-    extended: false
-}));
-app.use(bodyParser.json());
+// app.use(bodyParser.urlencoded({
+//     extended: false
+// }));
+// app.use(bodyParser.json());
+
+app.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 app.use(cors());
 
 

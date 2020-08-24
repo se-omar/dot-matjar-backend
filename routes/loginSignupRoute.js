@@ -5,8 +5,17 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 var hash = crypto.randomBytes(10).toString('hex');
 const bodyParser = require('body-parser');
+const jwt = require('jsonwebtoken');
 const cors = require('cors')
-router.use(bodyParser.json());
+
+router.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 router.use(cors());
 const jwt = require("jsonwebtoken");
 
@@ -15,9 +24,6 @@ const cryptoo = crypto.randomBytes(10).toString('hex');
 //LOGIN/SIGNUP/ACTIVATION/COMPLETEDATA WEBSERVICE
 
 router.post('/api/login', (req, res) => {
-    if (!req.body.email || !req.body.password) {
-        return res.send('please enter email and password')
-    }
     db.users.findOne({
         where: {
             email: req.body.email
@@ -26,34 +32,54 @@ router.post('/api/login', (req, res) => {
             model: db.business
         }]
     }).then(user => {
-
-        if (user) {
-            if (user.active == 0) {
-                return res.send("Please activate your account")
-            } else if (user.active == 1) {
-                if (user == null) {
-                    return res.json({
-                        message: 'wrong email'
-                    })
-                };
-            }
-            // if (req.body.password != user.password) {
-            //     return res.send('wrong password')
-            //     console.log(user.password , "======================")
-            // }
-            if (user.password == req.body.password) {
-                res.json({
-                    message: "authenitcation succesfull",
-                    data: user
-                });
-                console.log(user)
-
-            } else {
-                res.send("Password doesnt match")
-            }
-        } else {
-            res.send("Please Signup first")
+        if (!user) {
+            return res.json({ message: 'please sign up first' })
         }
+        if (user.active == 0) {
+            return res.json({ message: 'Please activate your account' })
+        }
+        if (user.password != req.body.password) {
+            return res.json({ message: 'authentication failed' })
+        }
+
+        jwt.sign({
+            user_id: user.user_id,
+            user_email: user.email
+        }, 'secret', (err, token) => {
+            return res.json({
+                message: 'authentication successful',
+                token: token
+            })
+        })
+
+
+
+
+
+        // if (user) {
+        //     if (user.active == 0) {
+        //         return res.send("Please activate your account")
+        //     } else if (user.active == 1) {
+        //         if (user == null) {
+        //             return res.json({
+        //                 message: 'wrong email'
+        //             })
+        //         };
+        //     }
+
+        //     if (user.password == req.body.password) {
+        //         res.json({
+        //             message: "authenitcation succesfull",
+        //             data: user
+        //         });
+        //         console.log(user)
+
+        //     } else {
+        //         res.send("Password doesnt match")
+        //     }
+        // } else {
+        //     res.send("Please Signup first")
+        // }
     });
 
 });

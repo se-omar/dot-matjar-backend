@@ -6,6 +6,14 @@ const cors = require('cors');
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 
+router.use((req, res, next) => {
+    if (req.originalUrl === '/webhook') {
+        next();
+    } else {
+        bodyParser.json()(req, res, next);
+    }
+});
+
 // sequelize.where(sequelize.fn("month", sequelize.col("fromDate")), fromMonth)
 router.post('/api/monthlySales', (req, res) => {
     db.orders.findAll({
@@ -26,6 +34,11 @@ router.post('/api/topSellingProduct', (req, res) => {
             user_id: req.body.user_id
         }
     }).then(max => {
+        if (!max) {
+            return res.json({
+                maxProduct: { message: 'product not found' }
+            })
+        }
         db.products.findOne({
             where: {
                 user_id: req.body.user_id,
@@ -52,6 +65,13 @@ router.post('/api/leastSellingProduct', (req, res) => {
             user_id: req.body.user_id
         }
     }).then(min => {
+        console.log('min product is', min)
+        if (!min && min !== 0) {
+            return res.json({
+                minProduct: { message: 'product not found' }
+            })
+        }
+
         db.products.findOne({
             where: {
                 user_id: req.body.user_id,
