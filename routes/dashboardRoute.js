@@ -34,6 +34,11 @@ router.post('/api/topSellingProduct', (req, res) => {
             user_id: req.body.user_id
         }
     }).then(max => {
+        if (!max) {
+            return res.json({
+                maxProduct: { message: 'product not found' }
+            })
+        }
         db.products.findOne({
             where: {
                 user_id: req.body.user_id,
@@ -60,6 +65,13 @@ router.post('/api/leastSellingProduct', (req, res) => {
             user_id: req.body.user_id
         }
     }).then(min => {
+        console.log('min product is', min)
+        if (!min && min !== 0) {
+            return res.json({
+                minProduct: { message: 'product not found' }
+            })
+        }
+
         db.products.findOne({
             where: {
                 user_id: req.body.user_id,

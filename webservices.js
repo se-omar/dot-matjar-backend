@@ -39,7 +39,7 @@ app.use(supplierRoute);
 
 
 const date = new Date()
-console.log(date.getMonth())
+console.log(date.getMonth() + 1)
 
 require("dotenv").config();
 

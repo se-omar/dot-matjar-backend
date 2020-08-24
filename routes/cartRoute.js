@@ -7,8 +7,7 @@ const cors = require('cors');
 const crypto = require('crypto');
 const orderid = require('order-id')('mysecret')
 const endpointSecret = 'whsec_cBcdnKIKvB73t8hltToBCAjZtQWhabds';
-const date = new Date();
-
+var date = new Date();
 router.use(cors());
 
 router.use((req, res, next) => {
@@ -105,7 +104,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), (request, 
                 status: 'pending',
                 order_date: new Date(),
                 order_number: orderid.generate(),
-                order_month: date.getMonth()
+                order_month: date.getMonth() + 1
             }).then(order => {
                 console.log(orderid.generate())
                 productsArray.forEach((element, index) => {
