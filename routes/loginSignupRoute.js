@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 var hash = crypto.randomBytes(10).toString('hex');
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
+
 const cors = require('cors')
 
 router.use((req, res, next) => {
@@ -154,8 +154,8 @@ router.post('/api/signup', async (req, res) => {
                 full_arabic_name: req.body.full_arabic_name,
                 gender: req.body.gender,
                 crypto: cryptoo,
-                governorate:req.body.governorate,
-                region:req.body.region
+                governorate: req.body.governorate,
+                region: req.body.region
 
 
             })

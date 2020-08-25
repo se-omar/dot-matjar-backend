@@ -114,9 +114,6 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), (request, 
                         }
                     }).then(product => {
                         if (!product) {
-                            productsArray = [];
-                            currentUserAtCheckout = '';
-                            quantityArray = [];
                             return response.send('product not found')
                         }
 

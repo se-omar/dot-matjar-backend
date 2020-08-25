@@ -19,8 +19,7 @@ const db = {
     cart_products: sequelize.import('./models/cart_products'),
     orders: sequelize.import('./models/orders'),
     products_orders: sequelize.import('./models/products_orders'),
-    country: sequelize.import('./models/country'),
-    country_regions: sequelize.import('./models/country_regions')
+
 }
 
 db.users.hasMany(db.requests, {
