@@ -39,20 +39,31 @@ const upload2 = multer({
 
 //===========================================================
 //PRODUCTS TABLE
-router.get('/api/products', (req, res) => {
-    db.products.findAll({
-        include: [{
-            model: db.business,
-            include: [{
-                model: db.users
-            }]
-        }]
-    }).then((data) => {
-        res.send(data);
-    }).catch(err => {
-        console.log(err)
-    })
-
+router.post('/api/products', (req, res) => {
+    if (!req.body.product_id) {
+        db.products.findAll({
+            limit: 20
+        }).then(products => {
+            res.json({
+                products: products
+            })
+        })
+    }
+    else {
+        console.log('entered here')
+        db.products.findAll({
+            where: {
+                product_id: {
+                    [Op.gt]: req.body.product_id
+                },
+            },
+            limit: 20
+        }).then(products => {
+            res.json({
+                products: products
+            })
+        })
+    }
 
 
 });
@@ -195,72 +206,152 @@ router.put('/api/filterProducts', async (req, res) => {
     console.log('category name=======', req.body.category_name)
 
     if (!req.body.category_name) {
-        console.log('product entered')
-
-        db.products.findAll({
-            where: {
-                product_name: {
-                    [Op.substring]: req.body.product_name
-                }
-            },
-            include: [{
-                model: db.business
-            }]
-        }).then(products => {
-            res.json({
-                data: products,
-                message: 'searched by productName'
+        if (!req.body.product_id) {
+            console.log('product entered')
+            db.products.findAll({
+                where: {
+                    product_name: {
+                        [Op.substring]: req.body.product_name
+                    }
+                },
+                limit: 20,
+                include: [{
+                    model: db.business
+                }]
+            }).then(products => {
+                res.json({
+                    data: products,
+                    message: 'searched by productName'
+                })
             })
-        })
+        }
+        else {
+            db.products.findAll({
+                where: {
+                    product_id: {
+                        [Op.gt]: req.body.product_id
+                    },
+                    product_name: {
+                        [Op.substring]: req.body.product_name
+                    }
+                },
+                limit: 20,
+                include: [{
+                    model: db.business
+                }]
+            }).then(products => {
+                res.json({
+                    data: products,
+                    message: 'searched by productName'
+                })
+            })
+        }
+
     } else if (!req.body.product_name) {
-        console.log('category entered')
-        var cat = await db.product_categories.findOne({
-            where: {
-                category_name: req.body.category_name
-            }
-        })
-        db.products.findAll({
-            where: {
-                category_id: cat.category_id
-            },
-            include: [{
-                model: db.business
-            }]
-        }).then(products => {
+        if (!req.body.product_id) {
+            console.log('category entered')
+            var cat = await db.product_categories.findOne({
+                where: {
+                    category_name: req.body.category_name
+                }
+            })
+            db.products.findAll({
+                where: {
+                    category_id: cat.category_id
+                },
+                limit: 20,
+                include: [{
+                    model: db.business
+                }]
+            }).then(products => {
+                res.json({
+                    data: products,
+                    message: 'searched by category'
+                })
+                console.log(products.length)
+            })
+        }
+        else {
+            console.log('category entered')
+            var cat = await db.product_categories.findOne({
+                where: {
+                    category_name: req.body.category_name
+                }
+            })
+            db.products.findAll({
+                where: {
+                    product_id: {
+                        [Op.gt]: req.body.product_id
+                    },
+                    category_id: cat.category_id
+                },
+                limit: 20,
+                include: [{
+                    model: db.business
+                }]
+            }).then(products => {
+                res.json({
+                    data: products,
+                    message: 'searched by category'
+                })
+                console.log(products.length)
+            })
+        }
+
+    } else {
+        if (!req.body.product_id) {
+            var cat = await db.product_categories.findOne({
+                where: {
+                    category_name: req.body.category_name
+                }
+            })
+            var products = await db.products.findAll({
+                where: {
+                    category_id: cat.category_id,
+                    product_name: req.body.product_name
+                },
+                limit: 20,
+                include: [{
+                    model: db.business
+                }]
+            })
             res.json({
                 data: products,
-                message: 'searched by category'
+                message: 'searched by both'
             })
-            console.log(products.length)
-        })
-    } else {
-        console.log('both entered')
+        }
+        else {
 
-        var cat = await db.product_categories.findOne({
-            where: {
-                category_name: req.body.category_name
-            }
-        })
-        var products = await db.products.findAll({
-            where: {
-                category_id: cat.category_id,
-                product_name: req.body.product_name
+            var cat = await db.product_categories.findOne({
+                where: {
+                    category_name: req.body.category_name
+                }
+            })
+            var products = await db.products.findAll({
+                where: {
+                    product_id: {
+                        [Op.gt]: req.body.product_id
+                    },
+                    category_id: cat.category_id,
+                    product_name: req.body.product_name
+                },
+                limit: 20,
+                include: [{
+                    model: db.business
+                }]
+            })
+            res.json({
+                data: products,
+                message: 'searched by both'
+            })
+        }
 
-            },
-            include: [{
-                model: db.business
-            }]
-        })
-        res.json({
-            data: products,
-            message: 'searched by both'
-        })
     }
 })
-    
 
 
-router.put('/api/filterSuppliers', (req, res) => {  
+
+router.put('/api/filterSuppliers', (req, res) => {
 
     if (!req.body.governorate) {
         console.log('name search')
@@ -276,48 +367,48 @@ router.put('/api/filterSuppliers', (req, res) => {
                 users: users,
             })
         })
-    } 
-    else if(! req.body.name && !req.body.region){
-console.log('governorate srarch')
-db.users.findAll({
-    where:{
-        governorate:req.body.governorate
     }
-}).then(users=>{
-    res.json({users:users})
-})
+    else if (!req.body.name && !req.body.region) {
+        console.log('governorate srarch')
+        db.users.findAll({
+            where: {
+                governorate: req.body.governorate
+            }
+        }).then(users => {
+            res.json({ users: users })
+        })
     }
-    else if(!req.body.region){
+    else if (!req.body.region) {
         console.log('name and governorate')
         db.users.findAll({
-            where:{
-                governorate:req.body.governorate,
+            where: {
+                governorate: req.body.governorate,
                 full_arabic_name: {
                     [Op.substring]: req.body.name
                 }
             }
-        }).then(users=>{
-            if(!users){res.json({message:'suppliers not found'})}
-            else{
-                res.json({users:users})
+        }).then(users => {
+            if (!users) { res.json({ message: 'suppliers not found' }) }
+            else {
+                res.json({ users: users })
             }
         })
     }
-    
-    else if (!req.body.name) {    
+
+    else if (!req.body.name) {
         console.log('location search')
         db.users.findAll({
             where: {
-              governorate:req.body.governorate,
-              region:req.body.region
+                governorate: req.body.governorate,
+                region: req.body.region
             }
         }).then(users => {
-            if(!users){res.json({message:'No suppliers found'})}
-            else{
-            res.json({
-                users: users
-            })
-        }
+            if (!users) { res.json({ message: 'No suppliers found' }) }
+            else {
+                res.json({
+                    users: users
+                })
+            }
         })
     } else {
         console.log('both search')
@@ -328,18 +419,18 @@ db.users.findAll({
                 full_arabic_name: {
                     [Op.substring]: req.body.name
                 },
-                region:req.body.region
+                region: req.body.region
             }
         })
             .then(users => {
-                if(!users){res.json({message:'No suppliers found'})}
-                else{
-                res.json({
-                    users: users
-                })
-            }
+                if (!users) { res.json({ message: 'No suppliers found' }) }
+                else {
+                    res.json({
+                        users: users
+                    })
+                }
             })
-        
+
     }
 })
 
