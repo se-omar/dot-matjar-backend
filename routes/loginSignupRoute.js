@@ -5,7 +5,7 @@ const nodemailer = require('nodemailer');
 const crypto = require('crypto');
 var hash = crypto.randomBytes(10).toString('hex');
 const bodyParser = require('body-parser');
-const jwt = require('jsonwebtoken');
+// const jwt = require('jsonwebtoken');
 const cors = require('cors')
 
 router.use((req, res, next) => {

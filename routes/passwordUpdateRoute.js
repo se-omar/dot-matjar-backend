@@ -29,8 +29,8 @@ var transporter = nodemailer.createTransport({
 });
 
 router.post('/api/resetpassword', (req, res) => {
-    if (!req.body.email || !req.body.national_number) {
-        return res.send('please enter email and national number')
+    if (!req.body.email ) {
+        return res.send('please enter your email')
     }
     db.users.findOne({
         where: {
@@ -40,9 +40,7 @@ router.post('/api/resetpassword', (req, res) => {
         if (user == null) {
             return res.send('wrong email')
         };
-        if (req.body.national_number != user.national_number) {
-            return res.send('wrong national number')
-        }
+       
 
         user.update({
             password_reset_token: hashLink
