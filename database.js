@@ -18,7 +18,9 @@ const db = {
     cart: sequelize.import('./models/cart'),
     cart_products: sequelize.import('./models/cart_products'),
     orders: sequelize.import('./models/orders'),
-    products_orders: sequelize.import('./models/products_orders')
+    products_orders: sequelize.import('./models/products_orders'),
+    country: sequelize.import('./models/country'),
+    country_regions: sequelize.import('./models/country_regions')
 }
 
 db.users.hasMany(db.requests, {
@@ -138,7 +140,5 @@ db.products.hasMany(db.products_orders, {
 db.products_orders.belongsTo(db.products, {
     foreignKey: 'product_id'
 });
-
-
 
 module.exports = db;

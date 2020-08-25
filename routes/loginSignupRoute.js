@@ -17,9 +17,9 @@ router.use((req, res, next) => {
 });
 
 router.use(cors());
+const jwt = require("jsonwebtoken");
 
-
-
+const cryptoo = crypto.randomBytes(10).toString('hex');
 //=============================================
 //LOGIN/SIGNUP/ACTIVATION/COMPLETEDATA WEBSERVICE
 
@@ -153,7 +153,9 @@ router.post('/api/signup', async (req, res) => {
                 mobile_number: req.body.mobile_number,
                 full_arabic_name: req.body.full_arabic_name,
                 gender: req.body.gender,
-                crypto: cryptoo
+                crypto: cryptoo,
+                governorate:req.body.governorate,
+                region:req.body.region
 
 
             })
