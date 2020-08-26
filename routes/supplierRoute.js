@@ -6,6 +6,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors');
 const path = require('path');
 const fs = require('fs')
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op;
 
 const {
     cart
@@ -21,11 +23,11 @@ router.use((req, res, next) => {
 
 router.use(cors());
 
-router.use(bodyParser.json({limit: '100mb', extended: true}))
-router.use(bodyParser.urlencoded({limit: '100mb', extended: true}))
+router.use(bodyParser.json({ limit: '100mb', extended: true }))
+router.use(bodyParser.urlencoded({ limit: '100mb', extended: true }))
 
 router.put('/api/supplierProducts/', (req, res) => {
-   
+
     console.log('user id issss', req.body.user_id)
     db.products.findAll({
         where: {
@@ -72,62 +74,165 @@ router.put('/api/supplierPageColor', (req, res) => {
     })
 })
 
-router.put('/api/getSupplier',(req,res)=>{
-  db.users.findOne({
-      where:{
-          user_id:req.body.user_id
-      }
-  }).then(user=>{
-      if(!user){res.json({message:"supplier not found"})}
-      else{
-      res.json({data:user})
-    }   
+router.put('/api/getSupplier', (req, res) => {
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(user => {
+        if (!user) { res.json({ message: "supplier not found" }) }
+        else {
+            res.json({ data: user })
+        }
     })
 })
 
-router.put('/api/getRegions',(req,res)=>{
-  console.log('asdasdasdas',req.body.governorate)  
-  var region
-fs.readFile('./countries.json', 'utf8',(err,data)=>{
-    if(err){
-        res.send('error')
-    }
-    else{
-var obj = JSON.parse(data);
-
-
-for(var i=0 ; i<obj.length;i++){
-if(obj[i].government == req.body.governorate){
-    region = obj[i].cities
-}
-}   
-res.json({data:region})
-    }
-})
-
-})
-
-
-router.put('/api/getGovernorate',(req,res)=>{
-    var governorate=[]
-    fs.readFile('./countries.json', 'utf8',(err,data)=>{
-        if(err){
+router.put('/api/getRegions', (req, res) => {
+    console.log('asdasdasdas', req.body.governorate)
+    var region
+    fs.readFile('./countries.json', 'utf8', (err, data) => {
+        if (err) {
             res.send('error')
         }
-        else{
-    var obj = JSON.parse(data);
-    
-    
-    for(var i=0 ; i<obj.length;i++){
-   
-        governorate .push (obj[i].government)
-   
-    }   
-    res.json({data:governorate})
+        else {
+            var obj = JSON.parse(data);
+
+
+            for (var i = 0; i < obj.length; i++) {
+                if (obj[i].government == req.body.governorate) {
+                    region = obj[i].cities
+                }
+            }
+            res.json({ data: region })
         }
     })
-    
+
+})
+
+
+router.put('/api/getGovernorate', (req, res) => {
+    var governorate = []
+    fs.readFile('./countries.json', 'utf8', (err, data) => {
+        if (err) {
+            res.send('error')
+        }
+        else {
+            var obj = JSON.parse(data);
+
+
+            for (var i = 0; i < obj.length; i++) {
+
+                governorate.push(obj[i].government)
+
+            }
+            res.json({ data: governorate })
+        }
     })
+
+})
+
+router.post('/api/loadMoreSuppliersWithFilter', (req, res) => {
+
+    if (!req.body.governorate) {
+        console.log('name search')
+        db.users.findAll({
+            where: {
+                user_id: {
+                    [Op.gt]: req.body.user_id
+                },
+                user_type: 'business',
+                full_arabic_name: {
+                    [Op.substring]: req.body.name
+                }
+            },
+            limit: 10
+        }).then(users => {
+            res.json({
+                users: users,
+            })
+        })
+    }
+    else if (!req.body.name && !req.body.region) {
+        console.log('governorate srarch')
+        db.users.findAll({
+            where: {
+                user_id: {
+                    [Op.gt]: req.body.user_id
+                },
+                governorate: req.body.governorate
+            },
+            limit: 10
+        }).then(users => {
+            res.json({ users: users })
+        })
+    }
+    else if (!req.body.region) {
+        console.log('name and governorate')
+        db.users.findAll({
+            where: {
+                user_id: {
+                    [Op.gt]: req.body.user_id
+                },
+                governorate: req.body.governorate,
+                full_arabic_name: {
+                    [Op.substring]: req.body.name
+                }
+            },
+            limit: 10
+        }).then(users => {
+            if (!users) { res.json({ message: 'suppliers not found' }) }
+            else {
+                res.json({ users: users })
+            }
+        })
+    }
+
+    else if (!req.body.name) {
+        console.log('location search')
+        db.users.findAll({
+            where: {
+                user_id: {
+                    [Op.gt]: req.body.user_id
+                },
+                governorate: req.body.governorate,
+                region: req.body.region
+            },
+            limit: 10
+        }).then(users => {
+            if (!users) { res.json({ message: 'No suppliers found' }) }
+            else {
+                res.json({
+                    users: users
+                })
+            }
+        })
+    } else {
+        console.log('both search')
+        db.users.findAll({
+            where: {
+                user_id: {
+                    [Op.gt]: req.body.user_id
+                },
+                user_type: 'business',
+                governorate: req.body.governorate,
+                full_arabic_name: {
+                    [Op.substring]: req.body.name
+                },
+                region: req.body.region
+            },
+            limit: 10
+        })
+            .then(users => {
+                if (!users) { res.json({ message: 'No suppliers found' }) }
+                else {
+                    res.json({
+                        users: users
+                    })
+                }
+            })
+
+    }
+})
 
 
 
