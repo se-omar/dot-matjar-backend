@@ -129,7 +129,9 @@ router.put('/api/getGovernorate',(req,res)=>{
     
     })
 
+router.get('/api/supplierProductsInOrder',(req,res)=>{
 
+})
 
 
 

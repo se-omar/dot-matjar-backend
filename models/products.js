@@ -130,6 +130,14 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0
     },
+    governorate: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    region: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
 
   }, {
     tableName: 'products',
