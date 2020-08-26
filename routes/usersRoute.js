@@ -127,7 +127,7 @@ router.post('/api/getSuppliers', (req, res) => {
             where: {
                 user_type: 'business'
             },
-            limit: 30
+            limit: 10
         }).then(users => {
             res.json({
                 users: users
@@ -143,7 +143,7 @@ router.post('/api/getSuppliers', (req, res) => {
                 },
                 user_type: 'business'
             },
-            limit: 20
+            limit: 10
         }).then(users => {
             res.json({
                 users: users

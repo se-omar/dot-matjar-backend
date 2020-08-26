@@ -68,6 +68,82 @@ router.post('/api/products', (req, res) => {
 
 });
 
+router.post('/api/loadMoreProductsWithFilter', async (req, res) => {
+    if (!req.body.category_name) {
+        console.log('product entered')
+        db.products.findAll({
+            where: {
+                product_id: {
+                    [Op.gt]: req.body.product_id
+                },
+                product_name: {
+                    [Op.substring]: req.body.product_name
+                }
+            },
+            limit: 20,
+            include: [{
+                model: db.business
+            }]
+        }).then(products => {
+            res.json({
+                products: products,
+                message: 'searched by productName'
+            })
+        })
+
+
+    } else if (!req.body.product_name) {
+        console.log('category entered')
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_name: req.body.category_name
+            }
+        })
+        db.products.findAll({
+            where: {
+                product_id: {
+                    [Op.gt]: req.body.product_id
+                },
+                category_id: cat.category_id
+            },
+            limit: 20,
+            include: [{
+                model: db.business
+            }]
+        }).then(products => {
+            res.json({
+                products: products,
+                message: 'searched by category'
+            })
+            console.log(products.length)
+        })
+
+    } else {
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_name: req.body.category_name
+            }
+        })
+        var products = await db.products.findAll({
+            where: {
+                product_id: {
+                    [Op.gt]: req.body.product_id
+                },
+                category_id: cat.category_id,
+                product_name: req.body.product_name
+            },
+            limit: 20,
+            include: [{
+                model: db.business
+            }]
+        })
+        res.json({
+            products: products,
+            message: 'searched by both'
+        })
+    }
+})
+
 router.post('/api/myProducts', (req, res) => {
     db.products.findAll({
         where: {
@@ -526,7 +602,8 @@ router.put('/api/filterSuppliers', (req, res) => {
                 full_arabic_name: {
                     [Op.substring]: req.body.name
                 }
-            }
+            },
+            limit: 10
         }).then(users => {
             res.json({
                 users: users,
@@ -538,7 +615,8 @@ router.put('/api/filterSuppliers', (req, res) => {
         db.users.findAll({
             where: {
                 governorate: req.body.governorate
-            }
+            },
+            limit: 10
         }).then(users => {
             res.json({ users: users })
         })
@@ -551,7 +629,8 @@ router.put('/api/filterSuppliers', (req, res) => {
                 full_arabic_name: {
                     [Op.substring]: req.body.name
                 }
-            }
+            },
+            limit: 10
         }).then(users => {
             if (!users) { res.json({ message: 'suppliers not found' }) }
             else {
@@ -566,7 +645,8 @@ router.put('/api/filterSuppliers', (req, res) => {
             where: {
                 governorate: req.body.governorate,
                 region: req.body.region
-            }
+            },
+            limit: 10
         }).then(users => {
             if (!users) { res.json({ message: 'No suppliers found' }) }
             else {
@@ -585,7 +665,8 @@ router.put('/api/filterSuppliers', (req, res) => {
                     [Op.substring]: req.body.name
                 },
                 region: req.body.region
-            }
+            },
+            limit: 10
         })
             .then(users => {
                 if (!users) { res.json({ message: 'No suppliers found' }) }
