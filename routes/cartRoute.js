@@ -58,6 +58,9 @@ router.post('/api/checkout', (req, res) => {
                 success_url: 'http://localhost:8080/successfulPayment/' + token,
                 cancel_url: 'https://example.com/cancel',
                 line_items: itemsArray,
+                shipping_address_collection: {
+                    allowed_countries: ['EG', 'US']
+                }
 
             }).then((session) => {
                 res.json({
@@ -92,6 +95,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), (request, 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
+        console.log('session si ', session)
         console.log('current user at successful', currentUserAtCheckout);
         db.users.findOne({
             where: {

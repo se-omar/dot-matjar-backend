@@ -39,6 +39,10 @@ module.exports = function (sequelize, DataTypes) {
     order_month: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
+    },
+    order_year: {
+      type: DataTypes.INTEGER(4),
+      allowNull: true,
     }
   }, {
     tableName: 'orders'
