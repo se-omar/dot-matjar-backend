@@ -95,6 +95,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), (request, 
     // Handle the checkout.session.completed event
     if (event.type === 'checkout.session.completed') {
         const session = event.data.object;
+        console.log('session si ', session)
         console.log('current user at successful', currentUserAtCheckout);
         console.log('the session is', session)
         db.users.findOne({
