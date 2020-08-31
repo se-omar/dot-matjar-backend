@@ -49,7 +49,25 @@ router.put('/api/getOrderProducts', (req, res) => {
 
 })
 
-
+router.put('/api/showOrderProducts',async (req,res)=>{
+    var order =await db.orders.findOne({
+        where:{
+            order_number: req.body.order_number
+        }
+    })
+    db.products_orders.findAll({
+        where:{
+            order_id : order.order_id
+        },
+        include:[
+            {model:db.products}
+        ]
+    }).then(products=>{
+        res.json({
+            data:products
+        })
+    })
+})
 
 
 

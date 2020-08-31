@@ -39,7 +39,31 @@ module.exports = function (sequelize, DataTypes) {
     order_month: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
-    }
+    },
+    order_year: {
+      type: DataTypes.INTEGER(4),
+      allowNull: true,
+    },
+    country: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    city: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    state: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    address_line_1: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
+    address_line_2: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    },
   }, {
     tableName: 'orders'
   });

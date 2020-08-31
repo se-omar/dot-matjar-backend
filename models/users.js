@@ -133,6 +133,10 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(11),
       allowNull: true
     },
+   site_color: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+    },
   }, {
     tableName: 'users',
   });

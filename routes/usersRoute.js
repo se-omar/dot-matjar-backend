@@ -8,7 +8,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
-const checkAuth = require('./check-auth')
+const checkAuth = require('./check-auth');
+const { where } = require('sequelize');
 
 
 router.use((req, res, next) => {
@@ -173,11 +174,54 @@ router.post('/api/refreshCurrentUser', checkAuth, (req, res) => {
 
 
 
+router.put('/api/changeSiteColor',async(req,res)=>{
+    console.log(req.body.user_id)
+    db.users.findOne({
+        where:{
+            user_id : req.body.user_id
+        }
+    }).then(async user=>{
+        if(user.user_type != 'admin'){res.json({message:'You have no access for this request' })}
+        else{
+            var admins = await db.users.findAll({
+                where:{
+                user_type : 'admin'
+                }
+            })
+            
+     for(let i=0; i<admins.length ; i++){
+       await  db.users.findOne({
+          where:{
+              user_id:admins[i].user_id
+          }
+         }).then(user=>{
+             user.update({
+           site_color:req.body.site_color
+             })
+         })
+     }
+     res.json({message:'site color changed'},
+        
+        )
+        }
+
+    })
+})
 
 
 
-
-
+router.put('/api/getSiteColor',async(req,res)=>{
+     db.users.findOne({
+        where:{
+            user_type: 'admin'
+        }
+    }).then(user=>{
+        res.json({
+            message:'connected',
+            data:user.site_color
+        })
+    })
+})
 
 
 

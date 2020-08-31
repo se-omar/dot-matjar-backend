@@ -139,4 +139,17 @@ db.products_orders.belongsTo(db.products, {
     foreignKey: 'product_id'
 });
 
+
+
+
+db.users.hasMany(db.orders,{
+    foreignKey:'user_id'
+},
+  {onDelete:'cascade'
+  }
+)
+db.orders.belongsTo(db.users,{
+    foreignKey:'user_id'
+})
+
 module.exports = db;

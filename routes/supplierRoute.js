@@ -55,7 +55,7 @@ router.put('/api/supplierPageColor', (req, res) => {
             user_id: req.body.user_id
         }
     }).then(user => {
-        if (user.user_type == 'business') {
+      
             if (req.body.page_color) {
                 user.update({
                     page_color: req.body.page_color
@@ -66,11 +66,7 @@ router.put('/api/supplierPageColor', (req, res) => {
                 data: user.page_color
             })
 
-        } else {
-            res.json({
-                message: 'user is not a suppliers'
-            })
-        }
+      
     })
 })
 
@@ -234,10 +230,30 @@ router.post('/api/loadMoreSuppliersWithFilter', (req, res) => {
     }
 })
 
-router.get('/api/supplierProductsInOrder',(req,res)=>{
-
+router.put('/api/supplierProductsInOrder',async(req,res)=>{
+console.log('id isss',req.body.user_id)
+    db.orders.findAll({
+       include:[{
+           model:db.products,
+           
+           where:{
+               user_id:req.body.user_id
+           },
+           
+       },
+        {
+            model:db.users
+        } 
+        ]
+      
+        
+    }).then(orders=>{
+     
+        res.json({
+            data:orders
+        })
+    })
 })
-
 
 
 
