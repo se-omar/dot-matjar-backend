@@ -1,5 +1,5 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('database2', 'root', '', {
+const sequelize = new Seq('ecommerce-31-august', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
@@ -142,14 +142,15 @@ db.products_orders.belongsTo(db.products, {
 
 
 
-db.users.hasMany(db.orders,{
-    foreignKey:'user_id'
+db.users.hasMany(db.orders, {
+    foreignKey: 'user_id'
 },
-  {onDelete:'cascade'
-  }
+    {
+        onDelete: 'cascade'
+    }
 )
-db.orders.belongsTo(db.users,{
-    foreignKey:'user_id'
+db.orders.belongsTo(db.users, {
+    foreignKey: 'user_id'
 })
 
 module.exports = db;

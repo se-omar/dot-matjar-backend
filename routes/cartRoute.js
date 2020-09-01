@@ -110,11 +110,11 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), (request, 
                 order_date: new Date(),
                 order_number: orderid.generate(),
                 order_month: date.getMonth() + 1,
-                country : session.shipping.address.country,
-                city:session.shipping.address.city,
-                address_line_1:session.shipping.address.line1,
-                address_line_2:session.shipping.address.line2,
-                state:session.shipping.address.state
+                country: session.shipping.address.country,
+                city: session.shipping.address.city,
+                address_line_1: session.shipping.address.line1,
+                address_line_2: session.shipping.address.line2,
+                state: session.shipping.address.state
             }).then(order => {
                 console.log(orderid.generate())
                 productsArray.forEach((element, index) => {
@@ -137,7 +137,8 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), (request, 
                             }
                         }).then(user => {
                             user.update({
-                                total_revenue: user.total_revenue + (product.unit_price * quantityArray[index])
+                                total_revenue: user.total_revenue + (product.unit_price * quantityArray[index]),
+                                total_sales: user.total_sales + quantityArray[index]
                             })
                         })
                     })
@@ -153,7 +154,7 @@ router.post('/webhook', bodyParser.raw({ type: 'application/json' }), (request, 
             })
         })
         console.log('session is ', session)
-        console.log('city iss',session.shipping.address)
+        console.log('city iss', session.shipping.address)
         return response.send(session)
     }
 });

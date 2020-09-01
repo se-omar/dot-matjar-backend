@@ -55,18 +55,18 @@ router.put('/api/supplierPageColor', (req, res) => {
             user_id: req.body.user_id
         }
     }).then(user => {
-      
-            if (req.body.page_color) {
-                user.update({
-                    page_color: req.body.page_color
-                })
-            }
-            res.json({
-                message: 'page color updated',
-                data: user.page_color
-            })
 
-      
+        if (req.body.page_color) {
+            user.update({
+                page_color: req.body.page_color
+            })
+        }
+        res.json({
+            message: 'page color updated',
+            data: user.page_color
+        })
+
+
     })
 })
 
@@ -230,27 +230,42 @@ router.post('/api/loadMoreSuppliersWithFilter', (req, res) => {
     }
 })
 
-router.put('/api/supplierProductsInOrder',async(req,res)=>{
-console.log('id isss',req.body.user_id)
+router.put('/api/supplierProductsInOrder', async (req, res) => {
+    console.log('id isss', req.body.user_id)
     db.orders.findAll({
-       include:[{
-           model:db.products,
-           
-           where:{
-               user_id:req.body.user_id
-           },
-           
-       },
+        include: [{
+            model: db.products,
+
+            where: {
+                user_id: req.body.user_id
+            },
+
+        },
         {
-            model:db.users
-        } 
+            model: db.users
+        }
         ]
-      
-        
-    }).then(orders=>{
-     
+
+
+    }).then(orders => {
+
         res.json({
-            data:orders
+            data: orders
+        })
+    })
+})
+
+router.get('/api/getAllSuppliersWithSales', (req, res) => {
+    db.users.findAll({
+        where: {
+            user_type: 'business',
+            total_sales: {
+                [Op.gt]: 0
+            }
+        }
+    }).then(suppliers => {
+        res.json({
+            suppliers: suppliers
         })
     })
 })
