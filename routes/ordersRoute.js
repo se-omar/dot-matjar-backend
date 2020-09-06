@@ -79,7 +79,7 @@ router.post('/api/createOrder', async(req,res)=>{
         order_month: date.getMonth() + 1,
         total_price : req.body.totalPrice,
         country : req.body.governorate,
-        city:req.body.region,
+        city: req.body.region,
         address_line_1: req.body.address
 
 
