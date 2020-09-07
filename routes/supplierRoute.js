@@ -300,16 +300,6 @@ router.put('/api/supplierProductsInOrder', async (req, res) => {
 
     })
 
-
-
-
-
-
-
-
-
-
-
 router.get('/api/getAllSuppliersWithSales', (req, res) => {
     db.users.findAll({
         where: {
