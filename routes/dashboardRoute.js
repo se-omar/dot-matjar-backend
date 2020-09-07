@@ -21,6 +21,9 @@ router.post('/api/monthlySales', (req, res) => {
             model: db.products, as: 'products',
             include: [{
                 model: db.product_categories
+            },
+            {
+                model: db.users
             }],
             where: {
                 user_id: req.body.user_id
