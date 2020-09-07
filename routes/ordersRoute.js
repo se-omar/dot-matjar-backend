@@ -71,6 +71,9 @@ router.put('/api/showOrderProducts',async (req,res)=>{
 })
 
 router.post('/api/createOrder', async(req,res)=>{
+    var products = req.body.cartItems
+    console.log('quantityy',products)
+
    var order = await db.orders.create({
         user_id:req.body.user_id,
         status: 'pending',
@@ -80,17 +83,19 @@ router.post('/api/createOrder', async(req,res)=>{
         total_price : req.body.totalPrice,
         country : req.body.governorate,
         city: req.body.region,
-        address_line_1: req.body.address
+        address_line_1: req.body.address,
+       
 
 
     })
-    var products = req.body.cartItems
+
   
    products.forEach( async element => {
      await db.products_orders.create({
          order_id : order.order_id,
          product_id : element.product_id,
-         purchase_date: new Date()
+         purchase_date: new Date(),
+         quantity : element.quantity
      })
    })
 res.json({message:'order created successfully'})
