@@ -70,6 +70,7 @@ app.use(function (req, res, next) {
     next();
 });
 
+console.log('current year is', new Date().getFullYear())
 app.post('/api/createFakeData', (req, res) => {
     // for (i = 0; i < 100; i++) {
     //     db.users.create({

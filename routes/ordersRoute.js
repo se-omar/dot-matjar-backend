@@ -50,55 +50,53 @@ router.put('/api/getOrderProducts', (req, res) => {
 
 })
 
-router.put('/api/showOrderProducts',async (req,res)=>{
-    var order =await db.orders.findOne({
-        where:{
+router.put('/api/showOrderProducts', async (req, res) => {
+    var order = await db.orders.findOne({
+        where: {
             order_number: req.body.order_number
         }
     })
     db.products_orders.findAll({
-        where:{
-            order_id : order.order_id
+        where: {
+            order_id: order.order_id
         },
-        include:[
-            {model:db.products}
+        include: [
+            { model: db.products }
         ]
-    }).then(products=>{
+    }).then(products => {
         res.json({
-            data:products
+            data: products
         })
     })
 })
 
-router.post('/api/createOrder', async(req,res)=>{
+router.post('/api/createOrder', async (req, res) => {
     var products = req.body.cartItems
-    console.log('quantityy',products)
+    console.log('quantityy', products)
 
-   var order = await db.orders.create({
-        user_id:req.body.user_id,
+    var order = await db.orders.create({
+        user_id: req.body.user_id,
         status: 'pending',
         order_date: new Date(),
         order_number: orderid.generate(),
         order_month: date.getMonth() + 1,
-        total_price : req.body.totalPrice,
-        country : req.body.governorate,
+        order_year: date.getFullYear(),
+        total_price: req.body.totalPrice,
+        country: req.body.governorate,
         city: req.body.region,
         address_line_1: req.body.address,
-       
-
-
     })
 
-  
-   products.forEach( async element => {
-     await db.products_orders.create({
-         order_id : order.order_id,
-         product_id : element.product_id,
-         purchase_date: new Date(),
-         quantity : element.quantity
-     })
-   })
-res.json({message:'order created successfully'})
+
+    products.forEach(async element => {
+        await db.products_orders.create({
+            order_id: order.order_id,
+            product_id: element.product_id,
+            purchase_date: new Date(),
+            quantity: element.quantity
+        })
+    })
+    res.json({ message: 'order created successfully' })
 })
 
 
