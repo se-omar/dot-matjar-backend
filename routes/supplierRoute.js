@@ -35,6 +35,10 @@ router.put('/api/supplierProducts/', (req, res) => {
         },
         include: [{
             model: db.business
+        }, {
+            model: db.users
+        }, {
+            model: db.product_categories
         }]
     })
         .then(products => {
@@ -232,18 +236,20 @@ router.post('/api/loadMoreSuppliersWithFilter', (req, res) => {
 
 router.put('/api/supplierProductsInOrder', async (req, res) => {
     db.orders.findAll({
-      include:[{
-          model:db.users
-      },
-    {
-        model :db.products,
-        where:{
-            user_id:req.body.user_id
-        }
-    }]
-           
-        
-        
+        include: [{
+            model: db.users
+        },
+        {
+            model: db.products,
+            where: {
+                user_id: req.body.user_id
+            },
+
+        },
+        ]
+
+
+
 
 
     }).then(orders => {
@@ -254,51 +260,51 @@ router.put('/api/supplierProductsInOrder', async (req, res) => {
     })
 
 
-// var ordersMade = []
-// console.log('supplier idd',req.body.user_id)
-//     var products = await db.products.findAll({
-//         where:{
-//             user_id : req.body.user_id
-//         }
-//     })
-//     products.forEach(e=>{
-//         console.log('products idd',e.product_id)
-//     })
-//     var productsOrder=[]
-    
-//         for(var i=0 ; i<products.length ; i++){
-//            console.log('for entered', i )
-//           var pro = await db.products_orders.findAll({
-//               where:{
-//                product_id:products[i].product_id
-//               },
-//               include:[{
-               
-//                   model:db.orders,
-//                   include:[{model:db.users}]
-//               },
-//             { model:db.products}],
-              
-//             })
-//             if(pro){
-//                 console.log('poroo is',pro )
-//                 for(var x=0 ; x<pro.length ; x++){
-                    
-//                          productsOrder.push(pro[x])
-                           
-//                 }
-//             }
-        
-         
-      
-//         }
-      
-   
-//         res.json({message:'orders found',data:productsOrder})
-  
-//         console.log('id isss', req.body.user_id)
+    // var ordersMade = []
+    // console.log('supplier idd',req.body.user_id)
+    //     var products = await db.products.findAll({
+    //         where:{
+    //             user_id : req.body.user_id
+    //         }
+    //     })
+    //     products.forEach(e=>{
+    //         console.log('products idd',e.product_id)
+    //     })
+    //     var productsOrder=[]
 
-    })
+    //         for(var i=0 ; i<products.length ; i++){
+    //            console.log('for entered', i )
+    //           var pro = await db.products_orders.findAll({
+    //               where:{
+    //                product_id:products[i].product_id
+    //               },
+    //               include:[{
+
+    //                   model:db.orders,
+    //                   include:[{model:db.users}]
+    //               },
+    //             { model:db.products}],
+
+    //             })
+    //             if(pro){
+    //                 console.log('poroo is',pro )
+    //                 for(var x=0 ; x<pro.length ; x++){
+
+    //                          productsOrder.push(pro[x])
+
+    //                 }
+    //             }
+
+
+
+    //         }
+
+
+    //         res.json({message:'orders found',data:productsOrder})
+
+    //         console.log('id isss', req.body.user_id)
+
+})
 
 router.get('/api/getAllSuppliersWithSales', (req, res) => {
     db.users.findAll({

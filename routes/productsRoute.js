@@ -42,6 +42,12 @@ const upload2 = multer({
 router.post('/api/products', (req, res) => {
     if (!req.body.product_id) {
         db.products.findAll({
+            include: [{
+                model: db.users
+            }, {
+                model: db.product_categories
+            }],
+
             limit: 20
         }).then(products => {
             res.json({
@@ -278,42 +284,46 @@ router.get('/api/selectCategory', async (req, res) => {
 })
 
 router.put('/api/filterProducts', async (req, res) => {
-    var gov = req.body.governorate 
-    var reg = req.body.region 
-    var prodname = req.body.product_name 
-    var catname = req.body.category_name 
+    var gov = req.body.governorate
+    var reg = req.body.region
+    var prodname = req.body.product_name
+    var catname = req.body.category_name
 
-    if(catname){ var cat = await db.product_categories.findOne({
-        where:{
-        category_name:catname
-        }
-    })}
+    if (catname) {
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_name: catname
+            }
+        })
+    }
 
     var wh = {}
-    if(gov){
+    if (gov) {
         wh.governorate = gov
     }
-    if(reg){
+    if (reg) {
         wh.region = reg
     }
-    if(prodname){
-        wh.product_name =  {[Op.substring]: prodname}
+    if (prodname) {
+        wh.product_name = { [Op.substring]: prodname }
     }
-    if(catname){
+    if (catname) {
         wh.category_id = cat.category_id
     }
-if(catname){ var cat = await db.product_categories.findOne({
-    where:{
-    category_name:catname
+    if (catname) {
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_name: catname
+            }
+        })
     }
-})}
-   
+
     db.products.findAll({
-        where:wh
-    }).then(products=>{
+        where: wh
+    }).then(products => {
         res.json({
-            message:'test search',
-            data:products
+            message: 'test search',
+            data: products
         })
     })
     // Dont have catrgory name
@@ -328,10 +338,10 @@ if(catname){ var cat = await db.product_categories.findOne({
     //          if(!req.body.product_name ){
     //             db.products.findAll({
     //                 where: {
-                        
+
     //                     governorate:gov,
     //                     region : reg
-    
+
     //                 },
     //                 limit: 20,
     //                 include: [{
@@ -350,7 +360,7 @@ if(catname){ var cat = await db.product_categories.findOne({
 
 
 
-            
+
     //         db.products.findAll({
     //             where: {
     //                 product_name: {
@@ -394,11 +404,11 @@ if(catname){ var cat = await db.product_categories.findOne({
     //     }
 
     // } 
-    
-    
-   
-    
-    
+
+
+
+
+
     // else if (!req.body.product_name) {
     //     if (!req.body.product_id) {
     //         console.log('category entered')
@@ -455,7 +465,7 @@ if(catname){ var cat = await db.product_categories.findOne({
     //     }
 
     // }
-    
+
     // else if(!gov){
 
 
@@ -470,7 +480,7 @@ if(catname){ var cat = await db.product_categories.findOne({
     //             where: {
     //                 category_id: cat.category_id,
     //                 product_name:req.body.product_name
-                   
+
     //             },
     //             limit: 20,
     //             include: [{
@@ -516,8 +526,8 @@ if(catname){ var cat = await db.product_categories.findOne({
 
 
     // }
-    
-    
+
+
     // else {
     //     if (!req.body.product_id) {
     //         var cat = await db.product_categories.findOne({
@@ -573,9 +583,6 @@ if(catname){ var cat = await db.product_categories.findOne({
     //     }
 
     // }
-       
-
-       
 
 
 
@@ -586,7 +593,10 @@ if(catname){ var cat = await db.product_categories.findOne({
 
 
 
-      
+
+
+
+
 
 })
 
@@ -680,6 +690,21 @@ router.put('/api/filterSuppliers', (req, res) => {
     }
 })
 
-
+router.put('/api/updateProductStatus', async (req, res) => {
+    console.log('get data from frontend testing ', req.body.status, req.body.orderId, req.body.productId)
+    var orderedProduct = await db.products_orders.findOne({
+        where: {
+            order_id: req.body.orderId,
+            product_id: req.body.productId
+        }
+    })
+    if (orderedProduct) {
+        orderedProduct.update({
+            status: req.body.status
+        })
+        res.json({ message: 'ordere status updated' })
+    }
+    else { res.json({ message: 'Something went WRONG' }) }
+})
 
 module.exports = router;

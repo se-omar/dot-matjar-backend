@@ -1,5 +1,5 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('database2', 'root', '', {
+const sequelize = new Seq('database4', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {

@@ -135,11 +135,11 @@ module.exports = function (sequelize, DataTypes) {
     },
     site_color: {
       type: DataTypes.STRING(255),
-      allowNull: false,
+      allowNull: true,
     },
     total_sales: {
       type: DataTypes.INTEGER(11),
-      allowNull: false
+      allowNull: true
     },
 
   }, {
