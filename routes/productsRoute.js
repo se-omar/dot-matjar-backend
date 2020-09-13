@@ -475,4 +475,34 @@ router.post('/api/getProductReview', (req, res) => {
     })
 })
 
+router.post('/api/calculateProductRating', (req, res) => {
+    db.products_reviews.findAll({
+        where: {
+            product_id: req.body.product_id
+        }
+    }).then(rows => {
+        var rating = 0;
+        var counter = 0;
+        var average = 0;
+        rows.forEach(element => {
+            rating += element.rating
+            counter++
+        });
+        console.log('primary key', req.body.product_id)
+        average = rating / counter;
+        db.products.findByPk(req.body.product_id).then(product => {
+            product.update({
+                rating: average,
+                rate_counter: counter
+            })
+        })
+        res.json({
+            message: 'rating placed in product'
+        })
+
+        // console.log('raating is ', rating)
+        // console.log('average is ', average)
+    })
+})
+
 module.exports = router;

@@ -138,6 +138,16 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
+    rating: {
+      type: DataTypes.INTEGER(11),
+      defaultValue: 0,
+      allowNull: false,
+    },
+    rate_counter: {
+      type: DataTypes.INTEGER(11),
+      defaultValue: 0,
+      allowNull: false,
+    },
 
   }, {
     tableName: 'products',
