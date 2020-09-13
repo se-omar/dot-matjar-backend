@@ -1,5 +1,5 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('database2', 'root', '', {
+const sequelize = new Seq('ecommerce-2-september', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
@@ -20,6 +20,7 @@ const db = {
     orders: sequelize.import('./models/orders'),
     products_orders: sequelize.import('./models/products_orders'),
     supplier_page_info: sequelize.import('./models/supplier_page_info'),
+    products_reviews: sequelize.import('./models/products_reviews.js')
 
 }
 
@@ -154,6 +155,32 @@ db.users.hasMany(db.orders, {
 db.orders.belongsTo(db.users, {
     foreignKey: 'user_id'
 })
+
+
+
+
+
+db.users.belongsToMany(db.products, {
+    through: 'products_reviews',
+    foreignKey: 'user_id'
+});
+db.products.belongsToMany(db.users, {
+    through: 'products_reviews',
+    foreignKey: 'product_id'
+});
+db.users.hasMany(db.products_reviews, {
+    foreignKey: 'user_id'
+});
+db.products_reviews.belongsTo(db.users, {
+    foreignKey: 'user_id'
+});
+db.products.hasMany(db.products_reviews, {
+    foreignKey: 'product_id'
+});
+db.products_reviews.belongsTo(db.products, {
+    foreignKey: 'product_id'
+});
+
 
 
 // db.users.hasOne(db.supplier_page_info)

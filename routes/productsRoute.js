@@ -326,277 +326,6 @@ router.put('/api/filterProducts', async (req, res) => {
             data: products
         })
     })
-    // Dont have catrgory name
-
-
-    // if (!req.body.category_name) {
-
-
-    //     if (!req.body.product_id) {
-
-
-    //          if(!req.body.product_name ){
-    //             db.products.findAll({
-    //                 where: {
-
-    //                     governorate:gov,
-    //                     region : reg
-
-    //                 },
-    //                 limit: 20,
-    //                 include: [{
-    //                     model: db.business
-    //                 }]
-    //             }).then(products => {
-    //                 res.json({
-    //                     data: products,
-    //                     message: 'searched by governoment and region'
-    //                 })
-    //             })
-    //         }
-
-
-    //        //   Dont have product name
-
-
-
-
-    //         db.products.findAll({
-    //             where: {
-    //                 product_name: {
-    //                     [Op.substring]: req.body.product_name
-    //                 },
-    //                 governorate:gov,
-    //                 region : reg
-
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by productName'
-    //             })
-    //         })
-    //     }
-    //     else {
-    //         db.products.findAll({
-    //             where: {
-    //                 product_id: {
-    //                     [Op.gt]: req.body.product_id
-    //                 },
-    //                 product_name: {
-    //                     [Op.substring]: req.body.product_name
-    //                 }
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by productName'
-    //             })
-    //         })
-    //     }
-
-    // } 
-
-
-
-
-
-    // else if (!req.body.product_name) {
-    //     if (!req.body.product_id) {
-    //         console.log('category entered')
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         db.products.findAll({
-    //             where: {
-    //                 category_id: cat.category_id,
-    //                 governorate:gov,
-    //                 region:reg
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by category'
-    //             })
-    //             console.log(products.length)
-    //         })
-    //     }
-    //     else {
-    //         console.log('category entered')
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         db.products.findAll({
-    //             where: {
-    //                 product_id: {
-    //                     [Op.gt]: req.body.product_id
-    //                 },
-    //                 category_id: cat.category_id,
-    //                 governorate:gov,
-    //                 region:reg
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by category'
-    //             })
-    //             console.log(products.length)
-    //         })
-    //     }
-
-    // }
-
-    // else if(!gov){
-
-
-    //     if (!req.body.product_id) {
-    //         console.log('gov entered')
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         db.products.findAll({
-    //             where: {
-    //                 category_id: cat.category_id,
-    //                 product_name:req.body.product_name
-
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by category'
-    //             })
-    //             console.log(products.length)
-    //         })
-    //     }
-    //     else {
-    //         console.log('category entered')
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         db.products.findAll({
-    //             where: {
-    //                 product_id: {
-    //                     [Op.gt]: req.body.product_id
-    //                 },
-    //                 category_id: cat.category_id,
-    //               product_name:req.body.product_name
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by category'
-    //             })
-    //             console.log(products.length)
-    //         })
-    //     }
-
-
-
-
-    // }
-
-
-    // else {
-    //     if (!req.body.product_id) {
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         var products = await db.products.findAll({
-    //             where: {
-    //                 category_id: cat.category_id,
-    //                 product_name: req.body.product_name,
-    //                 governorate:gov,
-    //                 region:reg
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         })
-    //         res.json({
-    //             data: products,
-    //             message: 'searched by both'
-    //         })
-    //     }
-
-
-    //     else {
-
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         var products = await db.products.findAll({
-    //             where: {
-    //                 product_id: {
-    //                     [Op.gt]: req.body.product_id
-    //                 },
-    //                 category_id: cat.category_id,
-    //                 product_name: req.body.product_name,
-    //                 governorate:gov,
-    //                 region:reg
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         })
-    //         res.json({
-    //             data: products,
-    //             message: 'searched by both'
-    //         })
-    //     }
-
-    // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 })
 
@@ -690,6 +419,60 @@ router.put('/api/filterSuppliers', (req, res) => {
     }
 })
 
+router.post('/api/addProductReview', (req, res) => {
+    db.products_reviews.findOne({
+        where: {
+            user_id: req.body.user_id,
+            product_id: req.body.product_id
+        }
+    }).then(row => {
+        if (!row) {
+            db.products_reviews.create({
+                product_id: req.body.product_id,
+                user_id: req.body.user_id,
+                rating: req.body.rating,
+                review: req.body.review
+            }).then(response => {
+                res.json({
+                    message: 'review placed successfully',
+                    review: response
+                })
+            })
+        }
+        else {
+            res.json({
+                message: 'you already placed a review',
+                review: row
+            })
+        }
+    })
 
+})
+
+router.post('/api/getProductReview', (req, res) => {
+    console.log(req.body.user_id)
+    db.products_reviews.findOne({
+        where: {
+            user_id: req.body.user_id,
+            product_id: req.body.product_id
+        }
+    }).then(row => {
+        if (!row) {
+            res.json({
+                message: 'no review found',
+                review: {
+                    rating: 0,
+                    review: ''
+                }
+            })
+        }
+        else {
+            res.json({
+                message: 'review was found',
+                review: row
+            })
+        }
+    })
+})
 
 module.exports = router;
