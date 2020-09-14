@@ -449,6 +449,18 @@ router.post('/api/addProductReview', (req, res) => {
 
 })
 
+router.post('/api/getProductRatingsArray', (req, res) => {
+    db.products_reviews.findAll({
+        where: {
+            product_id: req.body.product_id
+        }
+    }).then(rows => {
+        res.json({
+            rows: rows
+        })
+    })
+})
+
 router.post('/api/getProductReview', (req, res) => {
     console.log(req.body.user_id)
     db.products_reviews.findOne({
