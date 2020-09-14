@@ -706,5 +706,90 @@ router.put('/api/updateProductStatus', async (req, res) => {
     }
     else { res.json({ message: 'Something went WRONG' }) }
 })
+router.post('/api/addProductReview', (req, res) => {
+    db.products_reviews.findOne({
+        where: {
+            user_id: req.body.user_id,
+            product_id: req.body.product_id
+        }
+    }).then(row => {
+        if (!row) {
+            db.products_reviews.create({
+                product_id: req.body.product_id,
+                user_id: req.body.user_id,
+                rating: req.body.rating,
+                review: req.body.review
+            }).then(response => {
+                res.json({
+                    message: 'review placed successfully',
+                    review: response
+                })
+            })
+        }
+        else {
+            res.json({
+                message: 'you already placed a review',
+                review: row
+            })
+        }
+    })
+
+})
+
+router.post('/api/getProductReview', (req, res) => {
+    console.log(req.body.user_id)
+    db.products_reviews.findOne({
+        where: {
+            user_id: req.body.user_id,
+            product_id: req.body.product_id
+        }
+    }).then(row => {
+        if (!row) {
+            res.json({
+                message: 'no review found',
+                review: {
+                    rating: 0,
+                    review: ''
+                }
+            })
+        }
+        else {
+            res.json({
+                message: 'review was found',
+                review: row
+            })
+        }
+    })
+})
+
+router.post('/api/calculateProductRating', (req, res) => {
+    db.products_reviews.findAll({
+        where: {
+            product_id: req.body.product_id
+        }
+    }).then(rows => {
+        var rating = 0;
+        var counter = 0;
+        var average = 0;
+        rows.forEach(element => {
+            rating += element.rating
+            counter++
+        });
+        console.log('primary key', req.body.product_id)
+        average = rating / counter;
+        db.products.findByPk(req.body.product_id).then(product => {
+            product.update({
+                rating: average,
+                rate_counter: counter
+            })
+        })
+        res.json({
+            message: 'rating placed in product'
+        })
+
+        // console.log('raating is ', rating)
+        // console.log('average is ', average)
+    })
+})
 
 module.exports = router;

@@ -81,28 +81,26 @@ router.post('/api/createOrder', async (req, res) => {
         order_date: new Date(),
         order_number: orderid.generate(),
         order_month: date.getMonth() + 1,
+        order_year: date.getFullYear(),
         total_price: req.body.totalPrice,
         country: req.body.governorate,
         city: req.body.region,
         address_line_1: req.body.address,
-
-
-
     })
 
 
+
+
+
+
     products.forEach(async (element, index) => {
+
         await db.products_orders.create({
             order_id: order.order_id,
             product_id: element.product_id,
             purchase_date: new Date(),
             quantity: element.quantity
         })
-        //   await db.products.findOne({
-        //             where:{
-        //                 product_id:element.product_id
-        //             }
-        //         })
 
         db.products.findOne({
             where: {
@@ -110,7 +108,7 @@ router.post('/api/createOrder', async (req, res) => {
             }
         }).then(product => {
             if (!product) {
-                return response.send('product not found')
+                return res.send('product not found')
             }
 
             product.update({
@@ -128,8 +126,9 @@ router.post('/api/createOrder', async (req, res) => {
                 })
             })
         })
-        res.json({ message: 'order created successfully' })
-    })
 
+    })
+    res.json({ message: 'order created successfully' })
+    console.log('Data comming from frontend', req.body.cartItems, req.body.address, req.body.totalPrice, req.body.governorate, req.body.region)
 })
 module.exports = router;
