@@ -35,8 +35,7 @@ router.put('/api/supplierProducts/', (req, res) => {
         },
         include: [{
             model: db.business
-        },
-        {
+        }, {
             model: db.users
         }, {
             model: db.product_categories
@@ -244,8 +243,10 @@ router.put('/api/supplierProductsInOrder', async (req, res) => {
             model: db.products,
             where: {
                 user_id: req.body.user_id
-            }
-        }]
+            },
+
+        },
+        ]
 
 
 

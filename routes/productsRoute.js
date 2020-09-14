@@ -42,13 +42,13 @@ const upload2 = multer({
 router.post('/api/products', (req, res) => {
     if (!req.body.product_id) {
         db.products.findAll({
-            limit: 20,
             include: [{
                 model: db.users
-            },
-            {
+            }, {
                 model: db.product_categories
-            }]
+            }],
+
+            limit: 20
         }).then(products => {
             res.json({
                 products: products
@@ -326,6 +326,277 @@ router.put('/api/filterProducts', async (req, res) => {
             data: products
         })
     })
+    // Dont have catrgory name
+
+
+    // if (!req.body.category_name) {
+
+
+    //     if (!req.body.product_id) {
+
+
+    //          if(!req.body.product_name ){
+    //             db.products.findAll({
+    //                 where: {
+
+    //                     governorate:gov,
+    //                     region : reg
+
+    //                 },
+    //                 limit: 20,
+    //                 include: [{
+    //                     model: db.business
+    //                 }]
+    //             }).then(products => {
+    //                 res.json({
+    //                     data: products,
+    //                     message: 'searched by governoment and region'
+    //                 })
+    //             })
+    //         }
+
+
+    //        //   Dont have product name
+
+
+
+
+    //         db.products.findAll({
+    //             where: {
+    //                 product_name: {
+    //                     [Op.substring]: req.body.product_name
+    //                 },
+    //                 governorate:gov,
+    //                 region : reg
+
+    //             },
+    //             limit: 20,
+    //             include: [{
+    //                 model: db.business
+    //             }]
+    //         }).then(products => {
+    //             res.json({
+    //                 data: products,
+    //                 message: 'searched by productName'
+    //             })
+    //         })
+    //     }
+    //     else {
+    //         db.products.findAll({
+    //             where: {
+    //                 product_id: {
+    //                     [Op.gt]: req.body.product_id
+    //                 },
+    //                 product_name: {
+    //                     [Op.substring]: req.body.product_name
+    //                 }
+    //             },
+    //             limit: 20,
+    //             include: [{
+    //                 model: db.business
+    //             }]
+    //         }).then(products => {
+    //             res.json({
+    //                 data: products,
+    //                 message: 'searched by productName'
+    //             })
+    //         })
+    //     }
+
+    // } 
+
+
+
+
+
+    // else if (!req.body.product_name) {
+    //     if (!req.body.product_id) {
+    //         console.log('category entered')
+    //         var cat = await db.product_categories.findOne({
+    //             where: {
+    //                 category_name: req.body.category_name
+    //             }
+    //         })
+    //         db.products.findAll({
+    //             where: {
+    //                 category_id: cat.category_id,
+    //                 governorate:gov,
+    //                 region:reg
+    //             },
+    //             limit: 20,
+    //             include: [{
+    //                 model: db.business
+    //             }]
+    //         }).then(products => {
+    //             res.json({
+    //                 data: products,
+    //                 message: 'searched by category'
+    //             })
+    //             console.log(products.length)
+    //         })
+    //     }
+    //     else {
+    //         console.log('category entered')
+    //         var cat = await db.product_categories.findOne({
+    //             where: {
+    //                 category_name: req.body.category_name
+    //             }
+    //         })
+    //         db.products.findAll({
+    //             where: {
+    //                 product_id: {
+    //                     [Op.gt]: req.body.product_id
+    //                 },
+    //                 category_id: cat.category_id,
+    //                 governorate:gov,
+    //                 region:reg
+    //             },
+    //             limit: 20,
+    //             include: [{
+    //                 model: db.business
+    //             }]
+    //         }).then(products => {
+    //             res.json({
+    //                 data: products,
+    //                 message: 'searched by category'
+    //             })
+    //             console.log(products.length)
+    //         })
+    //     }
+
+    // }
+
+    // else if(!gov){
+
+
+    //     if (!req.body.product_id) {
+    //         console.log('gov entered')
+    //         var cat = await db.product_categories.findOne({
+    //             where: {
+    //                 category_name: req.body.category_name
+    //             }
+    //         })
+    //         db.products.findAll({
+    //             where: {
+    //                 category_id: cat.category_id,
+    //                 product_name:req.body.product_name
+
+    //             },
+    //             limit: 20,
+    //             include: [{
+    //                 model: db.business
+    //             }]
+    //         }).then(products => {
+    //             res.json({
+    //                 data: products,
+    //                 message: 'searched by category'
+    //             })
+    //             console.log(products.length)
+    //         })
+    //     }
+    //     else {
+    //         console.log('category entered')
+    //         var cat = await db.product_categories.findOne({
+    //             where: {
+    //                 category_name: req.body.category_name
+    //             }
+    //         })
+    //         db.products.findAll({
+    //             where: {
+    //                 product_id: {
+    //                     [Op.gt]: req.body.product_id
+    //                 },
+    //                 category_id: cat.category_id,
+    //               product_name:req.body.product_name
+    //             },
+    //             limit: 20,
+    //             include: [{
+    //                 model: db.business
+    //             }]
+    //         }).then(products => {
+    //             res.json({
+    //                 data: products,
+    //                 message: 'searched by category'
+    //             })
+    //             console.log(products.length)
+    //         })
+    //     }
+
+
+
+
+    // }
+
+
+    // else {
+    //     if (!req.body.product_id) {
+    //         var cat = await db.product_categories.findOne({
+    //             where: {
+    //                 category_name: req.body.category_name
+    //             }
+    //         })
+    //         var products = await db.products.findAll({
+    //             where: {
+    //                 category_id: cat.category_id,
+    //                 product_name: req.body.product_name,
+    //                 governorate:gov,
+    //                 region:reg
+    //             },
+    //             limit: 20,
+    //             include: [{
+    //                 model: db.business
+    //             }]
+    //         })
+    //         res.json({
+    //             data: products,
+    //             message: 'searched by both'
+    //         })
+    //     }
+
+
+    //     else {
+
+    //         var cat = await db.product_categories.findOne({
+    //             where: {
+    //                 category_name: req.body.category_name
+    //             }
+    //         })
+    //         var products = await db.products.findAll({
+    //             where: {
+    //                 product_id: {
+    //                     [Op.gt]: req.body.product_id
+    //                 },
+    //                 category_id: cat.category_id,
+    //                 product_name: req.body.product_name,
+    //                 governorate:gov,
+    //                 region:reg
+    //             },
+    //             limit: 20,
+    //             include: [{
+    //                 model: db.business
+    //             }]
+    //         })
+    //         res.json({
+    //             data: products,
+    //             message: 'searched by both'
+    //         })
+    //     }
+
+    // }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 })
 
@@ -419,6 +690,22 @@ router.put('/api/filterSuppliers', (req, res) => {
     }
 })
 
+router.put('/api/updateProductStatus', async (req, res) => {
+    console.log('get data from frontend testing ', req.body.status, req.body.orderId, req.body.productId)
+    var orderedProduct = await db.products_orders.findOne({
+        where: {
+            order_id: req.body.orderId,
+            product_id: req.body.productId
+        }
+    })
+    if (orderedProduct) {
+        orderedProduct.update({
+            status: req.body.status
+        })
+        res.json({ message: 'ordere status updated' })
+    }
+    else { res.json({ message: 'Something went WRONG' }) }
+})
 router.post('/api/addProductReview', (req, res) => {
     db.products_reviews.findOne({
         where: {

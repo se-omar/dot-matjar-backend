@@ -20,11 +20,12 @@ router.use((req, res, next) => {
 router.use(cors());
 
 
-router.put('/api/getOrders', (req, res) => {
+router.put('/api/getUserOrders', (req, res) => {
     db.orders.findAll({
         where: {
             user_id: req.body.user_id
-        }
+        },
+        include: [{ model: db.products_orders }]
     }).then(orders => {
         res.json({
             data: orders
@@ -88,16 +89,46 @@ router.post('/api/createOrder', async (req, res) => {
     })
 
 
-    products.forEach(async element => {
+
+
+
+
+    products.forEach(async (element, index) => {
+
         await db.products_orders.create({
             order_id: order.order_id,
             product_id: element.product_id,
             purchase_date: new Date(),
             quantity: element.quantity
         })
+
+        db.products.findOne({
+            where: {
+                product_id: element.product_id
+            }
+        }).then(product => {
+            if (!product) {
+                return res.send('product not found')
+            }
+
+            product.update({
+                buy_counter: product.buy_counter + quantityArray[index]
+            })
+
+            db.users.findOne({
+                where: {
+                    user_id: product.user_id
+                }
+            }).then(user => {
+                user.update({
+                    total_revenue: user.total_revenue + (product.unit_price * quantityArray[index]),
+                    total_sales: user.total_sales + element.quantity[index]
+                })
+            })
+        })
+
     })
     res.json({ message: 'order created successfully' })
+    console.log('Data comming from frontend', req.body.cartItems, req.body.address, req.body.totalPrice, req.body.governorate, req.body.region)
 })
-
-
 module.exports = router;

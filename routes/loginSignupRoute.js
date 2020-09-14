@@ -113,8 +113,8 @@ router.post('/api/signup', async (req, res) => {
 
                     secure: false, // true for 465, false for other ports
                     auth: {
-                        user: 'alphieethan@gmail.com', // generated ethereal user
-                        pass: '4523534m', // generated ethereal password
+                        user: 'dotmarketofficial@gmail.com', // generated ethereal user
+                        pass: 'dotmarket123', // generated ethereal password
                     },
                     tls: {
                         regectUnauthorized: false
@@ -157,10 +157,11 @@ router.post('/api/signup', async (req, res) => {
                 region: req.body.region
 
 
-            })
-            return res.json({
-                message: "a message is sent to your email , please verify "
-            });
+            }).then(res.json({ message: 'message sent' }))
+            // return res.json({
+            //     message: "a message is sent to your email , please verify "
+
+            // });
         } else {
             return res.json({
                 message: "user already exists"
@@ -222,8 +223,10 @@ router.put('/api/activate', async (req, res) => {
             active: 1
         })
         res.send("User activated")
+        console.log("user activated")
     } else {
         res.send("Some thing went wrong!!!!!")
+        console.log("something went wrong")
     }
 })
 
