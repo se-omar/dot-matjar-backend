@@ -740,7 +740,10 @@ router.post('/api/getProductRatingsArray', (req, res) => {
     db.products_reviews.findAll({
         where: {
             product_id: req.body.product_id
-        }
+        },
+        include: [{
+            model: db.users
+        }]
     }).then(rows => {
         res.json({
             rows: rows
