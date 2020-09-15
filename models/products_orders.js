@@ -24,6 +24,10 @@ module.exports = function (sequelize, DataTypes) {
         key: 'order_id'
       }
     },
+    user_id: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true,
+    },
     quantity: {
       type: DataTypes.INTEGER(11),
       allowNull: true,
