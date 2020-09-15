@@ -790,6 +790,137 @@ router.post('/api/calculateProductRating', (req, res) => {
         // console.log('raating is ', rating)
         // console.log('average is ', average)
     })
+
 })
+
+
+
+router.post('/api/addNewCategory', async (req, res) => {
+
+
+    var category = await db.product_categories.findOne({
+        where: {
+            category_name: req.body.categoryName
+        }
+    })
+    if (category) { res.json({ message: 'Category already exists' }) }
+    else {
+        db.product_categories.create({
+            category_name: req.body.categoryName
+        }).then(res.json({ message: "Category is added" }))
+    }
+
+})
+
+router.post('/api/addCategoryItems', async (req, res) => {
+    if (req.body.categoryItem == " ") { res.json({ message: 'Please enter an item name' }) }
+
+    else {
+
+
+        var checkIfItemExists = await db.category_items.findOne({
+            where: {
+                category_items: req.body.categoryItem
+            }
+        })
+
+        if (checkIfItemExists) { res.json({ message: 'Item already exists' }) }
+        else {
+            var category = await db.product_categories.findOne({
+                where: {
+                    category_name: req.body.categoryName
+                }
+            })
+
+            db.category_items.create({
+                category_id: category.category_id,
+                category_name: category.category_name,
+                category_items: req.body.categoryItem
+            }).then(res.json({ message: 'Items added successfully' }))
+        }
+    }
+})
+
+router.put('/api/getCategoryItems', (req, res) => {
+    db.category_items.findAll().then(category => {
+        res.json({ message: 'found', data: category })
+    })
+})
+
+
+router.put('/api/removeCategoryAndItems', async (req, res) => {
+    var wh = []
+    console.log('testing cateogry name ', req.body.categoryName, req.body.categoryItem)
+
+    if (req.body.categoryName && req.body.categoryItem.length == 0) {
+        console.log("first if entered")
+        db.category_items.findAll({
+            where: {
+                category_name: req.body.categoryName
+            }
+        }).then(items => {
+            items.forEach(e => {
+                e.destroy()
+            })
+        })
+        var category = await db.product_categories.findOne({
+            where: {
+                category_name: req.body.categoryName
+            }
+        })
+
+        db.products.findAll({
+            where: {
+                category_id: category.category_id
+            }
+        }).then(async products => {
+            await products.forEach(e => {
+                e.update({
+                    category_id: null
+                })
+            })
+            category.destroy()
+        })
+
+
+    }
+
+
+    else if (req.body.categoryName && req.body.categoryItem.length > 0) {
+        console.log('socond if entered')
+        db.category_items.findOne({
+            where: {
+                category_name: req.body.categoryName,
+                category_items: req.body.categoryItem
+            }
+        }).then(item => { item.destroy() })
+
+    }
+
+
+
+
+
+
+    // await db.product_categories.findOne({
+    //     where: {
+    //         category_name: req.body.categoryName
+    //     }
+    // }).then(category => {
+    //     category.destroy()
+    // })
+    // if (req.body.categoryItem) {
+    //     await db.category_items.findOne({
+    //         where: {
+    //             category_items: req.body.categoryItem
+    //         }
+    //     }).then(item => {
+    //         item.destroy()
+    //     })
+    // }
+    // res.json({ message: 'removed successfully' })
+})
+
+
 
 module.exports = router;

@@ -40,6 +40,8 @@ app.use(supplierRoute);
 const supplierPageInfoRoute = require('./routes/supplierPageInfoRoute.js')
 app.use(supplierPageInfoRoute)
 
+
+
 const date = new Date()
 console.log(date.getMonth() + 1)
 

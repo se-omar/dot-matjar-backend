@@ -131,4 +131,27 @@ router.post('/api/createOrder', async (req, res) => {
     res.json({ message: 'order created successfully' })
     console.log('Data comming from frontend', req.body.cartItems, req.body.address, req.body.totalPrice, req.body.governorate, req.body.region)
 })
+
+
+
+
+router.put('/api/getCategoryItems', async (req, res) => {
+    var category = await db.product_categories.findOne({
+        where: { category_name: req.body.category_name }
+    })
+    db.category_items.findAll({
+        where: {
+            category_id: category.category_id
+        }
+    }).then(items => {
+        res.json({ message: 'items FOUND', data: items })
+    })
+
+})
+
+
+
+
+
+
 module.exports = router;

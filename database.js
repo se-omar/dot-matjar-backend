@@ -20,7 +20,8 @@ const db = {
     orders: sequelize.import('./models/orders'),
     products_orders: sequelize.import('./models/products_orders'),
     supplier_page_info: sequelize.import('./models/supplier_page_info'),
-    products_reviews: sequelize.import('./models/products_reviews.js')
+    products_reviews: sequelize.import('./models/products_reviews.js'),
+    category_items: sequelize.import('./models/category_items')
 
 }
 
@@ -182,6 +183,13 @@ db.products_reviews.belongsTo(db.products, {
 });
 
 
+db.product_categories.hasMany(db.category_items, {
+    foreignKey: 'category_id'
+})
+
+db.category_items.belongsTo(db.product_categories, {
+    foreignKey: 'category_id'
+})
 
 // db.users.hasOne(db.supplier_page_info)
 
