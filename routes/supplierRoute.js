@@ -247,63 +247,12 @@ router.put('/api/supplierProductsInOrder', async (req, res) => {
 
         },
         ]
-
-
-
-
-
     }).then(orders => {
 
         res.json({
             data: orders
         })
     })
-
-
-    // var ordersMade = []
-    // console.log('supplier idd',req.body.user_id)
-    //     var products = await db.products.findAll({
-    //         where:{
-    //             user_id : req.body.user_id
-    //         }
-    //     })
-    //     products.forEach(e=>{
-    //         console.log('products idd',e.product_id)
-    //     })
-    //     var productsOrder=[]
-
-    //         for(var i=0 ; i<products.length ; i++){
-    //            console.log('for entered', i )
-    //           var pro = await db.products_orders.findAll({
-    //               where:{
-    //                product_id:products[i].product_id
-    //               },
-    //               include:[{
-
-    //                   model:db.orders,
-    //                   include:[{model:db.users}]
-    //               },
-    //             { model:db.products}],
-
-    //             })
-    //             if(pro){
-    //                 console.log('poroo is',pro )
-    //                 for(var x=0 ; x<pro.length ; x++){
-
-    //                          productsOrder.push(pro[x])
-
-    //                 }
-    //             }
-
-
-
-    //         }
-
-
-    //         res.json({message:'orders found',data:productsOrder})
-
-    //         console.log('id isss', req.body.user_id)
-
 })
 
 router.get('/api/getAllSuppliersWithSales', (req, res) => {
@@ -321,6 +270,104 @@ router.get('/api/getAllSuppliersWithSales', (req, res) => {
     })
 })
 
+router.post('/api/getSupplierReview', (req, res) => {
+    db.suppliers_reviews.findOne({
+        where: {
+            user_id: req.body.user_id,
+            supplier_id: req.body.supplier_id
+        }
+    }).then(row => {
+        if (!row) {
+            res.json({
+                message: 'no review found',
+                review: {
+                    rating: 0,
+                    review: ''
+                }
+            })
+        }
+        else {
+            res.json({
+                message: 'review was found',
+                review: row
+            })
+        }
+    })
+})
+
+router.post('/api/addSupplierReview', (req, res) => {
+    db.suppliers_reviews.findOne({
+        where: {
+            user_id: req.body.user_id,
+            supplier_id: req.body.supplier_id
+        }
+    }).then(row => {
+        if (!row) {
+            db.suppliers_reviews.create({
+                supplier_id: req.body.supplier_id,
+                user_id: req.body.user_id,
+                rating: req.body.rating,
+                review: req.body.review
+            }).then(response => {
+                res.json({
+                    message: 'review placed successfully',
+                    review: response
+                })
+            })
+        }
+        else {
+            res.json({
+                message: 'you already placed a review',
+                review: row
+            })
+        }
+    })
+})
+
+router.post('/api/getSupplierRatingsArray', (req, res) => {
+    db.suppliers_reviews.findAll({
+        where: {
+            supplier_id: req.body.supplier_id
+        },
+        include: [{
+            model: db.users,
+            as: 'supplier'
+        }, {
+            model: db.users,
+            as: 'user'
+        }]
+    }).then(rows => {
+        res.json({
+            rows: rows
+        })
+    })
+})
+
+router.post('/api/calculateSupplierRating', (req, res) => {
+    db.suppliers_reviews.findAll({
+        where: {
+            supplier_id: req.body.supplier_id
+        }
+    }).then(rows => {
+        var rating = 0;
+        var counter = 0;
+        var average = 0;
+        rows.forEach(element => {
+            rating += element.rating
+            counter++
+        });
+        average = rating / counter;
+        db.users.findByPk(req.body.supplier_id).then(user => {
+            user.update({
+                rating: average,
+                rate_counter: counter
+            })
+        })
+        res.json({
+            message: 'rating placed in product'
+        })
+    })
+})
 
 
 module.exports = router;

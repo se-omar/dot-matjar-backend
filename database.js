@@ -20,8 +20,8 @@ const db = {
     orders: sequelize.import('./models/orders'),
     products_orders: sequelize.import('./models/products_orders'),
     supplier_page_info: sequelize.import('./models/supplier_page_info'),
-    products_reviews: sequelize.import('./models/products_reviews.js')
-
+    products_reviews: sequelize.import('./models/products_reviews.js'),
+    suppliers_reviews: sequelize.import('./models/suppliers_reviews.js')
 }
 
 db.users.hasMany(db.requests, {
@@ -181,6 +181,23 @@ db.products_reviews.belongsTo(db.products, {
     foreignKey: 'product_id'
 });
 
+
+db.users.hasMany(db.suppliers_reviews, {
+    as: 'user',
+    foreignKey: 'user_id'
+});
+db.users.hasMany(db.suppliers_reviews, {
+    as: 'supplier',
+    foreignKey: 'supplier_id'
+});
+db.suppliers_reviews.belongsTo(db.users, {
+    as: 'user',
+    foreignKey: 'user_id'
+});
+db.suppliers_reviews.belongsTo(db.users, {
+    as: 'supplier',
+    foreignKey: 'supplier_id'
+});
 
 
 // db.users.hasOne(db.supplier_page_info)
