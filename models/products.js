@@ -148,6 +148,10 @@ module.exports = function (sequelize, DataTypes) {
       defaultValue: 0,
       allowNull: false,
     },
+    category_items_id: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true
+    }
 
   }, {
     tableName: 'products',

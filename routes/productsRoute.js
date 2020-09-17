@@ -179,13 +179,17 @@ router.post('/api/myProducts', (req, res) => {
 
 router.post('/api/product', upload2.array('file', 12), async (req, res, next) => {
     console.log('uploaded file', req.files);
-    var cat = db.product_categories.findOne({
+    var cat = await db.product_categories.findOne({
         where: {
             category_name: req.body.category_name
         }
     })
 
-
+    var catItem = await db.category_items.findOne({
+        where: {
+            category_items: req.body.category_item
+        }
+    })
 
     db.products.create({
         product_name: req.body.product_name,
@@ -206,7 +210,7 @@ router.post('/api/product', upload2.array('file', 12), async (req, res, next) =>
         main_picture: req.files[0] ? req.files[0].path.substr(11) : null,
         extra_picture1: req.files[1] ? req.files[1].path.substr(11) : null,
         extra_picture2: req.files[2] ? req.files[2].path.substr(11) : null,
-
+        category_items_id: catItem.category_items_id
     }).then(response => {
 
         res.send(response)
@@ -288,11 +292,18 @@ router.put('/api/filterProducts', async (req, res) => {
     var reg = req.body.region
     var prodname = req.body.product_name
     var catname = req.body.category_name
-
+    var catItem = req.body.categoryItem
     if (catname) {
         var cat = await db.product_categories.findOne({
             where: {
                 category_name: catname
+            }
+        })
+    }
+    if (catItem) {
+        var item = await db.category_items.findOne({
+            where: {
+                category_items: catItem
             }
         })
     }
@@ -310,13 +321,18 @@ router.put('/api/filterProducts', async (req, res) => {
     if (catname) {
         wh.category_id = cat.category_id
     }
-    if (catname) {
-        var cat = await db.product_categories.findOne({
-            where: {
-                category_name: catname
-            }
-        })
+    // if (catname) {
+    //     var cat = await db.product_categories.findOne({
+    //         where: {
+    //             category_name: catname
+    //         }
+    //     })
+    // }
+
+    if (catItem) {
+        wh.category_items_id = item.category_items_id
     }
+
 
     db.products.findAll({
         where: wh
@@ -326,278 +342,7 @@ router.put('/api/filterProducts', async (req, res) => {
             data: products
         })
     })
-    // Dont have catrgory name
-
-
-    // if (!req.body.category_name) {
-
-
-    //     if (!req.body.product_id) {
-
-
-    //          if(!req.body.product_name ){
-    //             db.products.findAll({
-    //                 where: {
-
-    //                     governorate:gov,
-    //                     region : reg
-
-    //                 },
-    //                 limit: 20,
-    //                 include: [{
-    //                     model: db.business
-    //                 }]
-    //             }).then(products => {
-    //                 res.json({
-    //                     data: products,
-    //                     message: 'searched by governoment and region'
-    //                 })
-    //             })
-    //         }
-
-
-    //        //   Dont have product name
-
-
-
-
-    //         db.products.findAll({
-    //             where: {
-    //                 product_name: {
-    //                     [Op.substring]: req.body.product_name
-    //                 },
-    //                 governorate:gov,
-    //                 region : reg
-
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by productName'
-    //             })
-    //         })
-    //     }
-    //     else {
-    //         db.products.findAll({
-    //             where: {
-    //                 product_id: {
-    //                     [Op.gt]: req.body.product_id
-    //                 },
-    //                 product_name: {
-    //                     [Op.substring]: req.body.product_name
-    //                 }
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by productName'
-    //             })
-    //         })
-    //     }
-
-    // } 
-
-
-
-
-
-    // else if (!req.body.product_name) {
-    //     if (!req.body.product_id) {
-    //         console.log('category entered')
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         db.products.findAll({
-    //             where: {
-    //                 category_id: cat.category_id,
-    //                 governorate:gov,
-    //                 region:reg
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by category'
-    //             })
-    //             console.log(products.length)
-    //         })
-    //     }
-    //     else {
-    //         console.log('category entered')
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         db.products.findAll({
-    //             where: {
-    //                 product_id: {
-    //                     [Op.gt]: req.body.product_id
-    //                 },
-    //                 category_id: cat.category_id,
-    //                 governorate:gov,
-    //                 region:reg
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by category'
-    //             })
-    //             console.log(products.length)
-    //         })
-    //     }
-
-    // }
-
-    // else if(!gov){
-
-
-    //     if (!req.body.product_id) {
-    //         console.log('gov entered')
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         db.products.findAll({
-    //             where: {
-    //                 category_id: cat.category_id,
-    //                 product_name:req.body.product_name
-
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by category'
-    //             })
-    //             console.log(products.length)
-    //         })
-    //     }
-    //     else {
-    //         console.log('category entered')
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         db.products.findAll({
-    //             where: {
-    //                 product_id: {
-    //                     [Op.gt]: req.body.product_id
-    //                 },
-    //                 category_id: cat.category_id,
-    //               product_name:req.body.product_name
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         }).then(products => {
-    //             res.json({
-    //                 data: products,
-    //                 message: 'searched by category'
-    //             })
-    //             console.log(products.length)
-    //         })
-    //     }
-
-
-
-
-    // }
-
-
-    // else {
-    //     if (!req.body.product_id) {
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         var products = await db.products.findAll({
-    //             where: {
-    //                 category_id: cat.category_id,
-    //                 product_name: req.body.product_name,
-    //                 governorate:gov,
-    //                 region:reg
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         })
-    //         res.json({
-    //             data: products,
-    //             message: 'searched by both'
-    //         })
-    //     }
-
-
-    //     else {
-
-    //         var cat = await db.product_categories.findOne({
-    //             where: {
-    //                 category_name: req.body.category_name
-    //             }
-    //         })
-    //         var products = await db.products.findAll({
-    //             where: {
-    //                 product_id: {
-    //                     [Op.gt]: req.body.product_id
-    //                 },
-    //                 category_id: cat.category_id,
-    //                 product_name: req.body.product_name,
-    //                 governorate:gov,
-    //                 region:reg
-    //             },
-    //             limit: 20,
-    //             include: [{
-    //                 model: db.business
-    //             }]
-    //         })
-    //         res.json({
-    //             data: products,
-    //             message: 'searched by both'
-    //         })
-    //     }
-
-    // }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    console.log(item)
 })
 
 
@@ -734,6 +479,21 @@ router.post('/api/addProductReview', (req, res) => {
         }
     })
 
+})
+
+router.post('/api/getProductRatingsArray', (req, res) => {
+    db.products_reviews.findAll({
+        where: {
+            product_id: req.body.product_id
+        },
+        include: [{
+            model: db.users
+        }]
+    }).then(rows => {
+        res.json({
+            rows: rows
+        })
+    })
 })
 
 router.post('/api/getProductReview', (req, res) => {
@@ -922,5 +682,25 @@ router.put('/api/removeCategoryAndItems', async (req, res) => {
 })
 
 
+router.post('/api/checkIfUserOrdered', (req, res) => {
+    db.products_orders.findOne({
+        where: {
+            user_id: req.body.user_id,
+            product_id: req.body.product_id
+        }
+    }).then(row => {
+        if (!row) {
+            res.json({
+                message: 'row not found'
+            })
+        }
+        else {
+            res.json({
+                message: 'row found',
+                row: row
+            })
+        }
+    })
+})
 
 module.exports = router;

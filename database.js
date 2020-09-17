@@ -1,5 +1,5 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('database5', 'root', '', {
+const sequelize = new Seq('database6', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
@@ -21,8 +21,8 @@ const db = {
     products_orders: sequelize.import('./models/products_orders'),
     supplier_page_info: sequelize.import('./models/supplier_page_info'),
     products_reviews: sequelize.import('./models/products_reviews.js'),
-    category_items: sequelize.import('./models/category_items')
-
+    category_items: sequelize.import('./models/category_items'),
+    suppliers_reviews: sequelize.import('./models/suppliers_reviews.js')
 }
 
 db.users.hasMany(db.requests, {
@@ -190,6 +190,30 @@ db.product_categories.hasMany(db.category_items, {
 db.category_items.belongsTo(db.product_categories, {
     foreignKey: 'category_id'
 })
+db.users.hasMany(db.suppliers_reviews, {
+    as: 'user',
+    foreignKey: 'user_id'
+});
+db.users.hasMany(db.suppliers_reviews, {
+    as: 'supplier',
+    foreignKey: 'supplier_id'
+});
+db.suppliers_reviews.belongsTo(db.users, {
+    as: 'user',
+    foreignKey: 'user_id'
+});
+db.suppliers_reviews.belongsTo(db.users, {
+    as: 'supplier',
+    foreignKey: 'supplier_id'
+});
+
+db.category_items.hasMany(db.products, {
+    foreignKey: 'category_items_id'
+})
+db.products.belongsTo(db.category_items, {
+    foreignKey: 'category_items_id'
+})
+
 
 // db.users.hasOne(db.supplier_page_info)
 

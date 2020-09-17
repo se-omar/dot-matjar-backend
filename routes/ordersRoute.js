@@ -88,15 +88,11 @@ router.post('/api/createOrder', async (req, res) => {
         address_line_1: req.body.address,
     })
 
-
-
-
-
-
     products.forEach(async (element, index) => {
 
         await db.products_orders.create({
             order_id: order.order_id,
+            user_id: order.user_id,
             product_id: element.product_id,
             purchase_date: new Date(),
             quantity: element.quantity
