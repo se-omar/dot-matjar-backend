@@ -156,15 +156,11 @@ router.post('/api/myProducts', (req, res) => {
             user_id: req.body.user_id
         },
         include: [{
-            model: db.business,
-            include: [{
-                model: db.users
-            }]
+            model: db.users
         },
         {
             model: db.product_categories,
-        },
-        ]
+        },]
     }).then(response => {
         if (!response) {
             res.send('no products found for this user')
@@ -319,7 +315,8 @@ router.put('/api/filterProducts', async (req, res) => {
     }
 
     db.products.findAll({
-        where: wh
+        where: wh,
+        limit: 20,
     }).then(products => {
         res.json({
             message: 'test search',
