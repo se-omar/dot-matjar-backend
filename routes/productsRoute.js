@@ -338,8 +338,9 @@ router.put('/api/filterProducts', async (req, res) => {
             message: 'test search',
             data: products
         })
+
     })
-    console.log(item)
+
 })
 
 
