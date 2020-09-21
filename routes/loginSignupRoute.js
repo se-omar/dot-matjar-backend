@@ -106,7 +106,7 @@ router.post('/api/signup', async (req, res) => {
             const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
                 expiresIn: '60m'
             }, (emailtoken, err) => {
-                const url = `http://localhost:8080/activation/` + cryptoo;
+                var url = `http://localhost:8080/activation/` + cryptoo;
 
                 let transporter = nodemailer.createTransport({
                     service: "gmail",
@@ -126,7 +126,7 @@ router.post('/api/signup', async (req, res) => {
 
 
                 let mailOptions = {
-                    from: ' alphieethan@gmail.com', // sender address
+                    from: 'DOT-MATJAR', // sender address
                     to: req.body.email, // list of receivers
                     subject: "Project almost DONE", // Subject line
                     text: "Please activate from here", // plain text body
@@ -157,7 +157,7 @@ router.post('/api/signup', async (req, res) => {
                 region: req.body.region
 
 
-            }).then(res.json({ message: 'message sent' }))
+            }).then(res.json({ message: 'A Message is sent to your Email' }))
             // return res.json({
             //     message: "a message is sent to your email , please verify "
 
@@ -209,7 +209,7 @@ router.put("/api/completedata", async (req, res) => {
 })
 
 
-router.put('/api/activate', async (req, res) => {
+router.put('/api/activateUserAccount', async (req, res) => {
 
     var user = await db.users.findOne({
         where: {
@@ -229,6 +229,101 @@ router.put('/api/activate', async (req, res) => {
         console.log("something went wrong")
     }
 })
+
+
+router.post('/api/businessOwnerRegistration', async (req, res) => {
+    console.log(req.body.email)
+    var checkEmail = await db.users.findOne({
+        where: {
+            email: req.body.email
+        }
+    })
+
+
+    if (checkEmail) { res.json({ message: 'Email already exists' }) }
+    else {
+        const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
+            expiresIn: '60m'
+        }, (emailtoken, err) => {
+            var url = `http://localhost:8080/activation/` + cryptoo;
+
+            let transporter = nodemailer.createTransport({
+                service: "gmail",
+
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: 'dotmarketofficial@gmail.com', // generated ethereal user
+                    pass: 'dotmarket123', // generated ethereal password
+                },
+                tls: {
+                    regectUnauthorized: false
+                }
+            });
+
+
+
+
+
+            let mailoptions = {
+                from: ' dotmarketofficial@gmail.com', // sender address
+                to: req.body.email, // list of receivers
+                subject: "account almost DONE", // Subject line
+                text: "Please activate from here", // plain text body
+                html: `  <a href="${url}">Click to ACTIVATE your account</a> <br/>
+   
+    `
+
+            };
+
+
+
+            transporter.sendMail(mailoptions, function (err) {
+                if (err) {
+
+                    console.log('err', err)
+                    res.json({ message: 'Failed' })
+                } else {
+                    console.log("email sent!!!!")
+                    res.json({ message: 'Verification message is sent to your email' })
+
+                    db.users.create({
+                        email: req.body.email,
+                        national_number: req.body.national_number,
+                        password: hash,
+                        mobile_number: req.body.mobile_number,
+                        full_arabic_name: req.body.full_arabic_name,
+                        gender: req.body.gender,
+                        crypto: cryptoo,
+                        governorate: req.body.governorate,
+                        region: req.body.region,
+                        user_type: 'waiting_approval',
+                        store_name: req.body.store_name
+
+
+                    }).then(
+                        res.json({ message: 'A Message is sent to your Email' })
+
+                    )
+
+                }
+            })
+
+
+        });
+
+
+
+
+
+    }
+
+
+
+
+})
+
+
+
 
 
 module.exports = router;

@@ -275,12 +275,12 @@ router.delete('/api/removeProduct/:product_id', (req, res) => {
 })
 
 
-router.get('/api/selectCategory', async (req, res) => {
+router.put('/api/selectCategory', async (req, res) => {
     var cat = await db.product_categories.findAll()
     res.json({
         data: cat
     })
-
+    console.log('categories DBBBBB entereddd', cat)
 })
 
 router.put('/api/filterProducts', async (req, res) => {
@@ -630,10 +630,11 @@ router.put('/api/removeCategoryAndItems', async (req, res) => {
             where: {
                 category_id: category.category_id
             }
-        }).then(async products => {
-            await products.forEach(e => {
+        }).then(products => {
+            products.forEach(e => {
                 e.update({
-                    category_id: null
+                    category_id: null,
+                    category_items_id: null
                 })
             })
             category.destroy()

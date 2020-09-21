@@ -148,6 +148,10 @@ module.exports = function (sequelize, DataTypes) {
     rate_counter: {
       type: DataTypes.INTEGER(11),
       allowNull: true
+    },
+    store_name: {
+      type: DataTypes.STRING(255),
+      allowNull: true
     }
 
   }, {

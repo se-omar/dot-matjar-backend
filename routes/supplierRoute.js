@@ -370,4 +370,86 @@ router.post('/api/calculateSupplierRating', (req, res) => {
 })
 
 
+
+router.put('/api/getPendingSuppliers', (req, res) => {
+    db.users.findAll({
+        where: {
+            user_type: "waiting_approval"
+        }
+    }).then(users => {
+        res.json({ message: "users FOUND", data: users })
+    })
+})
+
+router.put('/api/acceptSupplierRequest', async (req, res) => {
+    var id = req.body.user_id.user_id
+    console.log('id', id)
+    // db.users.findOne({
+    //     where: {
+    //         user_id: req.body.user_id
+    //     }
+    // }).then(async user => {
+    //     await user.update({
+    //         user_type: 'business'
+    //     })
+    //     res.json({ message: 'Request Accepted' })
+    // })
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id.user_id
+        }
+    }).then(user => {
+        if (!user) { console.log('error happened') }
+        else {
+            user.update({ user_type: 'business' })
+        }
+    })
+
+})
+
+
+router.put('/api/filterSupplierProducts', async (req, res) => {
+
+
+    var wh = {}
+
+    wh.user_id = req.body.user_id
+
+    if (req.body.productsSearch) {
+        wh.product_name = {
+            [Op.substring]: req.body.productsSearch
+        }
+    }
+    if (req.body.categoryName) {
+        await db.product_categories.findOne({
+            where: {
+                category_name: req.body.categoryName
+            }
+        }).then(category => {
+            wh.category_id = category.category_id
+        })
+    }
+
+    if (req.body.itemName) {
+        await db.category_items.findOne({
+            where: {
+                category_items: req.body.itemName
+            }
+        }).then(item => {
+            wh.category_items_id = item.category_items_id
+        })
+    }
+
+    await db.products.findAll({
+        where: wh
+    }).then(products => {
+        res.json({ message: 'products Found', data: products })
+
+    })
+
+})
+
+
+
+
 module.exports = router;
