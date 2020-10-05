@@ -61,6 +61,18 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(11),
       allowNull: false
     },
+    show_carousel: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false
+    },
+    show_left_banner: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false
+    },
+    show_right_banner: {
+      type: DataTypes.INTEGER(1),
+      allowNull: false
+    },
   }, {
     tableName: 'supplier_page_info',
     timestamps: false

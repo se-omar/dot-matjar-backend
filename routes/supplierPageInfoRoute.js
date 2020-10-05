@@ -21,11 +21,15 @@ const upload = multer({
     storage: storage
 })
 
+
+
 router.post('/api/updateSupplierPage', upload.single('file'), async (req, res) => {
     var file = req.file;
-    var wh = []
+    var wh = {}
 
-
+    wh.show_carousel = req.body.showCarousel;
+    wh.show_left_banner = req.body.showLeftBanner;
+    wh.show_right_banner = req.body.showRightBanner;
     if (req.body.facebook) { wh.facebook = req.body.facebook }
     if (req.body.instgram) { wh.instgram = req.body.instgram }
     if (req.body.linkedin) { wh.linkedin = req.body.linkedin }
@@ -39,7 +43,8 @@ router.post('/api/updateSupplierPage', upload.single('file'), async (req, res) =
     if (req.body.carousel_height) { wh.carousel_height = req.body.carousel_height }
     if (req.body.user_id) { wh.user_id = req.body.user_id }
 
-
+    console.log('wherer statement =========================================================================================', wh)
+    console.log('show carousel', req.body.showCarousel)
     var page = await db.supplier_page_info.findOne({
         where: {
             user_id: req.body.supplier_id
@@ -58,8 +63,11 @@ router.post('/api/updateSupplierPage', upload.single('file'), async (req, res) =
             logo: req.file.path.substr(11),
             footer: req.body.footer,
             user_id: req.body.supplier_id,
-            carousel_width: req.body.carousel_width,
-            carousel_height: req.body.carousel_height
+            show_carousel: req.body.showCarousel ? 1 : 0,
+            show_left_banner: req.body.showLeftBanner ? 1 : 0,
+            show_right_banner: req.body.showRightBanner ? 1 : 0,
+            carousel_width: req.body.carousel_width ? req.body.carousel_width : 10,
+            carousel_height: req.body.carousel_height ? req.body.carousel_height : 400
         }).then(page => {
             res.json({ messaage: 'Page created', data: page })
         }).catch(err => { console.log(err) })
@@ -67,6 +75,7 @@ router.post('/api/updateSupplierPage', upload.single('file'), async (req, res) =
 
     }
     else {
+        console.log('wherer statement', wh)
         page.update(wh).then(page => {
             res.json({ messaage: 'Page Updated', data: page })
         }).catch(err => { console.log(err) })
