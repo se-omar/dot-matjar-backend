@@ -11,16 +11,35 @@ const Op = Sequelize.Op;
 
 const storage = multer.diskStorage({
     destination: './allUploads/uploads/',
-
     filename: function (req, file, cb) {
         cb(null, file.originalname + Date.now() + '.jpg')
     }
 })
-
 const upload = multer({
     storage: storage
 })
+var imagedir = path.join(__dirname.substr(0, __dirname.length - 6), '/allUploads/');
+router.use(express.static(imagedir));
 
+const carouselStorage = multer.diskStorage({
+    destination: './allUploads/carousel_images/',
+    filename: function (req, file, cb) {
+        cb(null, file.originalname.substr(0, file.originalname.length - 3) + Date.now() + '.jpg')
+    }
+})
+const carouselUpload = multer({
+    storage: carouselStorage
+})
+
+const bannerStorage = multer.diskStorage({
+    destination: './allUploads/banner_images/',
+    filename: function (req, file, cb) {
+        cb(null, file.originalname + Date.now() + '.jpg')
+    }
+})
+const bannerUpload = multer({
+    storage: bannerStorage
+})
 
 
 router.post('/api/updateSupplierPage', upload.single('file'), async (req, res) => {
@@ -80,6 +99,30 @@ router.post('/api/updateSupplierPage', upload.single('file'), async (req, res) =
             res.json({ messaage: 'Page Updated', data: page })
         }).catch(err => { console.log(err) })
     }
+
+})
+
+router.post('/api/uploadCarouselImages', carouselUpload.array('file', 12), (req, res) => {
+    console.log('supplier id is ===============================================================================', req.files)
+
+    db.supplier_page_info.findOne({
+        where: {
+            user_id: req.body.supplier_id,
+        },
+    }).then(info => {
+        info.update({
+            carousel_image_1: req.files[0] ? req.files[0].path.substr(11) : null,
+            carousel_image_2: req.files[1] ? req.files[1].path.substr(11) : null,
+            carousel_image_3: req.files[2] ? req.files[2].path.substr(11) : null,
+            carousel_image_4: req.files[3] ? req.files[3].path.substr(11) : null,
+        }).then(row => {
+            res.send(row)
+        })
+    })
+
+})
+
+router.post('/api/uploadBannerImages', carouselUpload.array('file', 12), (req, res) => {
 
 })
 
