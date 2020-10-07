@@ -280,7 +280,7 @@ router.put('/api/selectCategory', async (req, res) => {
     res.json({
         data: cat
     })
-    console.log('categories DBBBBB entereddd', cat)
+
 })
 
 router.put('/api/filterProducts', async (req, res) => {

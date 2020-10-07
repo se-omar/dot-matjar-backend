@@ -42,7 +42,7 @@ router.put('/api/supplierProducts/', (req, res) => {
         }]
     })
         .then(products => {
-            console.log('supplier productsss', products)
+
             res.json({
                 data: products
 
@@ -88,7 +88,7 @@ router.put('/api/getSupplier', (req, res) => {
 })
 
 router.put('/api/getRegions', (req, res) => {
-    console.log('asdasdasdas', req.body.governorate)
+
     var region
     fs.readFile('./countries.json', 'utf8', (err, data) => {
         if (err) {
