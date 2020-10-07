@@ -1,5 +1,5 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('ecommerce-27-september', 'root', '', {
+const sequelize = new Seq('database6', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
