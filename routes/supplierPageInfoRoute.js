@@ -104,27 +104,145 @@ router.post('/api/updateSupplierPage', upload.single('file'), async (req, res) =
 
 router.post('/api/uploadCarouselImages', carouselUpload.array('file', 12), (req, res) => {
     console.log('supplier id is ===============================================================================', req.files)
+    var wh = {}
+    if (req.files[0]) { wh.carousel_image_1 = req.files[0].path.substr(11) }
+    if (req.files[1]) { wh.carousel_image_2 = req.files[1].path.substr(11) }
+    if (req.files[2]) { wh.carousel_image_3 = req.files[2].path.substr(11) }
+    if (req.files[3]) { wh.carousel_image_4 = req.files[3].path.substr(11) }
 
     db.supplier_page_info.findOne({
         where: {
             user_id: req.body.supplier_id,
         },
     }).then(info => {
-        info.update({
-            carousel_image_1: req.files[0] ? req.files[0].path.substr(11) : null,
-            carousel_image_2: req.files[1] ? req.files[1].path.substr(11) : null,
-            carousel_image_3: req.files[2] ? req.files[2].path.substr(11) : null,
-            carousel_image_4: req.files[3] ? req.files[3].path.substr(11) : null,
-        }).then(row => {
-            res.send(row)
-        })
+        if (wh !== {}) {
+            info.update(wh).then(row => {
+                res.send(row)
+            })
+        }
     })
 
 })
 
-router.post('/api/uploadBannerImages', carouselUpload.array('file', 12), (req, res) => {
-
+router.post('/api/uploadBannerImages', bannerUpload.array('file', 12), (req, res) => {
+    db.supplier_page_info.findOne({
+        where: {
+            user_id: req.body.supplier_id,
+        },
+    }).then(info => {
+        if (req.files[0] && req.files[0].originalname === 'left') {
+            info.update({
+                left_banner_image: req.files[0] ? req.files[0].path.substr(11) : info.left_banner_image,
+                right_banner_image: req.files[1] ? req.files[1].path.substr(11) : info.right_banner_image,
+            }).then(row => {
+                res.send(row)
+            })
+        }
+        else {
+            info.update({
+                right_banner_image: req.files[0] ? req.files[0].path.substr(11) : info.right_banner_image,
+                left_banner_image: req.files[1] ? req.files[1].path.substr(11) : info.left_banner_image,
+            }).then(row => {
+                res.send(row)
+            })
+        }
+    })
 })
+
+router.post('/api/removeCarouselImage1', (req, res) => {
+    db.supplier_page_info.findOne({
+        where: {
+            user_id: req.body.id
+        }
+    }).then(row => {
+        row.update({
+            carousel_image_1: null
+        })
+        res.json({
+            row
+        })
+    })
+})
+
+router.post('/api/removeCarouselImage2', (req, res) => {
+    db.supplier_page_info.findOne({
+        where: {
+            user_id: req.body.id
+        }
+    }).then(row => {
+        row.update({
+            carousel_image_2: null
+        })
+        res.json({
+            row
+        })
+    })
+})
+
+
+router.post('/api/removeCarouselImage3', (req, res) => {
+    db.supplier_page_info.findOne({
+        where: {
+            user_id: req.body.id
+        }
+    }).then(row => {
+        row.update({
+            carousel_image_3: null
+        })
+        res.json({
+            row
+        })
+    })
+})
+
+
+router.post('/api/removeCarouselImage4', (req, res) => {
+    db.supplier_page_info.findOne({
+        where: {
+            user_id: req.body.id
+        }
+    }).then(row => {
+        row.update({
+            carousel_image_4: null
+        })
+        res.json({
+            row
+        })
+    })
+})
+
+router.post('/api/removeLeftBannerImage', (req, res) => {
+    db.supplier_page_info.findOne({
+        where: {
+            user_id: req.body.id
+        }
+    }).then(row => {
+        row.update({
+            left_banner_image: null
+        })
+        res.json({
+            row
+        })
+    })
+})
+
+router.post('/api/removeRightBannerImage', (req, res) => {
+    db.supplier_page_info.findOne({
+        where: {
+            user_id: req.body.id
+        }
+    }).then(row => {
+        row.update({
+            right_banner_image: null
+        })
+        res.json({
+            row
+        })
+    })
+})
+
+
+
 
 router.put('/api/getSupplierPageData', (req, res) => {
     console.log(req.supplier_id)
