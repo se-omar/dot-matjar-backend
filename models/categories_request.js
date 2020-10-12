@@ -39,6 +39,11 @@ module.exports = function (sequelize, DataTypes) {
         new_item_category_name: {
             type: DataTypes.STRING(255),
             allowNull: true
+        },
+        status: {
+            type: DataTypes.STRING(255),
+            allowNull: false,
+
         }
     }, {
         tableName: 'categories_request',

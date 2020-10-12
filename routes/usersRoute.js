@@ -174,35 +174,35 @@ router.post('/api/refreshCurrentUser', checkAuth, (req, res) => {
 
 
 
-router.put('/api/changeSiteColor',async(req,res)=>{
+router.put('/api/changeSiteColor', async (req, res) => {
     console.log(req.body.user_id)
     db.users.findOne({
-        where:{
-            user_id : req.body.user_id
+        where: {
+            user_id: req.body.user_id
         }
-    }).then(async user=>{
-        if(user.user_type != 'admin'){res.json({message:'You have no access for this request' })}
-        else{
+    }).then(async user => {
+        if (user.user_type != 'admin') { res.json({ message: 'You have no access for this request' }) }
+        else {
             var admins = await db.users.findAll({
-                where:{
-                user_type : 'admin'
+                where: {
+                    user_type: 'admin'
                 }
             })
-            
-     for(let i=0; i<admins.length ; i++){
-       await  db.users.findOne({
-          where:{
-              user_id:admins[i].user_id
-          }
-         }).then(user=>{
-             user.update({
-           site_color:req.body.site_color
-             })
-         })
-     }
-     res.json({message:'site color changed'},
-        
-        )
+
+            for (let i = 0; i < admins.length; i++) {
+                await db.users.findOne({
+                    where: {
+                        user_id: admins[i].user_id
+                    }
+                }).then(user => {
+                    user.update({
+                        site_color: req.body.site_color
+                    })
+                })
+            }
+            res.json({ message: 'site color changed' },
+
+            )
         }
 
     })
@@ -210,18 +210,52 @@ router.put('/api/changeSiteColor',async(req,res)=>{
 
 
 
-router.put('/api/getSiteColor',async(req,res)=>{
-     db.users.findOne({
-        where:{
-            user_type: 'admin'
+router.put('/api/getSiteColor', async (req, res) => {
+    db.site_colors.findAll()
+        .then(data => { res.json({ data: data, message: 'site data connected' }) })
+})
+
+
+
+
+
+
+router.post('/api/updateSiteColors', async (req, res) => {
+    var siteColor = await db.site_colors.findOne({
+        where: {
+            id: 1
         }
-    }).then(user=>{
-        res.json({
-            message:'connected',
-            data:user.site_color
+    })
+    if (!siteColor) {
+        db.site_colors.create({
+            toolbar_color: req.body.toolBarColor,
+            footer_color: req.body.footerColor,
+            footer_text_color: req.body.footerTextColor,
+            button_color: req.body.buttonsColor,
+            button_text_color: req.body.buttonTextColor,
+            toolbar_text_color: req.body.toolBarTextColor
         })
-    })
+    }
+    if (siteColor) {
+        db.site_colors.findOne({
+            where: {
+                id: 1
+            }
+        }).then(siteUpdates => {
+            siteUpdates.update({
+                toolbar_color: req.body.toolBarColor,
+                footer_color: req.body.footerColor,
+                footer_text_color: req.body.footerTextColor,
+                button_color: req.body.buttonsColor,
+                button_text_color: req.body.buttonsTextColor,
+                toolbar_text_color: req.body.toolBarTextColor
+            })
+        })
+    }
 })
+
+
+
 
 
 
