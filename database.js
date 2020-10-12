@@ -1,5 +1,5 @@
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('ecommerce-7-oct', 'root', '', {
+const sequelize = new Seq('ecommerce-11-oct', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
@@ -23,7 +23,8 @@ const db = {
     products_reviews: sequelize.import('./models/products_reviews.js'),
     category_items: sequelize.import('./models/category_items'),
     suppliers_reviews: sequelize.import('./models/suppliers_reviews.js'),
-    categories_request: sequelize.import('./models/categories_request.js')
+    categories_request: sequelize.import('./models/categories_request.js'),
+    site_colors: sequelize.import('./models/site_colors.js'),
 }
 
 db.users.hasMany(db.requests, {
