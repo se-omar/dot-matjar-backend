@@ -149,14 +149,14 @@ router.post('/api/uploadBannerImages', bannerUpload.array('file', 12), (req, res
     })
 })
 
-router.post('/api/removeCarouselImage1', (req, res) => {
+router.post('/api/removeCarouselImage', (req, res) => {
     db.supplier_page_info.findOne({
         where: {
             user_id: req.body.id
         }
     }).then(row => {
         row.update({
-            carousel_image_1: null
+            [req.body.imgName]: null
         })
         res.json({
             row
@@ -164,76 +164,14 @@ router.post('/api/removeCarouselImage1', (req, res) => {
     })
 })
 
-router.post('/api/removeCarouselImage2', (req, res) => {
+router.post('/api/removeBannerImage', (req, res) => {
     db.supplier_page_info.findOne({
         where: {
             user_id: req.body.id
         }
     }).then(row => {
         row.update({
-            carousel_image_2: null
-        })
-        res.json({
-            row
-        })
-    })
-})
-
-
-router.post('/api/removeCarouselImage3', (req, res) => {
-    db.supplier_page_info.findOne({
-        where: {
-            user_id: req.body.id
-        }
-    }).then(row => {
-        row.update({
-            carousel_image_3: null
-        })
-        res.json({
-            row
-        })
-    })
-})
-
-
-router.post('/api/removeCarouselImage4', (req, res) => {
-    db.supplier_page_info.findOne({
-        where: {
-            user_id: req.body.id
-        }
-    }).then(row => {
-        row.update({
-            carousel_image_4: null
-        })
-        res.json({
-            row
-        })
-    })
-})
-
-router.post('/api/removeLeftBannerImage', (req, res) => {
-    db.supplier_page_info.findOne({
-        where: {
-            user_id: req.body.id
-        }
-    }).then(row => {
-        row.update({
-            left_banner_image: null
-        })
-        res.json({
-            row
-        })
-    })
-})
-
-router.post('/api/removeRightBannerImage', (req, res) => {
-    db.supplier_page_info.findOne({
-        where: {
-            user_id: req.body.id
-        }
-    }).then(row => {
-        row.update({
-            right_banner_image: null
+            [req.body.imgName]: null
         })
         res.json({
             row

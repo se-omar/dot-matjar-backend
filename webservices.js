@@ -40,6 +40,9 @@ app.use(supplierRoute);
 const supplierPageInfoRoute = require('./routes/supplierPageInfoRoute.js')
 app.use(supplierPageInfoRoute)
 
+const adminRoute = require('./routes/adminRoute.js')
+app.use(adminRoute)
+
 
 
 const date = new Date()
