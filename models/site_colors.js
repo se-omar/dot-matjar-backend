@@ -35,47 +35,47 @@ module.exports = function (sequelize, DataTypes) {
         carousel_width: {
             type: DataTypes.INTEGER(11),
             allowNull: false
-          },
-          carousel_height: {
+        },
+        carousel_height: {
             type: DataTypes.INTEGER(11),
             allowNull: false
-          },
-          show_carousel: {
+        },
+        show_carousel: {
             type: DataTypes.INTEGER(1),
             allowNull: false
-          },
-          show_left_banner: {
+        },
+        show_left_banner: {
             type: DataTypes.INTEGER(1),
             allowNull: false
-          },
-          show_right_banner: {
+        },
+        show_right_banner: {
             type: DataTypes.INTEGER(1),
             allowNull: false
-          },
-          carousel_image_1: {
+        },
+        carousel_image_1: {
             type: DataTypes.STRING(255),
             allowNull: true
-          },
-          carousel_image_2: {
+        },
+        carousel_image_2: {
             type: DataTypes.STRING(255),
             allowNull: true
-          },
-          carousel_image_3: {
+        },
+        carousel_image_3: {
             type: DataTypes.STRING(255),
             allowNull: true
-          },
-          carousel_image_4: {
+        },
+        carousel_image_4: {
             type: DataTypes.STRING(255),
             allowNull: true
-          },
-          left_banner_image: {
+        },
+        left_banner_image: {
             type: DataTypes.STRING(255),
             allowNull: true
-          },
-          right_banner_image: {
+        },
+        right_banner_image: {
             type: DataTypes.STRING(255),
             allowNull: true
-          },
+        },
     }, {
         tableName: 'site_colors',
 

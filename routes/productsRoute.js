@@ -197,7 +197,7 @@ router.post('/api/product', upload2.array('file', 12), async (req, res, next) =>
         unit_price: req.body.unit_price,
         size: req.body.size,
         color: req.body.color,
-        describtion: req.body.describtion,
+        description: req.body.describtion,
         unit_weight: req.body.unit_weight,
         has_discount: req.body.has_discount,
         discount_amount: req.body.discount_amount,
@@ -759,6 +759,106 @@ router.post('/api/requestNewCategoryAndItem', async (req, res) => {
 
 })
 
+router.get('/api/getCategoryAndItemRequests', (req, res) => {
+    db.categories_request.findAll({
+        include: [
+            { model: db.users }
+        ]
+    })
+        .then(requests => {
+            res.json({ message: 'Requested Categories and item', data: requests })
+        })
+})
+
+router.put('/api/categoryAndItemRequestStatus', async (req, res) => {
+    var category = await db.categories_request.findOne({
+        where: {
+            id: req.body.id
+        }
+    })
+    if (category) {
+        category.update({
+            status: req.body.status
+        }).then()
+
+
+        if (req.body.status == 'Accepted') {
+
+
+            if (req.body.requestType == 'category') {
+
+
+                var checkCategoryexist = await db.product_categories.findOne({
+                    where: {
+                        category_name: req.body.newCategoryName
+                    }
+                })
+
+                if (!checkCategoryexist) {
+
+                    db.product_categories.create({
+                        category_name: req.body.newCategoryName,
+                        description: req.body.newCategoryDescription
+
+                    }).then(res.json({ message: `Request ${req.body.status} Successfully` }))
+                }
+                else { res.json({ message: 'Category already Exists' }) }
+
+            }
+
+            else {
+
+                var checkIfItemExists = await db.category_items.findOne({
+                    where: {
+                        category_items: req.body.newCategoryItem
+                    }
+                })
+                if (checkIfItemExists) { res.json({ message: 'item already exists' }) }
+                else {
+                    db.product_categories.findOne({
+                        where: {
+                            category_name: req.body.newItemCategoryName
+                        }
+                    }).then(category => {
+                        db.category_items.create({
+                            category_id: category.category_id,
+                            category_name: category.category_name,
+                            category_items: req.body.newCategoryItem,
+
+                        }).then(res.json({ message: `Request ${req.body.status} Successfully` }))
+                    })
+                }
+
+
+
+            }
+
+        }
+        else {
+
+            res.json({ message: `Request ${req.body.status} Successfully` })
+        }
+    }
+    else {
+        res.json({ message: 'Request Denied' })
+
+    }
+
+})
+
+
+
+router.put('/api/getSupplierCategoriesRequests', (req, res) => {
+    console.log('user id iss', req.body.user_id)
+
+    db.categories_request.findAll({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(requests => {
+        res.json({ data: requests, message: 'requests found' })
+    })
+})
 
 
 
