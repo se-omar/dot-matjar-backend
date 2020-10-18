@@ -75,6 +75,18 @@ app.use(function (req, res, next) {
     next();
 });
 
+app.post('/api/testapi1', (req, res) => {
+    res.json({ 
+        message: 'sent message 1'
+    })
+})
+
+app.post('/api/testapi2', (req, res) => {
+    res.json({
+        message: 'sent message 2'
+    })
+})
+
 console.log('current year is', new Date().getFullYear())
 app.post('/api/createFakeData', (req, res) => {
     // for (i = 0; i < 100; i++) {
