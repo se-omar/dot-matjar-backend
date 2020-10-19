@@ -190,6 +190,7 @@ router.put('/api/getSupplierPageData', (req, res) => {
         }
     }).then(info => {
         res.json({ message: 'data is ', data: info })
+
     })
 
 })

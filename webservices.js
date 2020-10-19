@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const crypto = require('crypto');
 const faker = require('faker');
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op;
 const db = require('./database');
 
 
@@ -47,7 +49,7 @@ app.use(adminRoute)
 
 
 const date = new Date()
-console.log(date.getMonth() + 1)
+//console.log(date.getMonth() + 1)
 
 require("dotenv").config();
 
@@ -76,7 +78,19 @@ app.use(function (req, res, next) {
     next();
 });
 
-console.log('current year is', new Date().getFullYear())
+app.post('/api/testapi1', (req, res) => {
+    res.json({
+        message: 'sent message 1'
+    })
+})
+
+app.post('/api/testapi2', (req, res) => {
+    res.json({
+        message: 'sent message 2'
+    })
+})
+
+//console.log('current year is', new Date().getFullYear())
 app.post('/api/createFakeData', (req, res) => {
     // for (i = 0; i < 100; i++) {
     //     db.users.create({
@@ -121,6 +135,18 @@ app.post('/api/createFakeData', (req, res) => {
     res.send('records created')
 })
 
+app.post('/api/editAllProducts', (req, res) => {
+    db.products.update({
+        currency: 'usd'
+    },
+        {
+            where: {
+                product_id: {
+                    [Op.gt]: 1100
+                }
+            }
+        })
+})
 
 
 

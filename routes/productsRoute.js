@@ -216,6 +216,9 @@ router.post('/api/product', upload2.array('file', 12), async (req, res, next) =>
 
 });
 
+
+
+
 router.post('/api/updateProduct', upload2.array('file', 12), (req, res, next) => {
     console.log('uploaded file', req.files);
     db.products.findOne({
@@ -291,6 +294,9 @@ router.put('/api/filterProducts', async (req, res) => {
     var prodname = req.body.product_name
     var catname = req.body.category_name
     var catItem = req.body.categoryItem
+    var priceFrom = req.body.priceFrom;
+    var priceTo = req.body.priceTo;
+    var product_id = req.body.product_id
     var siteLanguage = req.body.siteLanguage
     if (catname && siteLanguage == 'en') {
         var cat = await db.product_categories.findOne({
@@ -334,6 +340,16 @@ router.put('/api/filterProducts', async (req, res) => {
     if (catname) {
         wh.category_id = cat.category_id
     }
+    if (priceFrom && !priceTo) {
+        wh.unit_price = { [Op.gte]: priceFrom }
+    }
+    else if (priceTo && !priceFrom) {
+        wh.unit_price = { [Op.lte]: priceTo }
+    }
+    else if (priceFrom && priceTo) {
+        wh.unit_price = { [Op.between]: [priceFrom, priceTo] }
+    }
+    wh.product_id = { [Op.gt]: product_id }
     // if (catname) {
     //     var cat = await db.product_categories.findOne({
     //         where: {

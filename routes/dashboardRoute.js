@@ -35,6 +35,7 @@ router.post('/api/monthlySales', (req, res) => {
 })
 
 router.post('/api/topSellingProduct', (req, res) => {
+    console.log('user id us', req.body.user_id)
     db.products.max('buy_counter', {
         where: {
             user_id: req.body.user_id
