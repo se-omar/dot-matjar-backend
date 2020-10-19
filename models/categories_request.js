@@ -42,9 +42,17 @@ module.exports = function (sequelize, DataTypes) {
         },
         status: {
             type: DataTypes.STRING(255),
-            allowNull: false,
+            allowNull: true,
 
-        }
+        },
+        new_category_arabic_name: {
+            type: DataTypes.STRING(255),
+            allowNull: true
+        },
+        new_item_arabic_name: {
+            type: DataTypes.STRING(255),
+            allowNull: true
+        },
     }, {
         tableName: 'categories_request',
     });

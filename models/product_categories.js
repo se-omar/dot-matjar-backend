@@ -23,7 +23,11 @@ module.exports = function (sequelize, DataTypes) {
     has_products: {
       type: "BINARY(1)",
       allowNull: true
-    }
+    },
+    category_arabic_name: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
   }, {
     tableName: 'product_categories',
 
