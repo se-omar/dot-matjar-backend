@@ -70,7 +70,9 @@ router.post('/api/products', (req, res) => {
             })
         })
     }
-
+    // db.products_generator.findAll().then(products => {
+    //     res.json({ products: products })
+    // })
 
 });
 
@@ -295,17 +297,32 @@ router.put('/api/filterProducts', async (req, res) => {
     var priceFrom = req.body.priceFrom;
     var priceTo = req.body.priceTo;
     var product_id = req.body.product_id
-    if (catname) {
+    var siteLanguage = req.body.siteLanguage
+    if (catname && siteLanguage == 'en') {
         var cat = await db.product_categories.findOne({
             where: {
                 category_name: catname
             }
         })
     }
-    if (catItem) {
+    if (catname && siteLanguage == 'ar') {
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_arabic_name: catname
+            }
+        })
+    }
+    if (catItem && siteLanguage == 'en') {
         var item = await db.category_items.findOne({
             where: {
                 category_items: catItem
+            }
+        })
+    }
+    if (catItem && siteLanguage == 'ar') {
+        var item = await db.category_items.findOne({
+            where: {
+                category_items_arabic_name: catItem
             }
         })
     }
@@ -570,7 +587,8 @@ router.post('/api/calculateProductRating', (req, res) => {
 
 
 router.post('/api/addNewCategory', async (req, res) => {
-
+    console.log('item name', req.body.itemArabicName)
+    console.log('category name', req.body.categoryArabicName)
 
     var category = await db.product_categories.findOne({
         where: {
@@ -580,7 +598,8 @@ router.post('/api/addNewCategory', async (req, res) => {
     if (category) { res.json({ message: 'Category already exists' }) }
     else {
         db.product_categories.create({
-            category_name: req.body.categoryName
+            category_name: req.body.categoryName,
+            category_arabic_name: req.body.categoryArabicName
         }).then(res.json({ message: "Category is added" }))
     }
 
@@ -609,7 +628,9 @@ router.post('/api/addCategoryItems', async (req, res) => {
             db.category_items.create({
                 category_id: category.category_id,
                 category_name: category.category_name,
-                category_items: req.body.categoryItem
+                category_items: req.body.categoryItem,
+                category_items_arabic_name: req.body.itemArabicName,
+                category_arabic_name: category.category_arabic_name
             }).then(res.json({ message: 'Items added successfully' }))
         }
     }
@@ -746,7 +767,7 @@ router.post('/api/requestNewCategoryAndItem', async (req, res) => {
             user_id: req.body.user_id,
             new_category_name: req.body.newCategoryName,
             new_category_description: req.body.newCategoryDescription,
-
+            new_category_arabic_name: req.body.categoryArabicName
         })
     }
     if (req.body.newCategoryItem) {
@@ -755,8 +776,8 @@ router.post('/api/requestNewCategoryAndItem', async (req, res) => {
             user_id: req.body.user_id,
             new_category_item: req.body.newCategoryItem,
             new_item_description: req.body.newCategoryItemDescription,
-            new_item_category_name: req.body.categoryName
-
+            new_item_category_name: req.body.categoryName,
+            new_item_arabic_name: req.body.itemArabicName
         })
     }
 
@@ -801,7 +822,8 @@ router.put('/api/categoryAndItemRequestStatus', async (req, res) => {
 
                     db.product_categories.create({
                         category_name: req.body.newCategoryName,
-                        description: req.body.newCategoryDescription
+                        description: req.body.newCategoryDescription,
+                        category_arabic_name: req.body.categoryArabicName
 
                     }).then(res.json({ message: `Request ${req.body.status} Successfully` }))
                 }
@@ -827,6 +849,8 @@ router.put('/api/categoryAndItemRequestStatus', async (req, res) => {
                             category_id: category.category_id,
                             category_name: category.category_name,
                             category_items: req.body.newCategoryItem,
+                            category_arabic_name: category.category_arabic_name,
+                            category_items_arabic_name: req.body.itemArabicName
 
                         }).then(res.json({ message: `Request ${req.body.status} Successfully` }))
                     })

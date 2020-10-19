@@ -194,4 +194,42 @@ router.put('/api/getSupplierPageData', (req, res) => {
 
 })
 
+
+
+
+router.post('/api/updateSupplierSiteColors', (req, res) => {
+
+    db.supplier_page_info.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(info => {
+        if (info) {
+            info.update({
+                toolbar_color: req.body.toolBarColor,
+                footer_color: req.body.footerColor,
+                footer_text_color: req.body.footerTextColor,
+                button_color: req.body.buttonsColor,
+                button_text_color: req.body.buttonsTextColor,
+                toolbar_text_color: req.body.toolBarTextColor
+            })
+        }
+        else {
+            db.supplier_page_info.create({
+                toolbar_color: req.body.toolBarColor,
+                footer_color: req.body.footerColor,
+                footer_text_color: req.body.footerTextColor,
+                button_color: req.body.buttonsColor,
+                button_text_color: req.body.buttonsTextColor,
+                toolbar_text_color: req.body.toolBarTextColor
+            })
+        }
+    })
+})
+
+// router.put('getSupplierSiteColors',(req,res)=>{
+//     console.log(req.body.user_id)
+// }
+
+
 module.exports = router

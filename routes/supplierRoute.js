@@ -449,7 +449,86 @@ router.put('/api/filterSupplierProducts', async (req, res) => {
 
 })
 
+router.post('/api/addCategoryAndItemsToSupplier', async (req, res) => {
+    console.log('supplier items', req.body.supplierItems)
+    var supplierItems = req.body.supplierItems;
+    await db.suppliers_items.findAll({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(async checkingItems => {
 
+
+
+        if (checkingItems) {
+
+            checkingItems.forEach(e => {
+                e.destroy()
+            })
+            for (var i = 0; i < supplierItems.length; i++) {
+                var item = await db.category_items.findOne({
+                    where: {
+                        category_items: supplierItems[i]
+                    }
+                })
+                await db.suppliers_items.create({
+                    user_id: req.body.user_id,
+                    category_items_id: item.category_items_id,
+                    item_name: req.body.supplierItems[i],
+                    category_id: item.category_id
+
+                })
+
+            }
+        }
+        else {
+            for (var i = 0; i < supplierItems.length; i++) {
+                var item = await db.category_items.findOne({
+                    where: {
+                        category_items: supplierItems[i]
+                    }
+                })
+                await db.suppliers_items.create({
+                    user_id: req.body.user_id,
+                    category_items_id: item.category_items_id,
+                    item_name: req.body.supplierItems[i],
+                    category_id: item.category_id
+                })
+
+            }
+        }
+
+    }).catch(err => { console.log(err) })
+
+
+
+})
+
+// router.put('/api/getSupplierItems', (req, res) => {
+//     console.log('id isss', req.body.user_id)
+//     db.suppliers_items.findAll({
+//         where: {
+//             user_id: req.body.user_id
+//         }
+//     }).then(items => {
+//         res.json({ message: 'supplier items found', data: items })
+//     })
+// })
+
+
+router.put('/api/getSupplierCategoriesAndItems', async (req, res) => {
+    console.log('idd of user', req.body.user_id)
+    db.suppliers_items.findAll({
+        where: {
+            user_id: req.body.user_id,
+
+        },
+        include: [{ model: db.product_categories }]
+    }).then(items => {
+        res.json({ data: items, message: 'category and items successfullly entered' })
+    })
+
+})
 
 
 module.exports = router;

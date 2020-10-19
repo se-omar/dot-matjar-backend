@@ -23,7 +23,15 @@ module.exports = function (sequelize, DataTypes) {
         category_items: {
             type: DataTypes.STRING(255),
             allowNull: true
-        }
+        },
+        category_arabic_name: {
+            type: DataTypes.STRING(255),
+            allowNull: true
+        },
+        category_items_arabic_name: {
+            type: DataTypes.STRING(255),
+            allowNull: true
+        },
     }, {
         tableName: 'category_items',
     });

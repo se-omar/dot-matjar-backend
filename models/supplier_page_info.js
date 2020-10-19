@@ -96,6 +96,30 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
+    toolbar_color: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    footer_color: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    footer_text_color: {
+      type: DataTypes.INTEGER(10),
+      allowNull: true
+    },
+    button_color: {
+      type: DataTypes.INTEGER(10),
+      allowNull: true
+    },
+    button_text_color: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    toolbar_text_color: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
   }, {
     tableName: 'supplier_page_info',
     timestamps: false
