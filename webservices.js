@@ -49,7 +49,7 @@ app.use(adminRoute)
 
 
 const date = new Date()
-console.log(date.getMonth() + 1)
+//console.log(date.getMonth() + 1)
 
 require("dotenv").config();
 
@@ -90,7 +90,7 @@ app.post('/api/testapi2', (req, res) => {
     })
 })
 
-console.log('current year is', new Date().getFullYear())
+//console.log('current year is', new Date().getFullYear())
 app.post('/api/createFakeData', (req, res) => {
     // for (i = 0; i < 100; i++) {
     //     db.users.create({
