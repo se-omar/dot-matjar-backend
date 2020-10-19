@@ -183,7 +183,7 @@ router.post('/api/removeBannerImage', (req, res) => {
 
 
 router.put('/api/getSupplierPageData', (req, res) => {
-    console.log(req.supplier_id)
+
     db.supplier_page_info.findOne({
         where: {
             user_id: req.body.supplier_id

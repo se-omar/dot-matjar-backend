@@ -29,6 +29,7 @@ const db = {
     site_colors: sequelize.import('./models/site_colors.js'),
     products_generator: sequelize.import('./models/products_generator.js'),
     suppliers_items: sequelize.import('./models/suppliers_items.js'),
+    available_countries: sequelize.import('./models/available_countries.js')
 }
 
 db.users.hasMany(db.requests, {

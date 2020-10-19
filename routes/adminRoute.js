@@ -60,7 +60,7 @@ router.post('/api/updateHomePage', async (req, res) => {
     if (req.body.carousel_height) { wh.carousel_height = req.body.carousel_height }
 
     console.log('wherer statement =========================================================================================', wh)
-     db.site_colors.findOne({
+    db.site_colors.findOne({
         where: {
             Id: 1
         }
@@ -68,8 +68,8 @@ router.post('/api/updateHomePage', async (req, res) => {
         page.update(wh).then(page => {
             res.json({ messaage: 'Page Updated', data: page })
         }).catch(err => { console.log(err) })
-    })      
-    
+    })
+
 })
 
 
@@ -101,7 +101,7 @@ router.post('/api/uploadHomeCarouselImages', carouselUpload.array('file', 12), (
 router.post('/api/uploadHomeBannerImages', bannerUpload.array('file', 12), (req, res) => {
     db.site_colors.findOne({
         where: {
-          Id: 1
+            Id: 1
         },
     }).then(info => {
         info.update({
@@ -146,7 +146,7 @@ router.post('/api/removeHomeCarouselImage', (req, res) => {
 router.post('/api/removeHomeBannerImage', (req, res) => {
     db.site_colors.findOne({
         where: {
-          Id: 1
+            Id: 1
         }
     }).then(row => {
         row.update({
@@ -169,6 +169,13 @@ router.put('/api/getHomePageData', (req, res) => {
         res.json({ message: 'data is ', data: info })
     })
 
+})
+
+router.post('/api/addCountry', (req, res) => {
+    console.log(req.body.country.country)
+    db.available_countries.create({
+        country_name: req.body.country.country
+    }).then(res.json({ message: 'Country id Added' }))
 })
 
 module.exports = router;

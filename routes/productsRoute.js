@@ -871,6 +871,9 @@ router.put('/api/getSupplierCategoriesRequests', (req, res) => {
     })
 })
 
+router.put('/api/getAvailableCountries', (req, res) => {
+    db.available_countries.findAll().then(countries => { res.json({ data: countries }) })
+})
 
 
 
