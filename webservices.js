@@ -4,6 +4,8 @@ const bodyParser = require('body-parser');
 const cors = require('cors')
 const crypto = require('crypto');
 const faker = require('faker');
+const Sequelize = require('sequelize')
+const Op = Sequelize.Op;
 const db = require('./database');
 
 
@@ -76,7 +78,7 @@ app.use(function (req, res, next) {
 });
 
 app.post('/api/testapi1', (req, res) => {
-    res.json({ 
+    res.json({
         message: 'sent message 1'
     })
 })
@@ -132,6 +134,18 @@ app.post('/api/createFakeData', (req, res) => {
     res.send('records created')
 })
 
+app.post('/api/editAllProducts', (req, res) => {
+    db.products.update({
+        currency: 'usd'
+    },
+        {
+            where: {
+                product_id: {
+                    [Op.gt]: 1100
+                }
+            }
+        })
+})
 
 app.listen(3000, () => {
     console.log('listening on port 3000');

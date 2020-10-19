@@ -53,6 +53,12 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.INTEGER(10),
       allowNull: true
     },
+    currency: {
+      type: DataTypes.STRING(255),
+      allowNull: false,
+      defaultValue: 'egp'
+
+    },
     size: {
       type: DataTypes.STRING(255),
       allowNull: true

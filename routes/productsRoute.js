@@ -214,6 +214,9 @@ router.post('/api/product', upload2.array('file', 12), async (req, res, next) =>
 
 });
 
+
+
+
 router.post('/api/updateProduct', upload2.array('file', 12), (req, res, next) => {
     console.log('uploaded file', req.files);
     db.products.findOne({
@@ -320,16 +323,16 @@ router.put('/api/filterProducts', async (req, res) => {
     if (catname) {
         wh.category_id = cat.category_id
     }
-    if(priceFrom && !priceTo){
-        wh.unit_price = {[Op.gte]: priceFrom}
+    if (priceFrom && !priceTo) {
+        wh.unit_price = { [Op.gte]: priceFrom }
     }
-    else if(priceTo && !priceFrom){
-        wh.unit_price = {[Op.lte]: priceTo}
+    else if (priceTo && !priceFrom) {
+        wh.unit_price = { [Op.lte]: priceTo }
     }
-    else if(priceFrom && priceTo){
-        wh.unit_price = {[Op.between]: [priceFrom, priceTo]}
+    else if (priceFrom && priceTo) {
+        wh.unit_price = { [Op.between]: [priceFrom, priceTo] }
     }
-    wh.product_id= {[Op.gt]: product_id}
+    wh.product_id = { [Op.gt]: product_id }
     // if (catname) {
     //     var cat = await db.product_categories.findOne({
     //         where: {
