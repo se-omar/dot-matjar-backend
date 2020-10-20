@@ -208,7 +208,8 @@ router.post('/api/product', upload2.array('file', 12), async (req, res, next) =>
         main_picture: req.files[0] ? req.files[0].path.substr(11) : null,
         extra_picture1: req.files[1] ? req.files[1].path.substr(11) : null,
         extra_picture2: req.files[2] ? req.files[2].path.substr(11) : null,
-        category_items_id: catItem.category_items_id
+        category_items_id: catItem.category_items_id,
+        currency: req.body.currency
     }).then(response => {
 
         res.send(response)
@@ -245,6 +246,7 @@ router.post('/api/updateProduct', upload2.array('file', 12), (req, res, next) =>
                 main_picture: req.files[0] ? req.files[0].path.substr(11) : product.main_picture,
                 extra_picture1: req.files[1] ? req.files[1].path.substr(11) : product.extra_picture1,
                 extra_picture2: req.files[2] ? req.files[2].path.substr(11) : product.extra_picture2,
+                currency: req.body.currency,
             }).then(response => {
                 res.send(response)
             })
