@@ -531,24 +531,6 @@ router.put('/api/getSupplierCategoriesAndItems', async (req, res) => {
 })
 
 
-router.put('/api/getWorldCountries', (req, res) => {
-
-    var region
-    fs.readFile('./worldCountries.json', 'utf8', (err, data) => {
-        if (err) {
-            res.send('error')
-        }
-        else {
-            var obj = JSON.parse(data);
-
-
-            res.json({ data: obj })
-            console.log(obj)
-        }
-    })
-
-})
-
 
 
 module.exports = router;

@@ -9,7 +9,7 @@ const cors = require('cors')
 const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const checkAuth = require('./check-auth');
-
+const fs = require('fs')
 
 
 
@@ -171,11 +171,57 @@ router.put('/api/getHomePageData', (req, res) => {
 
 })
 
-router.post('/api/addCountry', (req, res) => {
+router.post('/api/addCountry', async (req, res) => {
     console.log(req.body.country.country)
-    db.available_countries.create({
-        country_name: req.body.country.country
-    }).then(res.json({ message: 'Country id Added' }))
+    var checkIfCountryExists = await db.available_countries.findOne({
+        where: {
+            country_name: req.body.country.country
+        }
+    })
+    if (checkIfCountryExists) {
+        res.json({ message: 'Country already exists' })
+    }
+    else {
+        db.available_countries.create({
+            country_name: req.body.country.country
+        }).then(res.json({ message: 'Country is Added Successfully' }))
+    }
+
+})
+
+
+router.put('/api/getWorldCountries', (req, res) => {
+
+    var region
+    fs.readFile('./worldCountries.json', 'utf8', (err, data) => {
+        if (err) {
+            res.send('error')
+        }
+        else {
+            var obj = JSON.parse(data);
+
+
+            res.json({ data: obj })
+            console.log(obj)
+        }
+    })
+
+})
+
+router.put('/api/getChoosenWorldCountries', (req, res) => {
+    db.available_countries.findAll().then(countries => { res.json({ data: countries }) })
+})
+
+router.put('/api/removeCountry', (req, res) => {
+    console.log(req.body.country)
+    db.available_countries.findOne({
+        where: {
+            country_name: req.body.country
+        }
+    }).then(country => {
+        country.destroy()
+        res.json({ message: 'Country Removed Successfully' })
+    })
 })
 
 module.exports = router;
