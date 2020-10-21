@@ -1,7 +1,7 @@
 const suppliers_items = require('./models/suppliers_items');
 
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('ecommerce-19-oct', 'root', '', {
+const sequelize = new Seq('database6', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
@@ -29,6 +29,7 @@ const db = {
     site_colors: sequelize.import('./models/site_colors.js'),
     products_generator: sequelize.import('./models/products_generator.js'),
     suppliers_items: sequelize.import('./models/suppliers_items.js'),
+    available_countries: sequelize.import('./models/available_countries.js')
 }
 
 db.users.hasMany(db.requests, {
@@ -244,6 +245,13 @@ db.product_categories.hasMany(db.suppliers_items, {
 })
 db.suppliers_items.belongsTo(db.product_categories, {
     foreignKey: 'category_id'
+})
+
+db.category_items.hasMany(db.suppliers_items, {
+    foreignKey: 'category_items_id'
+})
+db.suppliers_items.belongsTo(db.category_items, {
+    foreignKey: 'category_items_id'
 })
 
 // db.users.hasOne(db.supplier_page_info)

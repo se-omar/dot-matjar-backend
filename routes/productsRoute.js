@@ -300,7 +300,8 @@ router.put('/api/filterProducts', async (req, res) => {
     var priceTo = req.body.priceTo;
     var product_id = req.body.product_id
     var siteLanguage = req.body.siteLanguage
-    if (catname && siteLanguage == 'en') {
+    console.log(catname, siteLanguage)
+    if (catname && siteLanguage == "en") {
         var cat = await db.product_categories.findOne({
             where: {
                 category_name: catname
@@ -311,6 +312,13 @@ router.put('/api/filterProducts', async (req, res) => {
         var cat = await db.product_categories.findOne({
             where: {
                 category_arabic_name: catname
+            }
+        })
+    }
+    if (catname && siteLanguage == 'en') {
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_name: catname
             }
         })
     }
@@ -351,6 +359,7 @@ router.put('/api/filterProducts', async (req, res) => {
     else if (priceFrom && priceTo) {
         wh.unit_price = { [Op.between]: [priceFrom, priceTo] }
     }
+
     wh.product_id = { [Op.gt]: product_id }
     // if (catname) {
     //     var cat = await db.product_categories.findOne({
@@ -364,7 +373,7 @@ router.put('/api/filterProducts', async (req, res) => {
         wh.category_items_id = item.category_items_id
     }
 
-
+    console.log(wh)
     db.products.findAll({
         where: wh,
         limit: 20,
@@ -889,6 +898,9 @@ router.put('/api/getSupplierCategoriesRequests', (req, res) => {
     })
 })
 
+router.put('/api/getAvailableCountries', (req, res) => {
+    db.available_countries.findAll().then(countries => { res.json({ data: countries }) })
+})
 
 
 

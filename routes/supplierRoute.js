@@ -421,23 +421,47 @@ router.put('/api/filterSupplierProducts', async (req, res) => {
         }
     }
     if (req.body.categoryName) {
-        await db.product_categories.findOne({
-            where: {
-                category_name: req.body.categoryName
-            }
-        }).then(category => {
-            wh.category_id = category.category_id
-        })
+        if (req.body.siteLanguage == 'en') {
+            await db.product_categories.findOne({
+                where: {
+                    category_name: req.body.categoryName
+                }
+            }).then(category => {
+                wh.category_id = category.category_id
+            })
+        }
+        else {
+            await db.product_categories.findOne({
+                where: {
+                    category_arabic_name: req.body.categoryName
+                }
+            }).then(category => {
+                wh.category_id = category.category_id
+            })
+        }
+
     }
 
     if (req.body.itemName) {
-        await db.category_items.findOne({
-            where: {
-                category_items: req.body.itemName
-            }
-        }).then(item => {
-            wh.category_items_id = item.category_items_id
-        })
+        if (req.body.siteLanguage == 'en') {
+            await db.category_items.findOne({
+                where: {
+                    category_items: req.body.itemName
+                }
+            }).then(item => {
+                wh.category_items_id = item.category_items_id
+            })
+        }
+        else {
+            await db.category_items.findOne({
+                where: {
+                    category_items_arabic_name: req.body.itemName
+                }
+            }).then(item => {
+                wh.category_items_id = item.category_items_id
+            })
+        }
+
     }
 
     await db.products.findAll({
@@ -465,21 +489,47 @@ router.post('/api/addCategoryAndItemsToSupplier', async (req, res) => {
             checkingItems.forEach(e => {
                 e.destroy()
             })
-            for (var i = 0; i < supplierItems.length; i++) {
-                var item = await db.category_items.findOne({
-                    where: {
-                        category_items: supplierItems[i]
-                    }
-                })
-                await db.suppliers_items.create({
-                    user_id: req.body.user_id,
-                    category_items_id: item.category_items_id,
-                    item_name: req.body.supplierItems[i],
-                    category_id: item.category_id
+            if (req.body.siteLanguage == 'en') {
+                for (var i = 0; i < supplierItems.length; i++) {
+                    var item = await db.category_items.findOne({
+                        where: {
+                            category_items: supplierItems[i]
+                        }
+                    })
+                    await db.suppliers_items.create({
+                        user_id: req.body.user_id,
+                        category_items_id: item.category_items_id,
+                        item_name: req.body.supplierItems[i],
+                        category_id: item.category_id,
+                        item_arabic_name: item.category_items_arabic_name
 
-                })
 
+                    })
+
+
+                }
             }
+            else {
+                for (var x = 0; x < supplierItems.length; x++) {
+                    var item = await db.category_items.findOne({
+                        where: {
+                            category_items_arabic_name: supplierItems[x]
+                        }
+                    })
+                    await db.suppliers_items.create({
+                        user_id: req.body.user_id,
+                        category_items_id: item.category_items_id,
+                        item_name: item.category_items,
+                        category_id: item.category_id,
+                        item_arabic_name: item.category_items_arabic_name
+
+                    })
+
+
+                }
+            }
+
+            res.json({ message: 'Items added successfully' })
         }
         else {
             for (var i = 0; i < supplierItems.length; i++) {
@@ -495,7 +545,9 @@ router.post('/api/addCategoryAndItemsToSupplier', async (req, res) => {
                     category_id: item.category_id
                 })
 
+
             }
+            res.json({ message: 'Items added successfully' })
         }
 
     }).catch(err => { console.log(err) })
@@ -523,12 +575,14 @@ router.put('/api/getSupplierCategoriesAndItems', async (req, res) => {
             user_id: req.body.user_id,
 
         },
-        include: [{ model: db.product_categories }]
+        include: [{ model: db.product_categories }, { model: db.category_items }]
     }).then(items => {
         res.json({ data: items, message: 'category and items successfullly entered' })
     })
 
 })
+
+
 
 
 module.exports = router;
