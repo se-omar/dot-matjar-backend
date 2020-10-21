@@ -24,6 +24,10 @@ module.exports = function (sequelize, DataTypes) {
             type: DataTypes.INTEGER(11),
             allowNull: true
         },
+        item_arabic_name: {
+            type: DataTypes.STRING(255),
+            allowNull: true
+        },
 
 
     }, {

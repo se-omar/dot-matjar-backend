@@ -247,6 +247,13 @@ db.suppliers_items.belongsTo(db.product_categories, {
     foreignKey: 'category_id'
 })
 
+db.category_items.hasMany(db.suppliers_items, {
+    foreignKey: 'category_items_id'
+})
+db.suppliers_items.belongsTo(db.category_items, {
+    foreignKey: 'category_items_id'
+})
+
 // db.users.hasOne(db.supplier_page_info)
 
 module.exports = db;
