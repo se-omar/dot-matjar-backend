@@ -137,15 +137,14 @@ app.post('/api/createFakeData', (req, res) => {
 
 app.post('/api/editAllProducts', (req, res) => {
     db.products.update({
-        currency: 'usd'
-    },
-        {
-            where: {
-                product_id: {
-                    [Op.gt]: 1100
-                }
+        main_picture: 'https://picsum.photos/450'
+    }, {
+        where: {
+            product_id: {
+                [Op.gte]: 19
             }
-        })
+        }
+    })
 })
 
 
