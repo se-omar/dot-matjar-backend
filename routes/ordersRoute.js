@@ -108,7 +108,8 @@ router.post('/api/createOrder', async (req, res) => {
             }
 
             product.update({
-                buy_counter: product.buy_counter + quantityArray[index]
+                buy_counter: product.buy_counter + quantityArray[index],
+                quantity: product.quantity - quantityArray[index]
             })
 
             db.users.findOne({

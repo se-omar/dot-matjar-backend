@@ -192,7 +192,7 @@ router.post('/api/product', upload2.array('file', 12), async (req, res, next) =>
     db.products.create({
         product_name: req.body.product_name,
         category_id: cat.category_id,
-        product_code: req.body.product_code,
+        quantity: req.body.quantity,
         user_id: req.body.user_id,
         HS_code: req.body.HS_code,
         min_units_per_order: req.body.min_units_per_order,
