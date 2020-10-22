@@ -49,6 +49,17 @@ const bannerUpload = multer({
 
 
 
+const profileStorage = multer.diskStorage({
+    destination: './allUploads/profile_pictures/',
+    filename: function (req, file, cb) {
+        cb(null, file.originalname.substr(0, file.originalname.length - 3) + Date.now() + '.jpg')
+    }
+})
+const profileUpload = multer({
+    storage: profileStorage
+})
+
+
 router.post('/api/updateHomePage', async (req, res) => {
     var wh = {}
     console.log('carousel width', req.body.carousel_width)
@@ -221,6 +232,27 @@ router.put('/api/removeCountry', (req, res) => {
     }).then(country => {
         country.destroy()
         res.json({ message: 'Country Removed Successfully' })
+    })
+})
+
+router.post('/api/addNewUser', profileUpload.single('file'), (req, res) => {
+    db.users.create({
+        full_arabic_name: req.body.fullName,
+        email: req.body.email,
+        password: req.body.password,
+        governorate: req.body.governorate,
+        region: req.body.region,
+        user_type: req.body.userType,
+        gender: req.body.gender,
+        facebook_account: req.body.facebook,
+        mobile_number: req.body.mobileNumber,
+        store_name: req.body.storeName,
+        profile_photo: req.file ? req.file.path.substr(11) : null
+    }).then(user => {
+        res.json({
+            data: user,
+            message: 'user created successfully'
+        })
     })
 })
 
