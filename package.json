@@ -30,10 +30,7 @@
     "randomstring": "^1.1.5",
     "sequelize": "^5.22.3",
     "sequelize-auto": "^0.5.3",
-<<<<<<< HEAD
     "sqlite3": "^5.0.0",
-=======
->>>>>>> 3d1aa3fc9fca337ae68969d13e46d70c13190dcc
     "tedious": "^8.3.0"
   }
 }
