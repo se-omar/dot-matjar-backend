@@ -3,7 +3,7 @@ const app = express();
 const bodyParser = require('body-parser');
 const cors = require('cors')
 const crypto = require('crypto');
-const faker = require('faker');
+//const faker = require('faker');
 const Sequelize = require('sequelize')
 const Op = Sequelize.Op;
 const db = require('./database');
@@ -91,49 +91,49 @@ app.post('/api/testapi2', (req, res) => {
 })
 
 //console.log('current year is', new Date().getFullYear())
-app.post('/api/createFakeData', (req, res) => {
-    // for (i = 0; i < 100; i++) {
-    //     db.users.create({
-    //         user_type: 'business',
-    //         email: faker.internet.email(),
-    //         profile_photo: faker.internet.avatar(),
-    //         national_number: 11111111111111,
-    //         full_arabic_name: faker.name.findName(),
-    //         password: faker.internet.password(),
-    //         mobile_number: faker.phone.phoneNumber(),
+// app.post('/api/createFakeData', (req, res) => {
+//     // for (i = 0; i < 100; i++) {
+//     //     db.users.create({
+//     //         user_type: 'business',
+//     //         email: faker.internet.email(),
+//     //         profile_photo: faker.internet.avatar(),
+//     //         national_number: 11111111111111,
+//     //         full_arabic_name: faker.name.findName(),
+//     //         password: faker.internet.password(),
+//     //         mobile_number: faker.phone.phoneNumber(),
 
-    //     })
-    // }
+//     //     })
+//     // }
 
-    for (var i = 0; i < 1000; i++) {
-        db.products.create({
-            main_picture: faker.image.avatar(),
-            extra_picture_1: faker.image.avatar(),
-            extra_picture_1: faker.image.avatar(),
-            product_name: faker.name.firstName(),
-            category_id: faker.random.number({
-                min: 1,
-                max: 4
-            }),
-            bussiness_id: 57,
-            pending_status: 'pending',
-            product_code: faker.random.number(),
-            unit_price: faker.random.number({
-                min: 100,
-                max: 44444
-            }),
-            describtion: faker.lorem.paragraph(),
-            color: faker.internet.color(),
-            user_id: faker.random.number({
-                min: 106,
-                max: 208,
-            }),
-            buy_counter: 0
+//     for (var i = 0; i < 1000; i++) {
+//         db.products.create({
+//             main_picture: faker.image.avatar(),
+//             extra_picture_1: faker.image.avatar(),
+//             extra_picture_1: faker.image.avatar(),
+//             product_name: faker.name.firstName(),
+//             category_id: faker.random.number({
+//                 min: 1,
+//                 max: 4
+//             }),
+//             bussiness_id: 57,
+//             pending_status: 'pending',
+//             product_code: faker.random.number(),
+//             unit_price: faker.random.number({
+//                 min: 100,
+//                 max: 44444
+//             }),
+//             describtion: faker.lorem.paragraph(),
+//             color: faker.internet.color(),
+//             user_id: faker.random.number({
+//                 min: 106,
+//                 max: 208,
+//             }),
+//             buy_counter: 0
 
-        })
-    }
-    res.send('records created')
-})
+//         })
+//     }
+//     res.send('records created')
+// })
 
 app.post('/api/editAllProducts', (req, res) => {
     db.products.update({
