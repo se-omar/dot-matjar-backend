@@ -569,16 +569,19 @@ router.post('/api/addCategoryAndItemsToSupplier', async (req, res) => {
 
 
 router.put('/api/getSupplierCategoriesAndItems', async (req, res) => {
-    console.log('idd of user', req.body.user_id)
-    db.suppliers_items.findAll({
-        where: {
-            user_id: req.body.user_id,
+    if (req.body.user_id) {
+        console.log('idd of user', req.body.user_id)
+        db.suppliers_items.findAll({
+            where: {
+                user_id: req.body.user_id,
 
-        },
-        include: [{ model: db.product_categories }, { model: db.category_items }]
-    }).then(items => {
-        res.json({ data: items, message: 'category and items successfullly entered' })
-    })
+            },
+            include: [{ model: db.product_categories }, { model: db.category_items }]
+        }).then(items => {
+            res.json({ data: items, message: 'category and items successfullly entered' })
+        })
+    }
+
 
 })
 
