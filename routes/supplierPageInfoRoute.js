@@ -105,6 +105,7 @@ router.post('/api/updateSupplierPage', upload.single('file'), async (req, res) =
 router.post('/api/uploadCarouselImages', carouselUpload.array('file', 12), (req, res) => {
     console.log('supplier id is ===============================================================================', req.files)
     var wh = {}
+
     if (req.files[0]) { wh.carousel_image_1 = req.files[0].path.substr(11) }
     if (req.files[1]) { wh.carousel_image_2 = req.files[1].path.substr(11) }
     if (req.files[2]) { wh.carousel_image_3 = req.files[2].path.substr(11) }
