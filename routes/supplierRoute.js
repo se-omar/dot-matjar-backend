@@ -585,7 +585,15 @@ router.put('/api/getSupplierCategoriesAndItems', async (req, res) => {
 
 })
 
-
+router.put('/api/rejectSupplierRequest', (req, res) => {
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(user => {
+        user.destroy()
+    })
+})
 
 
 module.exports = router;

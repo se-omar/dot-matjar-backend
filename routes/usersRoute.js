@@ -258,6 +258,89 @@ router.post('/api/updateSiteColors', async (req, res) => {
 
 
 
+router.put('/api/getAllUsers', (req, res) => {
+    if (!req.body.user_id) {
+        db.users.findAll({
+            limit: 10
+        }).then(users => {
+            res.json({ data: users })
+        })
+    }
+    else {
+
+        db.users.findAll({
+            where: {
+                user_id: {
+                    [Op.gt]: req.body.user_id
+                }
+
+            },
+            limit: 10
+        }).then(users => {
+            res.json({
+                data: users
+            })
+        })
+    }
+
+})
+
+router.put('/api/getUser', (req, res) => {
+    console.log(req.body.user_id)
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(user => {
+        res.json({ data: user })
+    })
+
+})
+
+
+router.put('/api/updateUserInfoFromAdmin', (req, res) => {
+    db.users.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    }).then(async user => {
+        await user.update({
+            national_number: req.body.national_number,
+            gender: req.body.gender,
+            full_arabic_name: req.body.full_arabic_name,
+            full_english_name: req.body.full_english_name,
+            birthdate: req.body.birthdate,
+            qualifications: req.body.qualifications,
+            job: req.body.job,
+            governorate: req.body.governorate,
+
+            region: req.body.region,
+            center: req.body.center,
+            phone_number: req.body.phone_number,
+            mobile_number: req.body.mobile_number,
+            fax: req.body.fax,
+            facebook_account: req.body.facebook_account,
+            linkedin: req.body.linkedin,
+            website: req.body.website,
+            address: req.body.address,
+            user_type: req.body.user_type
+        })
+        res.json({ message: 'User Updated successfully' })
+    })
+}),
+    router.put('/api/deleteUser', (req, res) => {
+
+
+
+
+        db.users.findOne({
+            where: { user_id: req.body.user_id }
+        }).then(user => {
+            user.destroy()
+            res.json({ message: 'User Deleted Successfully' })
+        })
+    })
+
 
 
 // router.get('/api/users', async (req, res) => {
