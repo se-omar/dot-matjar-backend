@@ -10,6 +10,7 @@ const Sequelize = require('sequelize');
 const Op = Sequelize.Op;
 const checkAuth = require('./check-auth');
 const { where } = require('sequelize');
+const jwt = require('jsonwebtoken')
 
 
 router.use((req, res, next) => {
@@ -154,22 +155,31 @@ router.post('/api/getSuppliers', (req, res) => {
 })
 
 router.post('/api/refreshCurrentUser', checkAuth, (req, res) => {
-    db.users.findOne({
-        where: {
-            user_id: req.userData.user_id
+    jwt.verify(req.token, 'secretdotmatjar4523', (err, data) => {
+        if (err) {
+            console.log(err)
+            res.sendStatus('403')
         }
-    }).then(user => {
-        if (!user) {
-            return res.json({
-                message: 'user not found',
+        else {
+            db.users.findOne({
+                where: {
+                    user_id: data.user_id
+                }
+            }).then(user => {
+                if (!user) {
+                    return res.json({
+                        message: 'user not found',
+                    })
+                }
+
+                res.json({
+                    message: 'user sent successfully',
+                    user: user
+                })
             })
         }
-
-        res.json({
-            message: 'user sent successfully',
-            user: user
-        })
     })
+
 })
 
 

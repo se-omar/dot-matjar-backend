@@ -44,7 +44,7 @@ router.post('/api/login', (req, res) => {
         jwt.sign({
             user_id: user.user_id,
             user_email: user.email
-        }, 'secret', (err, token) => {
+        }, 'secretdotmatjar4523', (err, token) => {
             return res.json({
                 message: 'authentication successful',
                 token: token
