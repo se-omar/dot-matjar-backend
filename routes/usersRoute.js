@@ -158,7 +158,7 @@ router.post('/api/refreshCurrentUser', checkAuth, (req, res) => {
     jwt.verify(req.token, 'secretdotmatjar4523', (err, data) => {
         if (err) {
             console.log(err)
-            res.sendStatus('403')
+            res.status(403).send('forbidden 2 api')
         }
         else {
             db.users.findOne({

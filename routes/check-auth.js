@@ -11,7 +11,7 @@ module.exports = (req, res, next) => {
         next();
     }
     else {
-        res.status(403);
+        res.status(403).send('forbidden 2 auth');
     }
     // try {
     //     const decodedToken = jwt.verify(req.body.token, process.env.JWT_KEY);
