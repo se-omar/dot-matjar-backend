@@ -1,7 +1,7 @@
 const suppliers_items = require('./models/suppliers_items');
 
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('database6', 'root', '', {
+const sequelize = new Seq('ecommerce-19-oct', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
