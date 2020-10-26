@@ -154,6 +154,7 @@ router.post('/api/getSuppliers', (req, res) => {
 })
 
 router.post('/api/refreshCurrentUser', checkAuth, (req, res) => {
+    console.log('referesh current user entered')
     db.users.findOne({
         where: {
             user_id: req.userData.user_id
