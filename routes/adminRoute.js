@@ -88,10 +88,12 @@ router.post('/api/updateHomePage', async (req, res) => {
 router.post('/api/uploadHomeCarouselImages', carouselUpload.array('file', 12), (req, res) => {
     console.log('supplier id is ===============================================================================', req.files)
     var wh = {}
-    if (req.files[0]) { wh.carousel_image_1 = req.files[0].path.substr(11) }
-    if (req.files[1]) { wh.carousel_image_2 = req.files[1].path.substr(11) }
-    if (req.files[2]) { wh.carousel_image_3 = req.files[2].path.substr(11) }
-    if (req.files[3]) { wh.carousel_image_4 = req.files[3].path.substr(11) }
+    var arIndex = req.body.index.split("")
+    var i = 0;//arIndex = "0,3"
+    for (i = 0; i < arIndex.length; i++) {
+        var num = parseInt(arIndex[i]) + 1;
+        wh["carousel_image_" + num] = req.files[i].path.substr(11)
+    }
 
     db.site_colors.findOne({
         where: {

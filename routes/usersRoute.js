@@ -221,7 +221,11 @@ router.put('/api/changeSiteColor', async (req, res) => {
 
 
 router.put('/api/getSiteColor', async (req, res) => {
-    db.site_colors.findAll()
+    db.site_colors.findOne({
+        where: {
+            Id: 1
+        }
+    })
         .then(data => { res.json({ data: data, message: 'site data connected' }) })
 })
 
