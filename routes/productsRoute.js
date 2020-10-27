@@ -393,6 +393,11 @@ router.put('/api/filterProducts', async (req, res) => {
 router.put('/api/loadmoreProducts', async (req, res) => {
     var loadmoreType = req.body.loadmoreType
     var loadmoreName = req.body.loadmoreName
+    var product_name = req.body.productName
+    var priceFrom = req.body.priceFrom;
+    var priceTo = req.body.priceTo;
+    var gov = req.body.governorate
+    var reg = req.body.region
     var wh = {}
     wh.product_id = { [Op.gt]: req.body.product_id }
     if (loadmoreType == 'item') {
@@ -433,7 +438,25 @@ router.put('/api/loadmoreProducts', async (req, res) => {
         console.log('category entered', loadmoreCategory.category_id)
         wh.category_id = loadmoreCategory.category_id
     }
+    if (prodname) {
+        wh.product_name = { [Op.substring]: prodname }
+    }
+    if (gov) {
+        wh.governorate = gov
+    }
+    if (reg) {
+        wh.region = reg
+    }
 
+    if (priceFrom && !priceTo) {
+        wh.unit_price = { [Op.gte]: priceFrom }
+    }
+    else if (priceTo && !priceFrom) {
+        wh.unit_price = { [Op.lte]: priceTo }
+    }
+    else if (priceFrom && priceTo) {
+        wh.unit_price = { [Op.between]: [priceFrom, priceTo] }
+    }
 
     db.products.findAll({
         where: wh,
