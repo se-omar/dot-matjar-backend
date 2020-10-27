@@ -300,7 +300,10 @@ router.put('/api/filterProducts', async (req, res) => {
     var priceTo = req.body.priceTo;
     var product_id = req.body.product_id
     var siteLanguage = req.body.siteLanguage
+
     console.log(catname, siteLanguage)
+
+
     if (catname && siteLanguage == "en") {
         var cat = await db.product_categories.findOne({
             where: {
@@ -387,7 +390,62 @@ router.put('/api/filterProducts', async (req, res) => {
 
 })
 
+router.put('/api/loadmoreProducts', async (req, res) => {
+    var loadmoreType = req.body.loadmoreType
+    var loadmoreName = req.body.loadmoreName
+    var wh = {}
+    wh.product_id = { [Op.gt]: req.body.product_id }
+    if (loadmoreType == 'item') {
+        if (req.body.siteLanguage == 'en') {
+            var loadmoreItem = await db.category_items.findOne({
+                where: {
+                    category_items: loadmoreName
+                }
+            })
+        }
+        else {
+            var loadmoreItem = await db.category_items.findOne({
+                where: {
+                    category_items_arabic_name: loadmoreName
+                }
+            })
+        }
 
+        wh.category_items_id = loadmoreItem.category_items_id
+
+    }
+    if (loadmoreType == 'category') {
+        if (req.body.siteLanguage == 'en') {
+            var loadmoreCategory = await db.product_categories.findOne({
+                where: {
+                    category_name: loadmoreName
+                }
+            })
+        }
+        else {
+            var loadmoreCategory = await db.product_categories.findOne({
+                where: {
+                    category_arabic_name: loadmoreName
+                }
+            })
+        }
+
+        console.log('category entered', loadmoreCategory.category_id)
+        wh.category_id = loadmoreCategory.category_id
+    }
+
+
+    db.products.findAll({
+        where: wh,
+        limit: 20,
+    }).then(products => {
+        res.json({
+            message: 'test search',
+            data: products
+        })
+
+    })
+})
 
 router.put('/api/filterSuppliers', (req, res) => {
 

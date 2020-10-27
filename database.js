@@ -1,7 +1,7 @@
 const suppliers_items = require('./models/suppliers_items');
 
 const Seq = require('sequelize').Sequelize;
-const sequelize = new Seq('ecommerce-19-oct', 'root', '', {
+const sequelize = new Seq('database6', 'root', '', {
     host: 'localhost',
     dialect: 'mysql',
     define: {
@@ -91,6 +91,8 @@ db.products.belongsTo(db.users, {
 
 db.product_categories.hasMany(db.products, {
     foreignKey: 'category_id'
+}, {
+    onDelete: 'cascade'
 });
 db.products.belongsTo(db.product_categories, {
     foreignKey: 'category_id'
