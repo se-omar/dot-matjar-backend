@@ -10,7 +10,6 @@ const db = require('./database');
 
 
 
-
 const usersRoute = require('./routes/usersRoute.js');
 app.use(usersRoute);
 
