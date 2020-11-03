@@ -157,6 +157,14 @@ module.exports = function (sequelize, DataTypes) {
     category_items_id: {
       type: DataTypes.INTEGER(11),
       allowNull: true
+    },
+    brand: {
+      type: DataTypes.STRING(255),
+      allowNull: true
+    },
+    condition: {
+      type: DataTypes.STRING(255),
+      allowNull: true
     }
 
   }, {
