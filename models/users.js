@@ -102,7 +102,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true
     },
     crypto: {
-      type: DataTypes.STRING(50),
+      type: DataTypes.STRING(300),
       allowNull: true
     },
     active: {

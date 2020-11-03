@@ -3,7 +3,7 @@ const router = express.Router();
 const db = require('../database');
 const nodemailer = require('nodemailer');
 const crypto = require('crypto');
-var hash = crypto.randomBytes(10).toString('hex');
+// var hash = crypto.randomBytes(10).toString('hex');
 const bodyParser = require('body-parser');
 const cors = require('cors')
 var bcrypt = require('bcryptjs');
@@ -170,20 +170,20 @@ router.post('/api/signup', async (req, res) => {
                 if (err) {
                     console.log(err)
                 } else {
-                    bcrypt.hash(req.body.password, salt, function (err, hashh) {
+                    bcrypt.hash(req.body.password, salt, function (err, hash) {
                         if (err) {
                             console.log(err)
                         } else {
-                            console.log(hashh)
+                            console.log(hash)
                             //$2a$10$FEBywZh8u9M0Cec/0mWep.1kXrwKeiWDba6tdKvDfEBjyePJnDT7K
                             db.users.create({
                                 email: req.body.email,
                                 national_number: req.body.national_number,
-                                password: hashh,
+                                password: hash,
                                 mobile_number: req.body.mobile_number,
                                 full_arabic_name: req.body.full_arabic_name,
                                 gender: req.body.gender,
-                                crypto: hashh,
+                                crypto: hash,
                                 governorate: req.body.governorate,
                                 region: req.body.region
 
@@ -290,10 +290,10 @@ router.put("/api/completedata", async (req, res) => {
 
 
 router.put('/api/activateUserAccount', async (req, res) => {
-
+    console.log('token from riuter', req.body.token)
     var user = await db.users.findOne({
         where: {
-            crypto: cryptoo
+            crypto: req.body.token
         }
     })
 
@@ -305,7 +305,7 @@ router.put('/api/activateUserAccount', async (req, res) => {
         res.send("User activated")
         console.log("user activated")
     } else {
-        res.send("Some thing went wrong!!!!!")
+        res.send("Some thing went wrong , user not found!!!!!")
         console.log("something went wrong")
     }
 })
@@ -322,74 +322,87 @@ router.post('/api/businessOwnerRegistration', async (req, res) => {
 
     if (checkEmail) { res.json({ message: 'Email already exists' }) }
     else {
-        const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
-            expiresIn: '60m'
-        }, (emailtoken, err) => {
-            var url = `http://localhost:8080/activation/` + cryptoo;
+        const token = jwt.sign({ email: req.body.email }, process.env.JWT_KEY, {
+            expiresIn: '1m'
+        })
+        console.log('email Token from JWT', token)
+        var url = `http://localhost:8080/${req.body.siteLanguage}/activation/` + token;
 
-            let transporter = nodemailer.createTransport({
-                service: "gmail",
+        let transporter = nodemailer.createTransport({
+            service: "gmail",
 
-                secure: false, // true for 465, false for other ports
-                auth: {
-                    user: 'dotmarketofficial@gmail.com', // generated ethereal user
-                    pass: 'dotmarket123', // generated ethereal password
-                },
-                tls: {
-                    regectUnauthorized: false
-                }
-            });
-
-
-
+            secure: false, // true for 465, false for other ports
+            auth: {
+                user: 'dotmarketofficial@gmail.com', // generated ethereal user
+                pass: 'dotmarket123', // generated ethereal password
+            },
+            tls: {
+                regectUnauthorized: false
+            }
+        });
 
 
-            let mailoptions = {
-                from: ' dotmarketofficial@gmail.com', // sender address
-                to: req.body.email, // list of receivers
-                subject: "account almost DONE", // Subject line
-                text: "Please activate from here", // plain text body
-                html: `  <a href="${url}">Click to ACTIVATE your account</a> <br/>
+
+
+
+        let mailoptions = {
+            from: ' dotmarketofficial@gmail.com', // sender address
+            to: req.body.email, // list of receivers
+            subject: "account almost DONE", // Subject line
+            text: "Please activate from here", // plain text body
+            html: `  <a href="${url}">Click to ACTIVATE your Account</a> <br/>
    
     `
 
-            };
+        };
 
 
 
-            transporter.sendMail(mailoptions, function (err) {
-                if (err) {
+        transporter.sendMail(mailoptions, function (err) {
+            if (err) {
 
-                    console.log('err', err)
-                    res.json({ message: 'Failed' })
-                } else {
-                    console.log("email sent!!!!")
-                    res.json({ message: 'Verification message is sent to your email' })
+                console.log('err', err)
+                res.json({ message: 'Failed' })
+            } else {
+                console.log("email sent!!!!")
 
-                    db.users.create({
-                        email: req.body.email,
-                        national_number: req.body.national_number,
-                        password: hash,
-                        mobile_number: req.body.mobile_number,
-                        full_arabic_name: req.body.full_arabic_name,
-                        gender: req.body.gender,
-                        crypto: cryptoo,
-                        governorate: req.body.governorate,
-                        region: req.body.region,
-                        user_type: 'waiting_approval',
-                        store_name: req.body.store_name
-
-
-                    }).then(
-                        res.json({ message: 'A Message is sent to your Email' })
-
-                    )
-
-                }
-            })
+                bcrypt.genSalt(10, (err, salt) => {
+                    if (err) { console.log(err) }
+                    else {
+                        bcrypt.hash(req.body.password, salt, (err, hash) => {
+                            if (err) { console.log(err) }
+                            else {
+                                console.log(hash)
+                                db.users.create({
+                                    email: req.body.email,
+                                    national_number: req.body.national_number,
+                                    password: hash,
+                                    mobile_number: req.body.mobile_number,
+                                    full_arabic_name: req.body.full_arabic_name,
+                                    gender: req.body.gender,
+                                    crypto: token,
+                                    governorate: req.body.governorate,
+                                    region: req.body.region,
+                                    user_type: 'waiting_approval',
+                                    store_name: req.body.store_name
 
 
-        });
+                                }).then(
+                                    res.json({ message: 'A Message is sent to your Email' })
+
+                                )
+
+
+                            }
+                        })
+                    }
+                })
+
+            }
+        })
+
+
+
 
 
 

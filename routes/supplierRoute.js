@@ -592,6 +592,7 @@ router.put('/api/rejectSupplierRequest', (req, res) => {
         }
     }).then(user => {
         user.destroy()
+        res.json({ message: 'Supplier Request Denied' })
     })
 })
 
