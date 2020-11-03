@@ -196,8 +196,23 @@ router.put('/api/getSupplierPageData', (req, res) => {
             user_id: req.body.supplier_id
         }
     }).then(info => {
-        res.json({ message: 'data is ', data: info })
+        if (info) {
+            console.log('suppkier page datataaa', info)
+            res.json({ message: 'data is ', data: info })
 
+        }
+        else {
+            res.json({
+                message: 'no dataFaound', data: {
+                    button_text_color: "black",
+                    button_color: "white",
+                    toolbar_color: "white",
+                    toolbar_text_color: "black",
+                    footer_color: "white",
+                    footer_text_color: "black",
+                }
+            })
+        }
     })
 
 })
