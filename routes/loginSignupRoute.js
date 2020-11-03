@@ -6,6 +6,7 @@ const crypto = require('crypto');
 var hash = crypto.randomBytes(10).toString('hex');
 const bodyParser = require('body-parser');
 const cors = require('cors')
+var bcrypt = require('bcryptjs');
 
 router.use((req, res, next) => {
     if (req.originalUrl === '/webhook') {
@@ -31,25 +32,44 @@ router.post('/api/login', (req, res) => {
             model: db.business
         }]
     }).then(user => {
+
+
         if (!user) {
             return res.json({ message: 'please sign up first' })
         }
         if (user.active == 0) {
             return res.json({ message: 'Please activate your account' })
         }
-        if (user.password != req.body.password) {
-            return res.json({ message: 'authentication failed' })
+        else {
+            bcrypt.compare(req.body.password, user.password, function (err, isMatch) {
+                if (err) {
+                    res.json({ message: 'error' })
+                } else if (!isMatch) {
+                    res.json({ message: 'authentication failed' })
+                } else {
+
+                    jwt.sign({
+                        user_id: user.user_id,
+                        user_email: user.email
+                    }, 'secretdotmatjar4523', (err, token) => {
+                        console.log('token is', token)
+                        return res.json({
+
+                            message: 'authentication successful',
+                            token: token
+                        })
+                    })
+
+                }
+            })
         }
 
-        jwt.sign({
-            user_id: user.user_id,
-            user_email: user.email
-        }, 'secretdotmatjar4523', (err, token) => {
-            return res.json({
-                message: 'authentication successful',
-                token: token
-            })
-        })
+
+
+        // if (user.password != req.body.password) {
+        //     return res.json({ message: 'authentication failed' })
+        // }
+
 
 
 
@@ -102,11 +122,12 @@ router.post('/api/signup', async (req, res) => {
 
         if (!user) {
 
+
             // sending email to req.body
             const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
                 expiresIn: '60m'
             }, (emailtoken, err) => {
-                var url = `http://localhost:8080/activation/` + cryptoo;
+                var url = `http://localhost:8080/${req.body.siteLanguage}/activation/` + cryptoo;
 
                 let transporter = nodemailer.createTransport({
                     service: "gmail",
@@ -128,7 +149,7 @@ router.post('/api/signup', async (req, res) => {
                 let mailOptions = {
                     from: 'DOT-MATJAR', // sender address
                     to: req.body.email, // list of receivers
-                    subject: "Project almost DONE", // Subject line
+                    subject: "Authentication almost done", // Subject line
                     text: "Please activate from here", // plain text body
                     html: `  <a href="${url}">Click to ACTIVATE</a> <br/>
        
@@ -145,19 +166,34 @@ router.post('/api/signup', async (req, res) => {
                 })
             });
             // Creating record in DATABASE
-            db.users.create({
-                email: req.body.email,
-                national_number: req.body.national_number,
-                password: hash,
-                mobile_number: req.body.mobile_number,
-                full_arabic_name: req.body.full_arabic_name,
-                gender: req.body.gender,
-                crypto: cryptoo,
-                governorate: req.body.governorate,
-                region: req.body.region
+            bcrypt.genSalt(10, function (err, salt) {
+                if (err) {
+                    console.log(err)
+                } else {
+                    bcrypt.hash(req.body.password, salt, function (err, hashh) {
+                        if (err) {
+                            console.log(err)
+                        } else {
+                            console.log(hashh)
+                            //$2a$10$FEBywZh8u9M0Cec/0mWep.1kXrwKeiWDba6tdKvDfEBjyePJnDT7K
+                            db.users.create({
+                                email: req.body.email,
+                                national_number: req.body.national_number,
+                                password: hashh,
+                                mobile_number: req.body.mobile_number,
+                                full_arabic_name: req.body.full_arabic_name,
+                                gender: req.body.gender,
+                                crypto: hashh,
+                                governorate: req.body.governorate,
+                                region: req.body.region
 
 
-            }).then(res.json({ message: 'A Message is sent to your Email' }))
+                            }).then(res.json({ message: 'A Message is sent to your Email' }))
+                        }
+                    })
+                }
+            })
+
             // return res.json({
             //     message: "a message is sent to your email , please verify "
 
@@ -171,6 +207,50 @@ router.post('/api/signup', async (req, res) => {
         .catch(err => {
             console.log(err)
         })
+})
+
+router.put('/api/loginTest', async (req, res) => {
+    // bcrypt.genSalt(10, function (err, salt) {
+    //     if (err) {
+    //         throw err
+    //     } else {
+    //         bcrypt.hash(req.body.password, salt, function (err, hashh) {
+    //             if (err) {
+    //                 throw err
+    //             } else {
+    //                 console.log(hashh)
+    //                 //$2a$10$FEBywZh8u9M0Cec/0mWep.1kXrwKeiWDba6tdKvDfEBjyePJnDT7K
+    //                 db.users.create({
+    //                     email: req.body.email,
+    //                     national_number: req.body.national_number,
+    //                     password: hashh,
+    //                     mobile_number: req.body.mobile_number,
+    //                     full_arabic_name: req.body.full_arabic_name,
+    //                     gender: req.body.gender,
+    //                     crypto: cryptoo,
+    //                     governorate: req.body.governorate,
+    //                     region: req.body.region
+
+
+    //                 }).then(res.json({ message: 'A Message is sent to your Email' }))
+    //             }
+    //         })
+    //     }
+    // })
+    var user = await db.users.findOne({ where: { user_id: 251 } })
+    if (user) {
+        console.log(user)
+        bcrypt.compare(req.body.password, user.password, function (err, isMatch) {
+            if (err) {
+                res.send('error')
+            } else if (!isMatch) {
+                res.send("Password doesn't match!")
+            } else {
+                res.send("Password matches!")
+            }
+        })
+    }
+    else res.send('user not found')
 })
 
 
