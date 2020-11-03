@@ -271,11 +271,11 @@ router.get('/api/getAllSuppliersWithSales', (req, res) => {
 })
 
 router.post('/api/getSupplierReview', (req, res) => {
+    var wh = {}
+    if (req.body.user_id) { wh.user_id = req.body.user_id }
+    if (req.body.supplier_id) { wh.supplier_id = req.body.supplier_id }
     db.suppliers_reviews.findOne({
-        where: {
-            user_id: req.body.user_id,
-            supplier_id: req.body.supplier_id
-        }
+        where: wh
     }).then(row => {
         if (!row) {
             res.json({

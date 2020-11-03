@@ -114,7 +114,7 @@ router.post('/api/signup', async (req, res) => {
     //     } else {
 
 
-    var user = await db.users.findOne({
+    await db.users.findOne({
         where: {
             email: req.body.email
         }
@@ -124,47 +124,47 @@ router.post('/api/signup', async (req, res) => {
 
 
             // sending email to req.body
-            const token = jwt.sign(req.body.email, process.env.JWT_KEY, {
-                expiresIn: '60m'
-            }, (emailtoken, err) => {
-                var url = `http://localhost:8080/${req.body.siteLanguage}/activation/` + cryptoo;
+            const token = jwt.sign({ email: req.body.email }, process.env.JWT_KEY,)
+            var url = `http://localhost:8080/${req.body.siteLanguage}/activation/` + token;
 
-                let transporter = nodemailer.createTransport({
-                    service: "gmail",
+            let transporter = nodemailer.createTransport({
+                service: "gmail",
 
-                    secure: false, // true for 465, false for other ports
-                    auth: {
-                        user: 'dotmarketofficial@gmail.com', // generated ethereal user
-                        pass: 'dotmarket123', // generated ethereal password
-                    },
-                    tls: {
-                        regectUnauthorized: false
-                    }
-                });
+                secure: false, // true for 465, false for other ports
+                auth: {
+                    user: 'dotmarketofficial@gmail.com', // generated ethereal user
+                    pass: 'dotmarket123', // generated ethereal password
+                },
+                tls: {
+                    regectUnauthorized: false
+                }
+            });
 
 
 
 
 
-                let mailOptions = {
-                    from: 'DOT-MATJAR', // sender address
-                    to: req.body.email, // list of receivers
-                    subject: "Authentication almost done", // Subject line
-                    text: "Please activate from here", // plain text body
-                    html: `  <a href="${url}">Click to ACTIVATE</a> <br/>
+            let mailOptions = {
+                from: 'DOT-MATJAR', // sender address
+                to: req.body.email, // list of receivers
+                subject: "Authentication almost done", // Subject line
+                text: "Please activate from here", // plain text body
+                html: `  <a href="${url}">Click to ACTIVATE</a> <br/>
        
         `
 
 
-                };
-                transporter.sendMail(mailOptions, function (data, err) {
-                    if (err) {
-                        console.log("error hrouterened")
-                    } else {
-                        console.log("email sent!!!!")
-                    }
-                })
-            });
+            };
+            transporter.sendMail(mailOptions, function (err) {
+                if (err) {
+                    console.log(err)
+
+                } else {
+
+                    console.log("email sent!!!!")
+                }
+            })
+
             // Creating record in DATABASE
             bcrypt.genSalt(10, function (err, salt) {
                 if (err) {
@@ -183,7 +183,7 @@ router.post('/api/signup', async (req, res) => {
                                 mobile_number: req.body.mobile_number,
                                 full_arabic_name: req.body.full_arabic_name,
                                 gender: req.body.gender,
-                                crypto: hash,
+                                crypto: token,
                                 governorate: req.body.governorate,
                                 region: req.body.region
 
@@ -198,10 +198,11 @@ router.post('/api/signup', async (req, res) => {
             //     message: "a message is sent to your email , please verify "
 
             // });
-        } else {
-            return res.json({
+        }
+        else {
+            res.json({
                 message: "user already exists"
-            });
+            })
         }
     })
         .catch(err => {
@@ -322,9 +323,7 @@ router.post('/api/businessOwnerRegistration', async (req, res) => {
 
     if (checkEmail) { res.json({ message: 'Email already exists' }) }
     else {
-        const token = jwt.sign({ email: req.body.email }, process.env.JWT_KEY, {
-            expiresIn: '1m'
-        })
+        const token = jwt.sign({ email: req.body.email }, process.env.JWT_KEY,)
         console.log('email Token from JWT', token)
         var url = `http://localhost:8080/${req.body.siteLanguage}/activation/` + token;
 

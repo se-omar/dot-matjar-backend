@@ -58,6 +58,12 @@ router.post('/api/products', (req, res) => {
     else {
         console.log('entered here')
         db.products.findAll({
+            include: [{
+                model: db.users
+            }, {
+                model: db.product_categories
+            }],
+
             where: {
                 product_id: {
                     [Op.gt]: req.body.product_id
@@ -80,6 +86,8 @@ router.post('/api/loadMoreProductsWithFilter', async (req, res) => {
     if (!req.body.category_name) {
         console.log('product entered')
         db.products.findAll({
+
+
             where: {
                 product_id: {
                     [Op.gt]: req.body.product_id
@@ -88,10 +96,13 @@ router.post('/api/loadMoreProductsWithFilter', async (req, res) => {
                     [Op.substring]: req.body.product_name
                 }
             },
-            limit: 20,
             include: [{
-                model: db.business
-            }]
+                model: db.users
+            }, {
+                model: db.product_categories
+            }],
+            limit: 20,
+
         }).then(products => {
             res.json({
                 products: products,
@@ -108,16 +119,21 @@ router.post('/api/loadMoreProductsWithFilter', async (req, res) => {
             }
         })
         db.products.findAll({
+
+
             where: {
                 product_id: {
                     [Op.gt]: req.body.product_id
                 },
                 category_id: cat.category_id
             },
-            limit: 20,
             include: [{
-                model: db.business
-            }]
+                model: db.users
+            }, {
+                model: db.product_categories
+            }],
+            limit: 20,
+
         }).then(products => {
             res.json({
                 products: products,
@@ -133,6 +149,7 @@ router.post('/api/loadMoreProductsWithFilter', async (req, res) => {
             }
         })
         var products = await db.products.findAll({
+
             where: {
                 product_id: {
                     [Op.gt]: req.body.product_id
@@ -140,10 +157,14 @@ router.post('/api/loadMoreProductsWithFilter', async (req, res) => {
                 category_id: cat.category_id,
                 product_name: req.body.product_name
             },
-            limit: 20,
             include: [{
-                model: db.business
-            }]
+                model: db.users
+            }, {
+                model: db.product_categories
+            }],
+
+            limit: 20,
+
         })
         res.json({
             products: products,
@@ -459,6 +480,11 @@ router.put('/api/loadmoreProducts', async (req, res) => {
     }
 
     db.products.findAll({
+        include: [{
+            model: db.users
+        }, {
+            model: db.product_categories
+        }],
         where: wh,
         limit: 20,
     }).then(products => {
@@ -620,12 +646,15 @@ router.post('/api/getProductRatingsArray', (req, res) => {
 })
 
 router.post('/api/getProductReview', (req, res) => {
-    console.log(req.body.user_id)
+    var wh = {}
+
+    if (req.body.user_id && req.body.user_id != null) {
+        wh.user_id = req.body.user_id
+        console.log('uuser id', req.body.user_id)
+    }
+    if (req.body.product_id) { wh.product_id = req.body.product_id }
     db.products_reviews.findOne({
-        where: {
-            user_id: req.body.user_id,
-            product_id: req.body.product_id
-        }
+        where: wh
     }).then(row => {
         if (!row) {
             res.json({
@@ -811,11 +840,11 @@ router.put('/api/removeCategoryAndItems', async (req, res) => {
 
 
 router.post('/api/checkIfUserOrdered', (req, res) => {
+    var wh = {}
+    if (req.body.user_id) { wh.user_id = req.body.user_id }
+    if (req.body.product_id) { wh.product_id = req.body.product_id }
     db.products_orders.findOne({
-        where: {
-            user_id: req.body.user_id,
-            product_id: req.body.product_id
-        }
+        where: wh
     }).then(row => {
         if (!row) {
             res.json({
