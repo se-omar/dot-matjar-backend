@@ -8,7 +8,7 @@ const Sequelize = require('sequelize')
 const Op = Sequelize.Op;
 const path = require('path');
 const {
-    cart
+    cart, product_categories
 } = require('../database');
 
 router.use((req, res, next) => {
@@ -56,7 +56,7 @@ router.post('/api/products', (req, res) => {
         })
     }
     else {
-        console.log('entered here')
+
         db.products.findAll({
             include: [{
                 model: db.users
@@ -399,6 +399,10 @@ router.put('/api/filterProducts', async (req, res) => {
 
     console.log(wh)
     db.products.findAll({
+        include: [
+            { model: db.users },
+            { model: db.product_categories }
+        ],
         where: wh,
         limit: 20,
     }).then(products => {
