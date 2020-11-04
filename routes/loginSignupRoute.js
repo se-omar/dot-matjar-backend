@@ -24,6 +24,7 @@ const cryptoo = crypto.randomBytes(10).toString('hex');
 //LOGIN/SIGNUP/ACTIVATION/COMPLETEDATA WEBSERVICE
 
 router.post('/api/login', (req, res) => {
+    debugger
     db.users.findOne({
         where: {
             email: req.body.email
