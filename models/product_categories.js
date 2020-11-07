@@ -28,6 +28,10 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
+    parent_id: {
+      type: DataTypes.INTEGER(10),
+      allowNull: true
+    }
   }, {
     tableName: 'product_categories',
 
