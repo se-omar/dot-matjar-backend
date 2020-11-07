@@ -60,4 +60,50 @@ router.post("/api/fillClosureTable", async (req, res) => {
   res.send("created");
 });
 
+router.post("/api/filterProductsByCategory", async (req, res) => {
+  var catname = req.body.category_name;
+  var siteLanguage = req.body.siteLanguage;
+  var cat;
+  var products = [];
+
+  if (catname && siteLanguage == "en") {
+    cat = await db.product_categories.findOne({
+      where: {
+        category_name: catname,
+      },
+    });
+  } else if (catname && siteLanguage == "ar") {
+    cat = await db.product_categories.findOne({
+      where: {
+        category_arabic_name: catname,
+      },
+    });
+  }
+  if (cat) {
+    var closureProducts = await db.categories_closure.findAll({
+      where: {
+        category_id: cat.category_id,
+      },
+    });
+
+    var promise = new Promise((resolve, reject) => {
+      closureProducts.forEach(async (element, index, array) => {
+        var product = await db.products.findOne({
+          where: {
+            product_id: element.product_id,
+          },
+        });
+        products.push(product);
+        if (index === array.length - 1) resolve();
+      });
+    });
+
+    promise.then(() => {
+      res.json({
+        products,
+      });
+    });
+  }
+});
+
 module.exports = router;
