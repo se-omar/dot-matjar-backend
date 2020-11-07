@@ -211,17 +211,19 @@ router.post(
   upload2.array("file", 12),
   async (req, res, next) => {
     console.log("uploaded file", req.files);
-    var cat = await db.product_categories.findOne({
-      where: {
-        category_name: req.body.category_name,
-      },
-    });
-
-    var catItem = await db.category_items.findOne({
-      where: {
-        category_items: req.body.category_item,
-      },
-    });
+    if (req.body.siteLanguage == "en") {
+      var cat = await db.product_categories.findOne({
+        where: {
+          category_name: req.body.category_name,
+        },
+      });
+    } else {
+      var cat = await db.product_categories.findOne({
+        where: {
+          category_arabic_name: req.body.category_name,
+        },
+      });
+    }
 
     db.products
       .create({
@@ -249,6 +251,43 @@ router.post(
       })
       .then((response) => {
         res.send(response);
+      });
+  }
+);
+
+router.post(
+  "/api/updateProduct",
+  upload2.array("file", 12),
+  (req, res, next) => {
+    console.log("uploaded file", req.files);
+    db.products
+      .findOne({
+        currency: req.body.currency,
+      })
+      .then(async (product) => {
+        db.categories_closure.create({
+          product_id: product.product_id,
+          category_id: cat.category_id,
+        });
+        if (cat.parent_id) {
+          db.categories_closure.create({
+            product_id: product.product_id,
+            category_id: cat.parent_id,
+          });
+          var categoryItem = await db.product_categories.findOne({
+            where: {
+              category_id: cat.parent_id,
+            },
+          });
+          if (categoryItem.parent_id) {
+            db.categories_closure.create({
+              product_id: product.product_id,
+              category_id: categoryItem.parent_id,
+            });
+          }
+        }
+        // res.send(product)
+        res.json({ data: product });
       });
   }
 );
