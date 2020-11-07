@@ -761,9 +761,9 @@ router.post('/api/addCategoryItems', async (req, res) => {
     else {
 
 
-        var checkIfItemExists = await db.category_items.findOne({
+        var checkIfItemExists = await db.product_categories.findOne({
             where: {
-                category_items: req.body.categoryItem
+                category_name: req.body.categoryItem
             }
         })
 
@@ -775,12 +775,11 @@ router.post('/api/addCategoryItems', async (req, res) => {
                 }
             })
 
-            db.category_items.create({
-                category_id: category.category_id,
-                category_name: category.category_name,
-                category_items: req.body.categoryItem,
-                category_items_arabic_name: req.body.itemArabicName,
-                category_arabic_name: category.category_arabic_name
+            db.product_categories.create({
+
+                category_name: req.body.categoryItem,
+                category_arabic_name: req.body.itemArabicName,
+                parent_id: category.category_id
             }).then(res.json({ message: 'Items added successfully' }))
         }
     }
