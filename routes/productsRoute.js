@@ -198,17 +198,20 @@ router.post('/api/myProducts', (req, res) => {
 
 router.post('/api/product', upload2.array('file', 12), async (req, res, next) => {
     console.log('uploaded file', req.files);
-    var cat = await db.product_categories.findOne({
-        where: {
-            category_name: req.body.category_name
-        }
-    })
-
-    var catItem = await db.category_items.findOne({
-        where: {
-            category_items: req.body.category_item
-        }
-    })
+    if (req.body.siteLanguage == 'en') {
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_name: req.body.category_name
+            }
+        })
+    }
+    else {
+        var cat = await db.product_categories.findOne({
+            where: {
+                category_arabic_name: req.body.category_name
+            }
+        })
+    }
 
     db.products.create({
         product_name: req.body.product_name,
@@ -230,11 +233,32 @@ router.post('/api/product', upload2.array('file', 12), async (req, res, next) =>
         main_picture: req.files[0] ? req.files[0].path.substr(11) : null,
         extra_picture1: req.files[1] ? req.files[1].path.substr(11) : null,
         extra_picture2: req.files[2] ? req.files[2].path.substr(11) : null,
-        category_items_id: catItem.category_items_id,
-        currency: req.body.currency
-    }).then(response => {
 
-        res.send(response)
+        currency: req.body.currency
+    }).then(async product => {
+        db.categories_closure.create({
+            product_id: product.product_id,
+            category_id: cat.category_id
+        })
+        if (cat.parent_id) {
+            db.categories_closure.create({
+                product_id: product.product_id,
+                category_id: cat.parent_id
+            })
+            var categoryItem = await db.product_categories.findOne({
+                where: {
+                    category_id: cat.parent_id
+                }
+            })
+            if (categoryItem.parent_id) {
+                db.categories_closure.create({
+                    product_id: product.product_id,
+                    category_id: categoryItem.parent_id
+                })
+            }
+        }
+        // res.send(product)
+        res.json({ data: product })
     })
 
 });
