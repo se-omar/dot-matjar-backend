@@ -381,51 +381,50 @@ router.put("/api/filterProducts", async (req, res) => {
     var reg = req.body.region;
     var prodname = req.body.product_name;
     var catname = req.body.category_name;
-    var catItem = req.body.categoryItem;
     var priceFrom = req.body.priceFrom;
     var priceTo = req.body.priceTo;
     var product_id = req.body.product_id;
     var siteLanguage = req.body.siteLanguage;
-
-    console.log(catname, siteLanguage);
+    var cat;
+    var categoriesId = [];
+    var promise;
+    var closureProducts;
+    var wh = {};
 
     if (catname && siteLanguage == "en") {
-        var cat = await db.product_categories.findOne({
+        cat = await db.product_categories.findOne({
             where: {
                 category_name: catname,
             },
         });
-    }
-    if (catname && siteLanguage == "ar") {
-        var cat = await db.product_categories.findOne({
+    } else if (catname && siteLanguage == "ar") {
+        cat = await db.product_categories.findOne({
             where: {
                 category_arabic_name: catname,
             },
         });
     }
-    // if (catname && siteLanguage == 'en') {
-    //     var cat = await db.product_categories.findOne({
-    //         where: {
-    //             category_name: catname
-    //         }
-    //     })
-    // }
-    if (catItem && siteLanguage == "en") {
-        var item = await db.category_items.findOne({
+    if (cat) {
+        closureProducts = await db.categories_closure.findAll({
             where: {
-                category_items: catItem,
-            },
-        });
-    }
-    if (catItem && siteLanguage == "ar") {
-        var item = await db.category_items.findOne({
-            where: {
-                category_items_arabic_name: catItem,
+                category_id: cat.category_id,
             },
         });
     }
 
-    var wh = {};
+    promise = new Promise((resolve, reject) => {
+        closureProducts.forEach(async (element, index, array) => {
+            var product = await db.products.findOne({
+                where: {
+                    product_id: element.product_id,
+                },
+            });
+            categoriesId.indexOf(product.category_id) === -1 ? categoriesId.push(product.category_id) : console.log('value repeated');
+            if (index === array.length - 1) resolve();
+        });
+    });
+
+
     if (gov) {
         wh.governorate = gov;
     }
@@ -435,9 +434,7 @@ router.put("/api/filterProducts", async (req, res) => {
     if (prodname) {
         wh.product_name = { [Op.substring]: prodname };
     }
-    if (catname) {
-        wh.category_id = cat.category_id;
-    }
+
     if (priceFrom && !priceTo) {
         wh.unit_price = { [Op.gte]: priceFrom };
     } else if (priceTo && !priceFrom) {
@@ -446,33 +443,28 @@ router.put("/api/filterProducts", async (req, res) => {
         wh.unit_price = { [Op.between]: [priceFrom, priceTo] };
     }
 
-    wh.product_id = { [Op.gt]: product_id };
-    // if (catname) {
-    //     var cat = await db.product_categories.findOne({
-    //         where: {
-    //             category_name: catname
-    //         }
-    //     })
-    // }
+    wh.product_id = { [Op.gte]: product_id };
 
-    if (catItem) {
-        wh.category_items_id = item.category_items_id;
-    }
-
-    console.log(wh);
-
-    db.products
-        .findAll({
-            include: [{ model: db.users }, { model: db.product_categories }],
-            where: wh,
-            limit: 20,
-        })
-        .then((products) => {
-            res.json({
-                message: "test search",
-                data: products,
+    promise.then(() => {
+        if (categoriesId.length > 0) {
+            wh.category_id = {
+                [Op.or]: categoriesId
+            }
+        }
+        console.log(wh)
+        db.products
+            .findAll({
+                include: [{ model: db.users }, { model: db.product_categories }],
+                where: wh,
+                limit: 20,
+            })
+            .then((products) => {
+                res.json({
+                    message: "test search",
+                    data: products,
+                });
             });
-        });
+    })
 });
 
 router.put("/api/loadmoreProducts", async (req, res) => {

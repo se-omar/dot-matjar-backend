@@ -93,7 +93,7 @@ router.post("/api/filterProductsByCategory", async (req, res) => {
             product_id: element.product_id,
           },
         });
-        products.push(product);
+        products.push(product.category_id);
         if (index === array.length - 1) resolve();
       });
     });
