@@ -413,15 +413,18 @@ router.put("/api/filterProducts", async (req, res) => {
     }
 
     promise = new Promise((resolve, reject) => {
-        closureProducts.forEach(async (element, index, array) => {
-            var product = await db.products.findOne({
-                where: {
-                    product_id: element.product_id,
-                },
+        if (closureProducts) {
+            closureProducts.forEach(async (element, index, array) => {
+                var product = await db.products.findOne({
+                    where: {
+                        product_id: element.product_id,
+                    },
+                });
+                categoriesId.indexOf(product.category_id) === -1 ? categoriesId.push(product.category_id) : console.log('value repeated');
+                if (index === array.length - 1) resolve();
             });
-            categoriesId.indexOf(product.category_id) === -1 ? categoriesId.push(product.category_id) : console.log('value repeated');
-            if (index === array.length - 1) resolve();
-        });
+        }
+        else resolve();
     });
 
 
