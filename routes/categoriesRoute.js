@@ -60,50 +60,34 @@ router.post("/api/fillClosureTable", async (req, res) => {
   res.send("created");
 });
 
-router.post("/api/filterProductsByCategory", async (req, res) => {
-  var catname = req.body.category_name;
-  var siteLanguage = req.body.siteLanguage;
-  var cat;
-  var products = [];
-
-  if (catname && siteLanguage == "en") {
-    cat = await db.product_categories.findOne({
-      where: {
-        category_name: catname,
-      },
-    });
-  } else if (catname && siteLanguage == "ar") {
-    cat = await db.product_categories.findOne({
-      where: {
-        category_arabic_name: catname,
-      },
-    });
-  }
-  if (cat) {
-    var closureProducts = await db.categories_closure.findAll({
-      where: {
-        category_id: cat.category_id,
-      },
-    });
-
-    var promise = new Promise((resolve, reject) => {
-      closureProducts.forEach(async (element, index, array) => {
-        var product = await db.products.findOne({
-          where: {
-            product_id: element.product_id,
-          },
-        });
-        products.push(product.category_id);
-        if (index === array.length - 1) resolve();
-      });
-    });
-
-    promise.then(() => {
-      res.json({
-        products,
-      });
-    });
-  }
+var treeAr = [];
+router.post("/api/getCategoriesTree", async (req, res) => {
+  treeAr = [];
+  await processCategoriesTree(null, null, req.body.language);
+  res.json({ categoriesTreeArray: treeAr });
 });
+
+async function processCategoriesTree(parentId, parentRow, language) {
+  var rows = await db.product_categories.findAll({
+    where: {
+      parent_id: parentId,
+    },
+  });
+  var i = 0;
+  var p;
+  for (i = 0; i < rows.length; i++) {
+    p = {
+      id: rows[i].category_id,
+      name: language == "en" ? rows[i].category_name : rows[i].category_arabic_name,
+    };
+    if (!parentRow) {
+      treeAr.push(p);
+    } else {
+      if (!parentRow.children) parentRow.children = [];
+      parentRow.children.push(p);
+    }
+    await processCategoriesTree(p.id, p);
+  }
+}
 
 module.exports = router;
