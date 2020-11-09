@@ -86,7 +86,7 @@ async function processCategoriesTree(parentId, parentRow, language) {
       if (!parentRow.children) parentRow.children = [];
       parentRow.children.push(p);
     }
-    await processCategoriesTree(p.id, p);
+    await processCategoriesTree(p.id, p, language);
   }
 }
 
