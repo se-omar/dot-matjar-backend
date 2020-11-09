@@ -442,7 +442,7 @@ router.put("/api/filterProducts", async (req, res) => {
         };
     }
 
-    wh.product_id = { [Op.gte]: product_id };
+    wh.product_id = { [Op.gt]: product_id };
 
     console.log(wh);
     var products = await db.products
@@ -452,7 +452,6 @@ router.put("/api/filterProducts", async (req, res) => {
             limit: 20,
         })
 
-    console.log('products', products)
     res.json({
         message: "test search",
         data: products,
