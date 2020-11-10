@@ -11,13 +11,13 @@ const path = require("path");
 router.use(cors());
 
 router.post("/api/testcategory", (req, res) => {
-  db.product_categories
-    .findOne({
-      where: {
-        category_id: 40,
-      },
-    })
-    .then((category) => res.send(category));
+  db.products.update({
+    category_id: 64
+  }, {
+    where: {
+      category_id: null
+    }
+  })
 });
 
 router.post("/api/fillClosureTable", async (req, res) => {
@@ -86,5 +86,15 @@ async function processCategoriesTree(parentId, parentRow, language) {
     await processCategoriesTree(p.id, p, language);
   }
 }
+
+router.post('/api/adminPageAddCategory', async (req, res) => {
+  db.product_categories.create({
+    parent_id: req.body.parentCatId == 64 ? null : req.body.parentCatId,
+    category_name: req.body.category_name,
+    category_arabic_name: req.body.category_arabic_name
+  }).then(row => {
+    res.send(row)
+  })
+})
 
 module.exports = router;
