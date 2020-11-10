@@ -35,9 +35,7 @@ router.post("/api/fillClosureTable", async (req, res) => {
   debugger;
   products.forEach(async (element) => {
     categoryId = element.category_id;
-    debugger;
     while (parentId != null) {
-      debugger;
       var category = await db.product_categories.findOne({
         where: {
           category_id: categoryId,
@@ -51,7 +49,6 @@ router.post("/api/fillClosureTable", async (req, res) => {
           category_id: categoryId,
         })
         .then((table) => {
-          debugger;
           categoryId = parentId;
         });
     }

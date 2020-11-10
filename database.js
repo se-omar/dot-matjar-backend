@@ -1,7 +1,7 @@
 const suppliers_items = require("./models/suppliers_items");
 
 const Seq = require("sequelize").Sequelize;
-const sequelize = new Seq("dot-matjar-db", "root", "", {
+const sequelize = new Seq("dotmatjardb2", "root", "", {
   host: "localhost",
   dialect: "mysql",
   define: {
@@ -34,19 +34,19 @@ const db = {
 
 db.users.hasMany(
   db.requests, {
-    as: "recievedRequests",
-    foreignKey: "to_user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  as: "recievedRequests",
+  foreignKey: "to_user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.users.hasMany(
   db.requests, {
-    as: "sentRequests",
-    foreignKey: "by_user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  as: "sentRequests",
+  foreignKey: "by_user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.requests.belongsTo(db.users, {
   as: "recievingUser",
@@ -66,10 +66,10 @@ db.requests.belongsTo(db.products, {
 
 db.users.hasOne(
   db.business, {
-    foreignKey: "user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.business.belongsTo(db.users, {
   foreignKey: "user_id",
@@ -87,10 +87,10 @@ db.products.belongsTo(db.business, {
 
 db.users.hasMany(
   db.products, {
-    foreignKey: "user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.products.belongsTo(db.users, {
   foreignKey: "user_id",
@@ -98,10 +98,10 @@ db.products.belongsTo(db.users, {
 
 db.product_categories.hasMany(
   db.products, {
-    foreignKey: "category_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "category_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.products.belongsTo(db.product_categories, {
   foreignKey: "category_id",
@@ -117,10 +117,10 @@ db.products.belongsTo(db.cart, {
 });
 db.users.belongsTo(
   db.cart, {
-    foreignKey: "cart_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "cart_id",
+}, {
+  onDelete: "cascade",
+}
 );
 
 db.cart.belongsToMany(db.products, {
@@ -139,10 +139,10 @@ db.cart_products.belongsTo(db.cart, {
 });
 db.products.hasMany(
   db.cart_products, {
-    foreignKey: "product_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "product_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.cart_products.belongsTo(db.products, {
   foreignKey: "product_id",
@@ -164,10 +164,10 @@ db.products_orders.belongsTo(db.orders, {
 });
 db.products.hasMany(
   db.products_orders, {
-    foreignKey: "product_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "product_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.products_orders.belongsTo(db.products, {
   foreignKey: "product_id",
@@ -175,26 +175,26 @@ db.products_orders.belongsTo(db.products, {
 
 db.users.hasMany(
   db.orders, {
-    foreignKey: "user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.orders.belongsTo(
   db.users, {
-    foreignKey: "user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 
 db.users.belongsToMany(
   db.products, {
-    through: "products_reviews",
-    foreignKey: "user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  through: "products_reviews",
+  foreignKey: "user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.products.belongsToMany(db.users, {
   through: "products_reviews",
@@ -202,10 +202,10 @@ db.products.belongsToMany(db.users, {
 });
 db.users.hasMany(
   db.products_reviews, {
-    foreignKey: "user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.products_reviews.belongsTo(db.users, {
   foreignKey: "user_id",
@@ -226,11 +226,11 @@ db.category_items.belongsTo(db.product_categories, {
 });
 db.users.hasMany(
   db.suppliers_reviews, {
-    as: "user",
-    foreignKey: "user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  as: "user",
+  foreignKey: "user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.users.hasMany(db.suppliers_reviews, {
   as: "supplier",
@@ -254,10 +254,10 @@ db.products.belongsTo(db.category_items, {
 
 db.users.hasMany(
   db.categories_request, {
-    foreignKey: "user_id",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "user_id",
+}, {
+  onDelete: "cascade",
+}
 );
 db.categories_request.belongsTo(db.users, {
   foreignKey: "user_id",
@@ -265,11 +265,11 @@ db.categories_request.belongsTo(db.users, {
 
 db.users.belongsToMany(
   db.category_items, {
-    foreignKey: "user_id",
-    through: "suppliers_items",
-  }, {
-    onDelete: "cascade",
-  }
+  foreignKey: "user_id",
+  through: "suppliers_items",
+}, {
+  onDelete: "cascade",
+}
 );
 db.category_items.belongsToMany(db.users, {
   foreignKey: "category_items_id",
