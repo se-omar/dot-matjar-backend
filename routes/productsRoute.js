@@ -992,39 +992,40 @@ router.post("/api/checkIfUserOrdered", (req, res) => {
 router.post("/api/requestNewCategoryAndItem", async (req, res) => {
     var wh = {};
 
-    if (req.body.newCategoryName) {
-        wh.new_category_name = req.body.newCategoryName;
-    }
-    if (req.body.newCategoryDescription) {
-        wh.new_category_description = req.body.newCategoryDescription;
-    }
-    if (req.body.newCategoryItem) {
-        wh.new_category_item = req.body.newCategoryItem;
-    }
-    if (req.body.newCategoryItemDescription) {
-        wh.new_item_description = req.body.newCategoryItemDescription;
-    }
-    if (req.body.categoryName) {
-        wh.category_name = req.body.categoryName;
-    }
+    // if (req.body.newCategoryName) {
+    //     wh.new_category_name = req.body.newCategoryName;
+    // }
+    // if (req.body.newCategoryDescription) {
+    //     wh.new_category_description = req.body.newCategoryDescription;
+    // }
+    // if (req.body.newCategoryItem) {
+    //     wh.new_category_item = req.body.newCategoryItem;
+    // }
+    // if (req.body.newCategoryItemDescription) {
+    //     wh.new_item_description = req.body.newCategoryItemDescription;
+    // }
+    // if (req.body.categoryName) {
+    //     wh.category_name = req.body.categoryName;
+    // }
 
-    if (req.body.newCategoryName) {
+
+    if (req.body.requestType == 'parent') {
+        db.categories_request.create({
+            request_type: "category",
+            user_id: req.body.user_id,
+            new_category_name: req.body.newParentCategory,
+            new_category_description: req.body.newParentDescription,
+            new_category_arabic_name: req.body.newParentCategoryArabic,
+        });
+    }
+    if (req.body.requestType == 'child') {
         db.categories_request.create({
             request_type: "category",
             user_id: req.body.user_id,
             new_category_name: req.body.newCategoryName,
             new_category_description: req.body.newCategoryDescription,
             new_category_arabic_name: req.body.categoryArabicName,
-        });
-    }
-    if (req.body.newCategoryItem) {
-        db.categories_request.create({
-            request_type: "item",
-            user_id: req.body.user_id,
-            new_category_item: req.body.newCategoryItem,
-            new_item_description: req.body.newCategoryItemDescription,
-            new_item_category_name: req.body.categoryName,
-            new_item_arabic_name: req.body.itemArabicName,
+            parent_id: req.body.parentCategoryId
         });
     }
 });
@@ -1066,6 +1067,7 @@ router.put("/api/categoryAndItemRequestStatus", async (req, res) => {
                             category_name: req.body.newCategoryName,
                             description: req.body.newCategoryDescription,
                             category_arabic_name: req.body.categoryArabicName,
+                            parent_id : req.body.parent_id
                         })
                         .then(res.json({ message: `Request ${req.body.status} Successfully` }));
                 } else {
