@@ -11,13 +11,16 @@ const path = require("path");
 router.use(cors());
 
 router.post("/api/testcategory", (req, res) => {
-  db.product_categories
-    .findOne({
+  db.products.update(
+    {
+      category_id: 64,
+    },
+    {
       where: {
-        category_id: 40,
+        category_id: null,
       },
-    })
-    .then((category) => res.send(category));
+    }
+  );
 });
 
 router.post("/api/fillClosureTable", async (req, res) => {
@@ -35,9 +38,7 @@ router.post("/api/fillClosureTable", async (req, res) => {
   debugger;
   products.forEach(async (element) => {
     categoryId = element.category_id;
-    debugger;
     while (parentId != null) {
-      debugger;
       var category = await db.product_categories.findOne({
         where: {
           category_id: categoryId,
@@ -51,7 +52,6 @@ router.post("/api/fillClosureTable", async (req, res) => {
           category_id: categoryId,
         })
         .then((table) => {
-          debugger;
           categoryId = parentId;
         });
     }
@@ -82,6 +82,114 @@ async function processCategoriesTree(parentId, parentRow, language) {
     };
     if (!parentRow) {
       treeAr.push(p);
+    } else {
+      if (!parentRow.children) parentRow.children = [];
+      parentRow.children.push(p);
+    }
+    await processCategoriesTree(p.id, p, language);
+  }
+}
+
+router.post("/api/adminPageAddCategory", async (req, res) => {
+  db.product_categories
+    .create({
+      parent_id: req.body.parentCatId == 64 ? null : req.body.parentCatId,
+      category_name: req.body.category_name,
+      category_arabic_name: req.body.category_arabic_name,
+    })
+    .then((row) => {
+      res.send(row);
+    });
+});
+
+router.post("/api/supplierPageAddCategories", async (req, res) => {
+  var supplierCategories = req.body.supplierCategories;
+  var cat;
+  var parentId;
+  var parentCat;
+  var catId;
+  var catCheck;
+  var closure;
+  if (supplierCategories) {
+    for (var i = 0; i < supplierCategories.length; i++) {
+      catCheck = null;
+      var cat = await db.product_categories.findByPk(supplierCategories[i]);
+      parentId = cat.parent_id;
+      catId = cat.category_id;
+
+      catCheck = await db.suppliers_categories_closure.findOne({
+        where: {
+          category_id: cat.category_id,
+        },
+      });
+
+      do {
+        if (!catCheck) {
+          closure = await db.suppliers_categories_closure.create({
+            supplier_id: req.body.supplier_id,
+            category_id: catId,
+            parent_id: parentId,
+            category_name: cat.category_name,
+            category_arabic_name: cat.category_arabic_name,
+          });
+          catId = parentId;
+
+          parentCat = await db.product_categories.findOne({
+            where: {
+              category_id: catId,
+            },
+          });
+          parentId = parentCat ? parentCat.parent_id : null;
+        }
+      } while (parentId != null);
+
+      catCheck = await db.suppliers_categories_closure.findOne({
+        where: {
+          category_id: parentCat.category_id,
+        },
+      });
+      if (parentCat && parentCat.parent_id == null && !catCheck) {
+        closure = await db.suppliers_categories_closure.create({
+          supplier_id: req.body.supplier_id,
+          category_id: parentCat.category_id,
+          parent_id: parentCat.parent_id,
+          category_name: parentCat.category_name,
+          category_arabic_name: parentCat.category_arabic_name,
+        });
+      }
+    }
+    res.send("product added successfully");
+  } else res.send("error happened");
+});
+
+var supplierTreeAr = [];
+router.post("/api/getSupplierCategoriesTree", async (req, res) => {
+  supplierTreeAr = [];
+  await processSupplierCategoriesTree(
+    null,
+    null,
+    req.body.supplier_id,
+    req.body.language
+  );
+  res.json({ categoriesTreeArray: supplierTreeAr });
+});
+
+async function processSupplierCategoriesTree(parentId, parentRow, supplierId, language) {
+  var rows = await db.suppliers_categories_closure.findAll({
+    where: {
+      supplier_id: supplierId,
+      parent_id: parentId,
+    },
+  });
+  var i = 0;
+  var p;
+  for (i = 0; i < rows.length; i++) {
+    p = {
+      id: rows[i].category_id,
+      name: language == "en" ? rows[i].category_name : rows[i].category_arabic_name,
+    };
+    if (!parentRow) {
+      supplierTreeAr.push(p);
     } else {
       if (!parentRow.children) parentRow.children = [];
       parentRow.children.push(p);

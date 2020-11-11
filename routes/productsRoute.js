@@ -203,26 +203,60 @@ router.post("/api/myProducts", (req, res) => {
 
 //POST METHOD
 
-router.post("/api/product", upload2.array("file", 12), async (req, res, next) => {
-    console.log("uploaded file", req.files);
-    if (req.body.siteLanguage == "en") {
-        var cat = await db.product_categories.findOne({
+router.post('/api/productTest', async (req, res, next) => {
+    var cat = await db.product_categories.findOne({
+        where: {
+            category_id: req.body.category_id
+        }
+    })
+
+    var product = await db.products
+        .create({
+            category_id: req.body.category_id,
+        })
+
+    var parentId = cat.parent_id
+    var catId = cat.category_id
+    var parentCat;
+    var closure;
+    while (parentId != null) {
+        closure = await db.categories_closure.create({
+            product_id: product.product_id,
+            category_id: catId
+        })
+        catId = parentId
+
+        parentCat = await db.product_categories.findOne({
             where: {
-                category_name: req.body.category_name,
-            },
-        });
-    } else {
-        var cat = await db.product_categories.findOne({
-            where: {
-                category_arabic_name: req.body.category_name,
-            },
-        });
+                category_id: catId
+            }
+        })
+        parentId = parentCat.parent_id
     }
 
-    db.products
+    if (parentCat && parentCat.parent_id == null) {
+        closure = await db.categories_closure.create({
+            product_id: product.product_id,
+            category_id: parentCat.category_id
+        })
+    }
+
+    res.send('finish')
+
+})
+
+router.post("/api/product", upload2.array("file", 12), async (req, res, next) => {
+    console.log("uploaded file", req.files);
+    var cat = await db.product_categories.findOne({
+        where: {
+            category_id: req.body.category_id
+        }
+    })
+
+    var product = await db.products
         .create({
             product_name: req.body.product_name,
-            category_id: cat.category_id,
+            category_id: cat ? cat.category_id : 64,
             quantity: req.body.quantity,
             user_id: req.body.user_id,
             brand: req.body.brand,
@@ -240,12 +274,37 @@ router.post("/api/product", upload2.array("file", 12), async (req, res, next) =>
             main_picture: req.files[0] ? req.files[0].path.substr(11) : null,
             extra_picture1: req.files[1] ? req.files[1].path.substr(11) : null,
             extra_picture2: req.files[2] ? req.files[2].path.substr(11) : null,
-            category_items_id: catItem.category_items_id,
             currency: req.body.currency,
         })
-        .then((response) => {
-            res.send(response);
-        });
+
+    var parentId = cat.parent_id
+    var catId = cat.category_id
+    var parentCat;
+    var closure;
+
+    do {
+        closure = await db.categories_closure.create({
+            product_id: product.product_id,
+            category_id: catId
+        })
+        catId = parentId
+
+        parentCat = await db.product_categories.findOne({
+            where: {
+                category_id: catId
+            }
+        })
+        parentId = parentCat ? parentCat.parent_id : null
+    }
+    while (parentId != null)
+
+    if (parentCat && parentCat.parent_id == null) {
+        closure = await db.categories_closure.create({
+            product_id: product.product_id,
+            category_id: parentCat.category_id
+        })
+    }
+    res.send('product added successfully')
 });
 
 router.post("/api/updateProduct", upload2.array("file", 12), (req, res, next) => {
