@@ -10,7 +10,8 @@ const Sequelize = require('sequelize')
 const Op = Sequelize.Op;
 
 const {
-    cart
+    cart,
+    categories_closure
 } = require('../database');
 
 router.use((req, res, next) => {
@@ -632,29 +633,153 @@ router.post('/api/addCategoryAndItemsToSupplier', async (req, res) => {
 //         res.json({ message: 'supplier items found', data: items })
 //     })
 // })
-
-
+var parent;
+var supplierCatTreeArray = []
+var categoryParentsIdArray = []
+var categoryArray = []
+var treeAr = []
 router.put('/api/getSupplierCategoriesAndItems', async (req, res) => {
+    supplierCatTreeArray = []
+
+
     if (req.body.user_id) {
         console.log('idd of user', req.body.user_id)
         db.suppliers_items.findAll({
             where: {
                 user_id: req.body.user_id,
 
-            },
-            include: [{
-                model: db.product_categories
-            }]
-        }).then(items => {
+            }
+
+        }).then(async items => {
+            debugger
+
+
+            for (let i = 0; i < items.length; i++) {
+                var row = []
+                var item = items[i]
+                var parentId = 0
+                var parentRow
+
+                while (parentId != null) {
+                    var push = true
+
+                    var cat = await db.product_categories.findOne({
+                        where: {
+                            category_id: item.category_id
+                        }
+                    })
+                    parentId = cat.parent_id
+                    if (parentId) {
+                        parentRow = await db.product_categories.findOne({
+                            where: {
+                                category_id: parentId
+                            }
+                        })
+                    }
+                    if (categoryArray.length > 0) {
+                        for (let y = 0; y < categoryArray.length; y++) {
+                            console.log('categoryArray enteredd')
+                            if (cat.category_id == categoryArray[y].id) {
+                                push = false
+                            }
+                        }
+                    }
+                    if (push == true) {
+                        row.push({
+                            id: cat.category_id,
+                            name: cat.category_name,
+                            parentId: parentId
+                        })
+                    }
+                    item = parentRow
+
+
+                }
+
+                categoryArray.push(...row.sort((a,b)=>{
+                    return a.parentId - b.parentId
+                }))
+                await supplierCategoryTree(null)
+                // debugger
+                // await getCategoryParents(category.category_id)
+                // await supplierCategoryTree(category.category_id, null)
+
+            }
             res.json({
-                data: items,
-                message: 'category and items successfullly entered'
+                data1: treeAr,
+                data2: treeAr,
+                categoryArray: categoryArray.sort((a, b)=>{
+                    return a.parentId - b.parentId
+                })
             })
+
+
+
+            debugger
+
         })
     }
 
 
 })
+
+// function getParents(catId){
+//     var cat = categories.findOne where catId
+//     catAr.push(cat.id)
+// getParents(cat.parentid)
+// } 
+var cat;
+async function getCategoryParents(id) {
+    categoryParentsIdArray.push(id);
+
+    cat = await db.product_categories.findOne({
+
+        where: {
+            category_id: id
+        }
+    })
+
+
+    console.log(categoryParentsIdArray)
+
+
+    if (cat.parent_id) {
+        getCategoryParents(cat.parent_id)
+    }
+
+
+}
+
+var parentcat=[]
+async function supplierCategoryTree(parentId, parentRow) {
+    var p;
+    var i;
+
+       for (let x=0 ; x<categoryArray.length; x++){
+           if(categoryArray[x].parentId == parentId){
+            parentcat.push(categoryArray[x])
+           }
+       }
+
+    for (let i =0;i<parentcat.length;i++) {
+       
+        p = {
+            id: parentcat[i].id,
+            name: parentcat[i].name,
+        };
+        if (!parentRow) {
+
+            treeAr.push(p);
+        } else {
+            if (!parentRow.children) parentRow.children = [];
+            parentRow.children.push(p);
+        }
+ 
+        await supplierCategoryTree(p.id, p);
+        
+    }
+
+}
 
 router.put('/api/rejectSupplierRequest', (req, res) => {
     db.users.findOne({
