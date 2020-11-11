@@ -90,6 +90,61 @@ async function processCategoriesTree(parentId, parentRow, language) {
   }
 }
 
+var removeCatAr = []
+router.post('/api/removeCategory', async (req, res) => {
+  removeCatAr = []
+  await getParentChildrenTest(req.body.parentId);
+
+  for (var j = 0; j < removeCatAr.length; j++) {
+    await db.products.destroy({
+      where: {
+        category_id: removeCatAr[j]
+      }
+    })
+    await db.categories_closure.destroy({
+      where: {
+        category_id: removeCatAr[j]
+      }
+    })
+    await db.suppliers_categories_closure.destroy({
+      where: {
+        category_id: removeCatAr[j]
+      }
+    })
+    await db.product_categories.destroy({
+      where: {
+        category_id: removeCatAr[j]
+      }
+    })
+  }
+  res.send('category deleted successfully');
+})
+
+async function getParentChildrenTest(parentId) {
+
+  var parent = await db.product_categories.findByPk(parentId);
+  var children = await db.product_categories.findAll({
+    where: {
+      parent_id: parentId
+    }
+  })
+
+  if (removeCatAr.indexOf(parent.category_id) == -1)
+    removeCatAr.push(parent.category_id)
+
+  if (children) {
+    for (var i = 0; i < children.length; i++) {
+      if (removeCatAr.indexOf(parent.category_id) == -1)
+        removeCatAr.push(parent.category_id)
+      if (removeCatAr.indexOf(children[i].category_id) == -1)
+        removeCatAr.push(children[i].category_id)
+      await getParentChildrenTest(children[i].category_id)
+    }
+  }
+}
+
+
+
 router.post("/api/adminPageAddCategory", async (req, res) => {
   db.product_categories
     .create({
@@ -197,5 +252,9 @@ async function processSupplierCategoriesTree(parentId, parentRow, supplierId, la
     await processCategoriesTree(p.id, p, language);
   }
 }
+
+router.post('/api/removeCategory', async (req, res) => {
+
+})
 
 module.exports = router;

@@ -433,19 +433,6 @@ router.put("/api/filterProducts", async (req, res) => {
     var closureProducts;
     var wh = {};
 
-    //   if (catname && siteLanguage == "en") {
-    //     cat = await db.product_categories.findOne({
-    //       where: {
-    //         category_name: catname,
-    //       },
-    //     });
-    //   } else if (catname && siteLanguage == "ar") {
-    //     cat = await db.product_categories.findOne({
-    //       where: {
-    //         category_arabic_name: catname,
-    //       },
-    //     });
-    //   }
 
     var cat = await db.product_categories.findOne({
         where: {
@@ -453,29 +440,38 @@ router.put("/api/filterProducts", async (req, res) => {
         },
     });
 
-    if (cat) {
-        closureProducts = await db.categories_closure.findAll({
-            where: {
-                category_id: cat.category_id,
-            },
-        });
-    }
-
-
-    if (closureProducts && closureProducts.length > 0) {
-        var i = 0;
-        for (i = 0; i < closureProducts.length; i++) {
-            var product = await db.products.findOne({
+    if (catId && catId != 64) {
+        if (cat) {
+            closureProducts = await db.categories_closure.findAll({
                 where: {
-                    product_id: closureProducts[i].product_id,
+                    category_id: cat.category_id,
                 },
             });
+        }
 
-            categoriesId.indexOf(product.category_id) === -1
-                ? categoriesId.push(product.category_id)
-                : console.log("value repeated");
+
+        if (closureProducts && closureProducts.length > 0) {
+            var i = 0;
+            for (i = 0; i < closureProducts.length; i++) {
+                var product = await db.products.findOne({
+                    where: {
+                        product_id: closureProducts[i].product_id,
+                    },
+                });
+
+                categoriesId.indexOf(product.category_id) === -1
+                    ? categoriesId.push(product.category_id)
+                    : console.log("value repeated");
+            }
+        }
+
+        if (catId) {
+            wh.category_id = {
+                [Op.or]: categoriesId.length > 0 ? categoriesId : [false],
+            };
         }
     }
+
 
     if (gov) {
         wh.governorate = gov;
@@ -495,11 +491,7 @@ router.put("/api/filterProducts", async (req, res) => {
         wh.unit_price = { [Op.between]: [priceFrom, priceTo] };
     }
 
-    if (catId) {
-        wh.category_id = {
-            [Op.or]: categoriesId.length > 0 ? categoriesId : [false],
-        };
-    }
+
 
     wh.product_id = { [Op.gt]: product_id };
 
