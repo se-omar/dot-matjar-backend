@@ -28,34 +28,63 @@ router.post("/api/fillClosureTable", async (req, res) => {
   var products = await db.products.findAll({
     where: {
       category_id: {
-        [Op.ne]: null,
+        [Op.ne]: 64,
       },
     },
   });
 
   var categoryId = products[0].category_id;
-  var parentId = 56;
-  debugger;
-  products.forEach(async (element) => {
-    categoryId = element.category_id;
-    while (parentId != null) {
-      var category = await db.product_categories.findOne({
-        where: {
-          category_id: categoryId,
-        },
-      });
+  var parent = await db.product_categories.findByPk(products[0].category_id)
+  var parentId = parent.parent_id
+
+  for (var i = 0; i < products.length; i++) {
+    categoryId = products[i].category_id;
+    do {
+      var category = await db.product_categories.findByPk(categoryId);
       parentId = category.parent_id;
 
-      db.categories_closure
+      await db.categories_closure
         .create({
-          product_id: element.product_id,
+          product_id: products[i].product_id,
           category_id: categoryId,
         })
-        .then((table) => {
-          categoryId = parentId;
-        });
+      categoryId = parentId;
+      parent = await db.product_categories.findByPk(categoryId)
+      parentId = parent ? parent.parent_id : null
+    } while (parentId != null)
+
+    if (parent && parentId == null) {
+      await db.categories_closure
+        .create({
+          product_id: products[i].product_id,
+          category_id: categoryId,
+        })
     }
-  });
+
+  }
+
+  // //================
+  // debugger;
+  // products.forEach(async (element) => {
+  //   categoryId = element.category_id;
+  //   while (parentId != null) {
+  //     var category = await db.product_categories.findOne({
+  //       where: {
+  //         category_id: categoryId,
+  //       },
+  //     });
+  //     parentId = category.parent_id;
+
+  //     db.categories_closure
+  //       .create({
+  //         product_id: element.product_id,
+  //         category_id: categoryId,
+  //       })
+  //       .then((table) => {
+  //         categoryId = parentId;
+  //       });
+  //   }
+  // });
 
   res.send("created");
 });
