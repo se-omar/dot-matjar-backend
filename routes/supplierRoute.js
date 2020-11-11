@@ -440,68 +440,105 @@ router.put('/api/acceptSupplierRequest', async (req, res) => {
 
 
 router.put('/api/filterSupplierProducts', async (req, res) => {
-
-
+var supplierFilteredProducts =[]
+var product;
     var wh = {}
+    if(req.body.searchType == 'category'){
+console.log('filter products with category')
+    
+var categoryId = req.body.categoryArray[0].id
+    wh.user_id = req.body.supplier_id
+    
 
-    wh.user_id = req.body.user_id
-
-    if (req.body.productsSearch) {
-        wh.product_name = {
-            [Op.substring]: req.body.productsSearch
+    var categoryClosure = await db.categories_closure.findAll({
+        where:{
+            category_id : categoryId
         }
-    }
-    if (req.body.categoryName) {
-        if (req.body.siteLanguage == 'en') {
-            await db.product_categories.findOne({
-                where: {
-                    category_name: req.body.categoryName
-                }
-            }).then(category => {
-                wh.category_id = category.category_id
-            })
-        } else {
-            await db.product_categories.findOne({
-                where: {
-                    category_arabic_name: req.body.categoryName
-                }
-            }).then(category => {
-                wh.category_id = category.category_id
-            })
-        }
-
-    }
-
-    if (req.body.itemName) {
-        if (req.body.siteLanguage == 'en') {
-            await db.category_items.findOne({
-                where: {
-                    category_items: req.body.itemName
-                }
-            }).then(item => {
-                wh.category_items_id = item.category_items_id
-            })
-        } else {
-            await db.category_items.findOne({
-                where: {
-                    category_items_arabic_name: req.body.itemName
-                }
-            }).then(item => {
-                wh.category_items_id = item.category_items_id
-            })
-        }
-
-    }
-
-    await db.products.findAll({
-        where: wh
-    }).then(products => {
-        res.json({
-            message: 'products Found',
-            data: products
-        })
-
     })
+if(categoryClosure){
+    for(let i=0 ; i<categoryClosure.length ; i++){
+product = await db.products.findOne({
+    where:{
+        product_id : categoryClosure[i].product_id
+    }
+})
+
+if(product && product.user_id == req.body.supplier_id){
+supplierFilteredProducts.push(product)
+}
+    }
+}
+res.json({message : 'products found' , data:supplierFilteredProducts})
+    }
+    if(req.body.searchType == 'name'){
+        console.log('filter by name entered')
+        db.products.findAll({
+            where:{
+                user_id:req.body.supplier_id,
+                product_name : {
+                    [Op.substring]:req.body.productsSearch
+                }
+            }
+        }).then(products=>{
+            res.json({data:products , message :"Products Found"})
+        })
+    }
+    // if (req.body.productsSearch) {
+    //     wh.product_name = {
+    //         [Op.substring]: req.body.productsSearch
+    //     }
+    // }
+    // if (req.body.categoryName) {
+    //     if (req.body.siteLanguage == 'en') {
+    //         await db.product_categories.findOne({
+    //             where: {
+    //                 category_name: req.body.categoryName
+    //             }
+    //         }).then(category => {
+    //             wh.category_id = category.category_id
+    //         })
+    //     } else {
+    //         await db.product_categories.findOne({
+    //             where: {
+    //                 category_arabic_name: req.body.categoryName
+    //             }
+    //         }).then(category => {
+    //             wh.category_id = category.category_id
+    //         })
+    //     }
+
+    // }
+
+    // if (req.body.itemName) {
+    //     if (req.body.siteLanguage == 'en') {
+    //         await db.category_items.findOne({
+    //             where: {
+    //                 category_items: req.body.itemName
+    //             }
+    //         }).then(item => {
+    //             wh.category_items_id = item.category_items_id
+    //         })
+    //     } else {
+    //         await db.category_items.findOne({
+    //             where: {
+    //                 category_items_arabic_name: req.body.itemName
+    //             }
+    //         }).then(item => {
+    //             wh.category_items_id = item.category_items_id
+    //         })
+    //     }
+
+    // }
+
+    // await db.products.findAll({
+    //     where: wh
+    // }).then(products => {
+    //     res.json({
+    //         message: 'products Found',
+    //         data: products
+    //     })
+
+    // })
 
 })
 
