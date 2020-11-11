@@ -244,13 +244,13 @@ db.products_reviews.belongsTo(db.products, {
   foreignKey: "product_id",
 });
 
-db.product_categories.hasMany(db.category_items, {
-  foreignKey: "category_id",
-});
+// db.product_categories.hasMany(db.category_items, {
+//   foreignKey: "category_id",
+// });
 
-db.category_items.belongsTo(db.product_categories, {
-  foreignKey: "category_id",
-});
+// db.category_items.belongsTo(db.product_categories, {
+//   foreignKey: "category_id",
+// });
 db.users.hasMany(
   db.suppliers_reviews,
   {
@@ -274,12 +274,12 @@ db.suppliers_reviews.belongsTo(db.users, {
   foreignKey: "supplier_id",
 });
 
-db.category_items.hasMany(db.products, {
-  foreignKey: "category_items_id",
-});
-db.products.belongsTo(db.category_items, {
-  foreignKey: "category_items_id",
-});
+// db.category_items.hasMany(db.products, {
+//   foreignKey: "category_items_id",
+// });
+// db.products.belongsTo(db.category_items, {
+//   foreignKey: "category_items_id",
+// });
 
 db.users.hasMany(
   db.categories_request,
