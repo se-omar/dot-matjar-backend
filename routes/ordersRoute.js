@@ -104,7 +104,7 @@ router.post('/api/createOrder', async (req, res) => {
             }
         }).then(product => {
             if (!product) {
-                return res.send('product not found')
+                return res.json({message:'product not found'})
             }
 
             product.update({

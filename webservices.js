@@ -44,6 +44,9 @@ app.use(adminRoute);
 const categoriesRoute = require("./routes/categoriesRoute.js");
 app.use(categoriesRoute);
 
+const shipping_companiesRoute = require("./routes/shipping_companiesRoute.js")
+app.use(shipping_companiesRoute)
+
 const products = require("./models/products");
 
 const date = new Date();

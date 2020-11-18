@@ -1,7 +1,7 @@
 const suppliers_items = require("./models/suppliers_items");
 
 const Seq = require("sequelize").Sequelize;
-const sequelize = new Seq("dot-matjar-db", "root", "", {
+const sequelize = new Seq("dotmatjardb", "root", "", {
   host: "localhost",
   dialect: "mysql",
   define: {
@@ -30,6 +30,9 @@ const db = {
   suppliers_items: sequelize.import("./models/suppliers_items.js"),
   available_countries: sequelize.import("./models/available_countries.js"),
   categories_closure: sequelize.import("./models/categories_closure.js"),
+  shipping_companies: sequelize.import("./models/shipping_companies"),
+  shipping_rate : sequelize.import ("./models/shipping_rate"),
+  collection_rate : sequelize.import("./models/collection_rate"),
   suppliers_categories_closure: sequelize.import(
     "./models/suppliers_categories_closure.js"
   ),
@@ -322,6 +325,31 @@ db.category_items.hasMany(db.suppliers_items, {
 db.suppliers_items.belongsTo(db.category_items, {
   foreignKey: "category_items_id",
 });
+
+
+db.shipping_companies.hasMany(db.shipping_rate , {
+  foreignKey:"shipping_companies_id"
+},
+{
+  onDelete: 'CASCADE',
+  hooks:true
+})
+
+db.shipping_rate.belongsTo(db.shipping_companies , {
+  foreignKey:"shipping_companies_id"
+})
+
+
+db.shipping_companies.hasMany(db.collection_rate , {
+  foreignKey:"shipping_companies_id"
+},{
+  onDelete: 'CASCADE',
+  hooks:true
+})
+
+db.collection_rate.belongsTo(db.shipping_companies , {
+  foreignKey:"shipping_companies_id"
+})
 
 // db.users.hasOne(db.supplier_page_info)
 
