@@ -90,7 +90,7 @@ router.put('/api/updateShippingCompany',(req,res)=>{
                 shipping_companies_id : company.shipping_companies_id
             }
         }).then(companyShippingRate =>{
-companyShippingRate .update({
+companyShippingRate.update({
     country : req.body.country,
     rate : req.body.shipping_rate , 
     governorate : req.body.governorate,
@@ -104,8 +104,8 @@ companyShippingRate .update({
         }).then(collectionRate=>{
             collectionRate.update({
                 amount  : req.body.amount ,
-               collection_rate : req.body.collection_rate,
-                shipping_companies_id : company.shipping_companies_id
+               collection_rate : req.body.collection_rate
+               
             })
         })
     })
@@ -118,8 +118,13 @@ router.put('/api/getDefaultCompany',(req,res)=>{
         },
         include:[{model : db.collection_rate},{model:db.shipping_rate}]
     }).then(company=>{
-res.json({data: company , Message:'default company found'})
+        if(company)res.json({data: company , Message:'default company found'})
+else res.json({ Message:'No company FOUND'})
     })
 })
+
+
+
+
 
 module.exports = router;
