@@ -264,7 +264,6 @@ router.post("/api/product", upload2.array("file", 12), async (req, res, next) =>
             min_units_per_order: req.body.min_units_per_order,
             unit_price: req.body.unit_price,
             size: req.body.size,
-            color: req.body.color,
             description: req.body.describtion,
             unit_weight: req.body.unit_weight,
             has_discount: req.body.has_discount,
@@ -276,6 +275,18 @@ router.post("/api/product", upload2.array("file", 12), async (req, res, next) =>
             extra_picture2: req.files[2] ? req.files[2].path.substr(11) : null,
             currency: req.body.currency,
         })
+
+    var colors = req.body.colors.split(',');
+    if (colors && colors.length > 0) {
+        for (var i = 0; i < colors.length; i++) {
+            await db.products_colors.create({
+                product_id: product.product_id,
+                color: colors[i]
+            })
+        }
+
+    }
+
 
     var parentId = cat.parent_id
     var catId = cat.category_id
@@ -307,40 +318,7 @@ router.post("/api/product", upload2.array("file", 12), async (req, res, next) =>
     res.send('product added successfully')
 });
 
-router.post("/api/updateProduct", upload2.array("file", 12), (req, res, next) => {
-    console.log("uploaded file", req.files);
-    db.products
-        .findOne({
-            currency: req.body.currency,
-        })
-        .then(async (product) => {
-            db.categories_closure.create({
-                product_id: product.product_id,
-                category_id: cat.category_id,
-            });
-            if (cat.parent_id) {
-                db.categories_closure.create({
-                    product_id: product.product_id,
-                    category_id: cat.parent_id,
-                });
-                var categoryItem = await db.product_categories.findOne({
-                    where: {
-                        category_id: cat.parent_id,
-                    },
-                });
-                if (categoryItem.parent_id) {
-                    db.categories_closure.create({
-                        product_id: product.product_id,
-                        category_id: categoryItem.parent_id,
-                    });
-                }
-            }
-            // res.send(product)
-            res.json({ data: product });
-        });
-});
-
-router.post("/api/updateProduct", upload2.array("file", 12), (req, res, next) => {
+router.post("/api/updateProduct", upload2.array("file", 12), async (req, res, next) => {
     console.log("uploaded file", req.files);
     db.products
         .findOne({
@@ -359,8 +337,7 @@ router.post("/api/updateProduct", upload2.array("file", 12), (req, res, next) =>
                         min_units_per_order: req.body.min_units_per_order,
                         unit_price: req.body.unit_price,
                         size: req.body.size,
-                        color: req.body.color,
-                        describtion: req.body.describtion,
+                        description: req.body.description,
                         unit_weight: req.body.unit_weight,
                         has_discount: req.body.has_discount,
                         discount_amount: req.body.discount_amount,
@@ -384,6 +361,20 @@ router.post("/api/updateProduct", upload2.array("file", 12), (req, res, next) =>
                 res.send("cant find product");
             }
         });
+
+    await db.products_colors.destroy({
+        where: {
+            product_id: req.body.product_id
+        }
+    })
+    var colors = req.body.colors.split(",")
+    for (var i = 0; i < colors.length; i++) {
+        await db.products_colors.create({
+            product_id: req.body.product_id,
+            color: colors[i]
+        })
+    }
+
 });
 
 router.delete("/api/removeProduct/:product_id", (req, res) => {
@@ -1059,7 +1050,7 @@ router.put("/api/categoryAndItemRequestStatus", async (req, res) => {
                             category_name: req.body.newCategoryName,
                             description: req.body.newCategoryDescription,
                             category_arabic_name: req.body.categoryArabicName,
-                            parent_id : req.body.parent_id
+                            parent_id: req.body.parent_id
                         })
                         .then(res.json({ message: `Request ${req.body.status} Successfully` }));
                 } else {
@@ -1124,5 +1115,23 @@ router.put("/api/getAvailableCountries", (req, res) => {
         res.json({ data: countries });
     });
 });
+
+router.post("/api/getProductColors", (req, res) => {
+    db.products_colors.findAll({
+        where: {
+            product_id: req.body.product_id
+        }
+    }).then(rows => {
+        var colors = []
+        if (rows.length > 0) {
+            for (var i = 0; i < rows.length; i++) {
+                colors.push(rows[i].color)
+            }
+        }
+        res.json({
+            colors
+        })
+    })
+})
 
 module.exports = router;

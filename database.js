@@ -1,7 +1,7 @@
 const suppliers_items = require("./models/suppliers_items");
 
 const Seq = require("sequelize").Sequelize;
-const sequelize = new Seq("dotmatjardb", "root", "", {
+const sequelize = new Seq("dotmatjardb2", "root", "", {
   host: "localhost",
   dialect: "mysql",
   define: {
@@ -31,11 +31,12 @@ const db = {
   available_countries: sequelize.import("./models/available_countries.js"),
   categories_closure: sequelize.import("./models/categories_closure.js"),
   shipping_companies: sequelize.import("./models/shipping_companies"),
-  shipping_rate : sequelize.import ("./models/shipping_rate"),
-  collection_rate : sequelize.import("./models/collection_rate"),
+  shipping_rate: sequelize.import("./models/shipping_rate"),
+  collection_rate: sequelize.import("./models/collection_rate"),
   suppliers_categories_closure: sequelize.import(
     "./models/suppliers_categories_closure.js"
   ),
+  products_colors: sequelize.import("./models/products_colors"),
 };
 
 db.users.hasMany(
@@ -327,28 +328,28 @@ db.suppliers_items.belongsTo(db.category_items, {
 });
 
 
-db.shipping_companies.hasMany(db.shipping_rate , {
-  foreignKey:"shipping_companies_id"
+db.shipping_companies.hasMany(db.shipping_rate, {
+  foreignKey: "shipping_companies_id"
 },
-{
+  {
+    onDelete: 'CASCADE',
+    hooks: true
+  })
+
+db.shipping_rate.belongsTo(db.shipping_companies, {
+  foreignKey: "shipping_companies_id"
+})
+
+
+db.shipping_companies.hasMany(db.collection_rate, {
+  foreignKey: "shipping_companies_id"
+}, {
   onDelete: 'CASCADE',
-  hooks:true
+  hooks: true
 })
 
-db.shipping_rate.belongsTo(db.shipping_companies , {
-  foreignKey:"shipping_companies_id"
-})
-
-
-db.shipping_companies.hasMany(db.collection_rate , {
-  foreignKey:"shipping_companies_id"
-},{
-  onDelete: 'CASCADE',
-  hooks:true
-})
-
-db.collection_rate.belongsTo(db.shipping_companies , {
-  foreignKey:"shipping_companies_id"
+db.collection_rate.belongsTo(db.shipping_companies, {
+  foreignKey: "shipping_companies_id"
 })
 
 // db.users.hasOne(db.supplier_page_info)

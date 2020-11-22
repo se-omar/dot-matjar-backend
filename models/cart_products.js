@@ -23,6 +23,10 @@ module.exports = function (sequelize, DataTypes) {
         model: 'products',
         key: 'product_id'
       }
+    },
+    product_color: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
     }
   }, {
     tableName: 'cart_products',
