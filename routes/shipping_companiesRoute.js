@@ -36,6 +36,7 @@ db.shipping_companies.findOne({
 
 
 router.post('/api/addNewShippingCompany',async (req,res)=>{
+    console.log('datataaaaa' , req.body.company_name)
     db.shipping_companies.create({
         company_name : req.body.company_name ,
         company_number : req.body.company_number,
