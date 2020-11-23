@@ -72,8 +72,17 @@ router.put('/api/showOrderProducts', async (req, res) => {
 })
 
 router.post('/api/createOrder', async (req, res) => {
-    var products = req.body.cartItems
-    console.log('quantityy', products)
+    var cart = await db.cart.findOne({
+        where: {
+            user_id: req.body.user_id
+        }
+    })
+
+    var cartProducts = await db.cart_products.findAll({
+        where: {
+            cart_id: cart.cart_id
+        },
+    })
 
     var order = await db.orders.create({
         user_id: req.body.user_id,
@@ -82,51 +91,36 @@ router.post('/api/createOrder', async (req, res) => {
         order_number: orderid.generate(),
         order_month: date.getMonth() + 1,
         order_year: date.getFullYear(),
-        total_price: req.body.totalPrice,
         country: req.body.governorate,
         city: req.body.region,
         address_line_1: req.body.address,
     })
 
-    products.forEach(async (element, index) => {
-
+    for (var i = 0; i < cartProducts.length; i++) {
         await db.products_orders.create({
             order_id: order.order_id,
             user_id: order.user_id,
-            product_id: element.product_id,
+            product_id: cartProducts[i].product_id,
             purchase_date: new Date(),
-            quantity: element.quantity
+            quantity: cartProducts[i].quantity
         })
 
-        db.products.findOne({
-            where: {
-                product_id: element.product_id
-            }
-        }).then(product => {
-            if (!product) {
-                return res.json({message:'product not found'})
-            }
+        var product = await db.products.findByPk(cartProducts[i].product_id);
 
-            product.update({
-                buy_counter: product.buy_counter + quantityArray[index],
-                quantity: product.quantity - quantityArray[index]
-            })
-
-            db.users.findOne({
-                where: {
-                    user_id: product.user_id
-                }
-            }).then(user => {
-                user.update({
-                    total_revenue: user.total_revenue + (product.unit_price * quantityArray[index]),
-                    total_sales: user.total_sales + element.quantity[index]
-                })
-            })
+        product.update({
+            buy_counter: product.buy_counter + cartProducts[i].quantity,
+            stock_remaining: product.stock_remaining - cartProducts[i].quantity
         })
 
-    })
+        var user = await db.users.findByPk(product.user_id)
+
+        await user.update({
+            total_revenue: user.total_revenue + (product.unit_price * cartProducts[i].quantity),
+            total_sales: user.total_sales + cartProducts[i].quantity
+        })
+    }
+
     res.json({ message: 'order created successfully' })
-    console.log('Data comming from frontend', req.body.cartItems, req.body.address, req.body.totalPrice, req.body.governorate, req.body.region)
 })
 
 
