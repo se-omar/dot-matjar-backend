@@ -7,7 +7,7 @@ const cors = require('cors');
 const path = require('path');
 const fs = require('fs')
 const Sequelize = require('sequelize');
-const { shipping_rate } = require('../database');
+const { shipping_rate, collection_rate } = require('../database');
 const Op = Sequelize.Op;
 
 
@@ -59,19 +59,34 @@ router.post('/api/addNewShippingCompany',async (req,res)=>{
 
 
 
-router.delete('/api/deleteShippingCompany',async (req,res)=>{
+router.put('/api/deleteShippingCompany',async (req,res)=>{
     console.log(req.body.shipping_companies_id)
 db.shipping_companies.findOne({
     where:{ 
         shipping_companies_id : req.body.shipping_companies_id
     }
-}).then(company=>{
+}).then( async company=>{
 company.destroy();
     res.json({message : 'company data deleted successfully'})
+var collectionRate = await db.collection_rate.findAll({
+    where:{
+        shipping_companies_id : company.shipping_companies_id
+    }
+})
+var shippingRate = await db.shipping_rate.findAll({
+    where:{
+        shipping_companies_id : company.shipping_companies_id
+
+    }
+})
+shippingRate.destroy()
+collectionRate.destroy()
+
 })
 })
 
-router.put('/api/updateShippingCompany',(req,res)=>{
+router.put('/api/updateShippingCompany',async(req,res)=>{
+    if(req.body.shipping_companies_id){
     db.shipping_companies.findOne({
         where:{
             shipping_companies_id: req.body.shipping_companies_id
@@ -85,21 +100,30 @@ router.put('/api/updateShippingCompany',(req,res)=>{
              company_address3 : req.body.company_address3 
              
         })
-        await db.shipping_rate.findone({
+        res.json({message:"Updated Successfully"})
+    })
+}
+if(req.body.rate_id){
+        await db.shipping_rate.findOne({
             where:{
-                shipping_companies_id : company.shipping_companies_id
+                rate_id : req.body.rate_id
             }
         }).then(companyShippingRate =>{
 companyShippingRate.update({
     country : req.body.country,
     rate : req.body.shipping_rate , 
     governorate : req.body.governorate,
-    shipping_companies_id : company.shipping_companies_id
+   
 })
+res.json({message:"Updated Successfully"})
         })
+    }
+    if(req.body.collection_id){
+
+    
         db.collection_rate.findOne({
             where:{
-                shipping_companies_id : company.shipping_companies_id
+                collection_id : req.body.collection_id
             }
         }).then(collectionRate=>{
             collectionRate.update({
@@ -107,8 +131,10 @@ companyShippingRate.update({
                collection_rate : req.body.collection_rate
                
             })
+            res.json({message:"Updated Successfully"})
         })
-    })
+    }
+   
 })
 
 router.put('/api/getDefaultCompany',(req,res)=>{

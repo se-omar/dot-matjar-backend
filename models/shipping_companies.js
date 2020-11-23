@@ -13,7 +13,7 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: true
     },
     company_number: {
-      type: DataTypes.INTEGER(15),
+      type: DataTypes.INTEGER(20),
       allowNull: true
     },
     company_address1: {
