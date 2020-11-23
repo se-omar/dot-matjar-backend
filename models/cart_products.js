@@ -27,7 +27,11 @@ module.exports = function (sequelize, DataTypes) {
     product_color: {
       type: DataTypes.STRING(255),
       allowNull: true,
-    }
+    },
+    quantity: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true,
+    },
   }, {
     tableName: 'cart_products',
   });

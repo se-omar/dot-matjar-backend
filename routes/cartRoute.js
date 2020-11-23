@@ -5,6 +5,7 @@ const db = require('../database');
 const bodyParser = require('body-parser');
 const cors = require('cors');
 const crypto = require('crypto');
+const { sequelize } = require('../database');
 const orderid = require('order-id')('mysecret')
 const endpointSecret = 'whsec_cBcdnKIKvB73t8hltToBCAjZtQWhabds';
 var date = new Date();
@@ -225,7 +226,8 @@ router.post('/api/addProductToCart', async (req, res) => {
             db.cart_products.create({
                 cart_id: cart.cart_id,
                 product_id: req.body.product_id,
-                product_color: req.body.color
+                product_color: req.body.color,
+                quantity: 1
             })
             res.json({
                 message: "product added successfully"
@@ -298,6 +300,32 @@ router.put('/api/cleanCart', async (req, res) => {
         })
     })
 
+})
+
+router.post('/api/iterateCartProductQuantity', async (req, res) => {
+    if (req.body.type == 1) {
+        db.cart_products.update({
+            quantity: sequelize.literal('quantity + 1')
+        },
+            {
+                where: {
+                    cart_products_id: req.body.cart_products_id
+                }
+            })
+    } else if (req.body.type == 2) {
+        db.cart_products.update({
+            quantity: sequelize.literal('quantity - 1')
+        },
+            {
+                where: {
+                    cart_products_id: req.body.cart_products_id
+                }
+            })
+    } else {
+        res.json({
+            message: 'an error occured'
+        })
+    }
 })
 
 

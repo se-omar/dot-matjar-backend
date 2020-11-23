@@ -63,10 +63,6 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true
     },
-    color: {
-      type: DataTypes.STRING(255),
-      allowNull: true
-    },
     unit_weight: {
       type: DataTypes.INTEGER(10),
       allowNull: true
@@ -111,11 +107,6 @@ module.exports = function (sequelize, DataTypes) {
         key: 'cart_id'
       }
     },
-    quantity: {
-      type: DataTypes.INTEGER(11),
-      allowNull: false,
-      defaultValue: '1'
-    },
     in_cart: {
       type: DataTypes.INTEGER(1),
       allowNull: false,
@@ -130,7 +121,6 @@ module.exports = function (sequelize, DataTypes) {
       allowNull: false,
       defaultValue: 0
     },
-
     buy_counter: {
       type: DataTypes.INTEGER(11),
       allowNull: false,
@@ -165,7 +155,11 @@ module.exports = function (sequelize, DataTypes) {
     condition: {
       type: DataTypes.STRING(255),
       allowNull: true
-    }
+    },
+    stock_remaining: {
+      type: DataTypes.INTEGER(11),
+      allowNull: true,
+    },
 
   }, {
     tableName: 'products',
