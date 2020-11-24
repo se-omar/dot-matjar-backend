@@ -57,7 +57,7 @@ var collectionTable = req.body.collectionTable
         company_address2 : req.body.company_address2,
         company_address3 : req.body.company_address3
     }).then (async company =>{
-        for(let i=0 ; i<req.body.shippingTable.length ; i++){
+        for(let i=0 ; i<shippingTable.length ; i++){
             await db.shipping_rate.create({
                 country : shippingTable[i].country,
                 shipping_rate : shippingTable[i].shipping_rate , 
@@ -65,7 +65,7 @@ var collectionTable = req.body.collectionTable
                 shipping_companies_id : company.shipping_companies_id
             })
         }
-       for(let x=0 ; x<req.body.collectionTable.length; x++){
+       for(let x=0 ; x<collectionTable.length; x++){
         await db.collection_rate.create({
             amount  : collectionTable[x].amount,
            collection_rate : collectionTable[x].collection_rate,
