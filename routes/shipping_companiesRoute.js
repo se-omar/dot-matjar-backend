@@ -22,6 +22,15 @@ router.get('/api/getAllShippingCompanies',async(req,res)=>{
 })
 
 router.put('/api/updateDefaultShippingCompany',async (req,res)=>{
+ 
+   var def= await db.shipping_companies.findOne({
+        where:{
+            default: 'TRUE'
+        }
+    })
+   def.update({
+default : null
+    })
 db.shipping_companies.findOne({
     where:{
         shipping_companies_id : req.body.shipping_companies_id
@@ -31,12 +40,16 @@ db.shipping_companies.findOne({
         default : 'TRUE'
 
     })
+    res.json({mesage : "default Company updated"})
 })
 })
 
 
 router.post('/api/addNewShippingCompany',async (req,res)=>{
-    console.log('datataaaaa' , req.body.company_name)
+    console.log('datataaaaa' , req.body.shippingTable)
+    console.log('datataaaaa' , req.body.collectionTable)
+var shippingTable = req.body.shippingTable
+var collectionTable = req.body.collectionTable
     db.shipping_companies.create({
         company_name : req.body.company_name ,
         company_number : req.body.company_number,
@@ -44,17 +57,24 @@ router.post('/api/addNewShippingCompany',async (req,res)=>{
         company_address2 : req.body.company_address2,
         company_address3 : req.body.company_address3
     }).then (async company =>{
-        await db.shipping_rate.create({
-            country : req.body.country,
-            shipping_rate : req.body.shipping_rate , 
-            governorate : req.body.governorate,
-            shipping_companies_id : company.shipping_companies_id
-        })
-        await db.collection_rate.create({
-                amount  : req.body.amount ,
-               collection_rate : req.body.collection_rate,
+        for(let i=0 ; i<req.body.shippingTable.length ; i++){
+            await db.shipping_rate.create({
+                country : shippingTable[i].country,
+                shipping_rate : shippingTable[i].shipping_rate , 
+                governorate : shippingTable[i].governorate,
                 shipping_companies_id : company.shipping_companies_id
-        })
+            })
+        }
+       for(let x=0 ; x<req.body.collectionTable.length; x++){
+        await db.collection_rate.create({
+            amount  : collectionTable[x].amount,
+           collection_rate : collectionTable[x].collection_rate,
+            shipping_companies_id : company.shipping_companies_id
+    })
+       }
+        res.json({message : 'Company is added successfully'})
+    }).catch(err=>{
+        res.json({message:'Error occurred'})
     })
 })
 
