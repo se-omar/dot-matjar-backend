@@ -40,6 +40,10 @@ module.exports = function (sequelize, DataTypes) {
       type: DataTypes.STRING(255),
       allowNull: true,
     },
+    product_color: {
+      type: DataTypes.STRING(255),
+      allowNull: true,
+    }
   }, {
     tableName: 'products_orders'
   });

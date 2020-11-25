@@ -102,7 +102,8 @@ router.post('/api/createOrder', async (req, res) => {
             user_id: order.user_id,
             product_id: cartProducts[i].product_id,
             purchase_date: new Date(),
-            quantity: cartProducts[i].quantity
+            quantity: cartProducts[i].quantity,
+            product_color: cartProducts[i].product_color
         })
 
         var product = await db.products.findByPk(cartProducts[i].product_id);
