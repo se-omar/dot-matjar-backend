@@ -690,6 +690,7 @@ router.put("/api/updateProductStatus", async (req, res) => {
         where: {
             order_id: req.body.orderId,
             product_id: req.body.productId,
+            product_color: req.body.productColor
         },
     });
     if (orderedProduct) {

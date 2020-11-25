@@ -37,17 +37,17 @@ router.put('/api/supplierProducts/', (req, res) => {
 
     console.log('user id issss', req.body.user_id)
     db.products.findAll({
-            where: {
-                user_id: req.body.user_id
-            },
-            include: [{
-                model: db.business
-            }, {
-                model: db.users
-            }, {
-                model: db.product_categories
-            }]
-        })
+        where: {
+            user_id: req.body.user_id
+        },
+        include: [{
+            model: db.business
+        }, {
+            model: db.users
+        }, {
+            model: db.product_categories
+        }]
+    })
         .then(products => {
 
             res.json({
@@ -229,19 +229,19 @@ router.post('/api/loadMoreSuppliersWithFilter', (req, res) => {
     } else {
         console.log('both search')
         db.users.findAll({
-                where: {
-                    user_id: {
-                        [Op.gt]: req.body.user_id
-                    },
-                    user_type: 'business',
-                    governorate: req.body.governorate,
-                    full_arabic_name: {
-                        [Op.substring]: req.body.name
-                    },
-                    region: req.body.region
+            where: {
+                user_id: {
+                    [Op.gt]: req.body.user_id
                 },
-                limit: 10
-            })
+                user_type: 'business',
+                governorate: req.body.governorate,
+                full_arabic_name: {
+                    [Op.substring]: req.body.name
+                },
+                region: req.body.region
+            },
+            limit: 10
+        })
             .then(users => {
                 if (!users) {
                     res.json({
@@ -260,15 +260,23 @@ router.post('/api/loadMoreSuppliersWithFilter', (req, res) => {
 router.put('/api/supplierProductsInOrder', async (req, res) => {
     db.orders.findAll({
         include: [{
-                model: db.users
+            model: db.users
+        },
+        {
+            model: db.products,
+            where: {
+                user_id: req.body.user_id
             },
-            {
+        },
+        {
+            model: db.products_orders,
+            include: [{
                 model: db.products,
                 where: {
                     user_id: req.body.user_id
-                },
-
-            },
+                }
+            }]
+        },
         ]
     }).then(orders => {
 
@@ -440,47 +448,47 @@ router.put('/api/acceptSupplierRequest', async (req, res) => {
 
 
 router.put('/api/filterSupplierProducts', async (req, res) => {
-var supplierFilteredProducts =[]
-var product;
+    var supplierFilteredProducts = []
+    var product;
     var wh = {}
-    if(req.body.searchType == 'category'){
-console.log('filter products with category')
-    
-var categoryId = req.body.categoryArray[0].id
-    wh.user_id = req.body.supplier_id
-    
+    if (req.body.searchType == 'category') {
+        console.log('filter products with category')
 
-    var categoryClosure = await db.categories_closure.findAll({
-        where:{
-            category_id : categoryId
-        }
-    })
-if(categoryClosure){
-    for(let i=0 ; i<categoryClosure.length ; i++){
-product = await db.products.findOne({
-    where:{
-        product_id : categoryClosure[i].product_id
-    }
-})
+        var categoryId = req.body.categoryArray[0].id
+        wh.user_id = req.body.supplier_id
 
-if(product && product.user_id == req.body.supplier_id){
-supplierFilteredProducts.push(product)
-}
-    }
-}
-res.json({message : 'products found' , data:supplierFilteredProducts})
-    }
-    if(req.body.searchType == 'name'){
-        console.log('filter by name entered')
-        db.products.findAll({
-            where:{
-                user_id:req.body.supplier_id,
-                product_name : {
-                    [Op.substring]:req.body.productsSearch
+
+        var categoryClosure = await db.categories_closure.findAll({
+            where: {
+                category_id: categoryId
+            }
+        })
+        if (categoryClosure) {
+            for (let i = 0; i < categoryClosure.length; i++) {
+                product = await db.products.findOne({
+                    where: {
+                        product_id: categoryClosure[i].product_id
+                    }
+                })
+
+                if (product && product.user_id == req.body.supplier_id) {
+                    supplierFilteredProducts.push(product)
                 }
             }
-        }).then(products=>{
-            res.json({data:products , message :"Products Found"})
+        }
+        res.json({ message: 'products found', data: supplierFilteredProducts })
+    }
+    if (req.body.searchType == 'name') {
+        console.log('filter by name entered')
+        db.products.findAll({
+            where: {
+                user_id: req.body.supplier_id,
+                product_name: {
+                    [Op.substring]: req.body.productsSearch
+                }
+            }
+        }).then(products => {
+            res.json({ data: products, message: "Products Found" })
         })
     }
     // if (req.body.productsSearch) {
@@ -733,7 +741,7 @@ router.put('/api/getSupplierCategoriesAndItems', async (req, res) => {
 
                 }
 
-                categoryArray.push(...row.sort((a,b)=>{
+                categoryArray.push(...row.sort((a, b) => {
                     return a.parentId - b.parentId
                 }))
                 await supplierCategoryTree(null)
@@ -745,7 +753,7 @@ router.put('/api/getSupplierCategoriesAndItems', async (req, res) => {
             res.json({
                 data1: treeAr,
                 data2: treeAr,
-                categoryArray: categoryArray.sort((a, b)=>{
+                categoryArray: categoryArray.sort((a, b) => {
                     return a.parentId - b.parentId
                 })
             })
@@ -787,19 +795,19 @@ async function getCategoryParents(id) {
 
 }
 
-var parentcat=[]
+var parentcat = []
 async function supplierCategoryTree(parentId, parentRow) {
     var p;
     var i;
 
-       for (let x=0 ; x<categoryArray.length; x++){
-           if(categoryArray[x].parentId == parentId){
+    for (let x = 0; x < categoryArray.length; x++) {
+        if (categoryArray[x].parentId == parentId) {
             parentcat.push(categoryArray[x])
-           }
-       }
+        }
+    }
 
-    for (let i =0;i<parentcat.length;i++) {
-       
+    for (let i = 0; i < parentcat.length; i++) {
+
         p = {
             id: parentcat[i].id,
             name: parentcat[i].name,
@@ -811,9 +819,9 @@ async function supplierCategoryTree(parentId, parentRow) {
             if (!parentRow.children) parentRow.children = [];
             parentRow.children.push(p);
         }
- 
+
         await supplierCategoryTree(p.id, p);
-        
+
     }
 
 }
