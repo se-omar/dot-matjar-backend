@@ -270,9 +270,9 @@ router.post("/api/product", upload2.array("file", 12), async (req, res, next) =>
             discount_amount: req.body.discount_amount,
             availability: req.body.availability,
             product_rating: req.body.product_rating,
-            main_picture: req.files[0] ? req.files[0].path.substr(11) : null,
-            extra_picture1: req.files[1] ? req.files[1].path.substr(11) : null,
-            extra_picture2: req.files[2] ? req.files[2].path.substr(11) : null,
+            main_picture: req.files[0] ? req.files[0].path.substr(10) : null,
+            extra_picture1: req.files[1] ? req.files[1].path.substr(10) : null,
+            extra_picture2: req.files[2] ? req.files[2].path.substr(10) : null,
             currency: req.body.currency,
         })
 
@@ -690,6 +690,7 @@ router.put("/api/updateProductStatus", async (req, res) => {
         where: {
             order_id: req.body.orderId,
             product_id: req.body.productId,
+            product_color: req.body.productColor
         },
     });
     if (orderedProduct) {

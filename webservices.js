@@ -138,19 +138,21 @@ app.post("/api/testapi2", (req, res) => {
 //     res.send('records created')
 // })
 
-app.post("/api/editAllProducts", (req, res) => {
-  db.products.update(
+app.post("/api/editAllProducts", async (req, res) => {
+  await db.products.update(
     {
-      main_picture: "https://picsum.photos/450",
+      extra_picture1: "/productImages/all-cat.jpg",
+      extra_picture2: "/productImages/bmw-cat.jpg",
     },
     {
       where: {
         product_id: {
-          [Op.gte]: 19,
-        },
-      },
+          [Op.gte]: 18
+        }
+      }
     }
   );
+  res.send('successful')
 });
 
 app.put("/api/generateProducts", (req, res) => {
