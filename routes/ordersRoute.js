@@ -72,6 +72,7 @@ router.put('/api/showOrderProducts', async (req, res) => {
 })
 
 router.post('/api/createOrder', async (req, res) => {
+    var quantities = req.body.productsQuantities
     var cart = await db.cart.findOne({
         where: {
             user_id: req.body.user_id
@@ -83,6 +84,16 @@ router.post('/api/createOrder', async (req, res) => {
             cart_id: cart.cart_id
         },
     })
+
+    for (var k = 0; k < cartProducts.length; k++) {
+        await db.cart_products.update({
+            quantity: quantities[k]
+        }, {
+            where: {
+                cart_products_id: cartProducts[k].cart_products_id
+            }
+        })
+    }
 
     var order = await db.orders.create({
         user_id: req.body.user_id,
@@ -102,22 +113,22 @@ router.post('/api/createOrder', async (req, res) => {
             user_id: order.user_id,
             product_id: cartProducts[i].product_id,
             purchase_date: new Date(),
-            quantity: cartProducts[i].quantity,
+            quantity: quantities[i],
             product_color: cartProducts[i].product_color
         })
 
         var product = await db.products.findByPk(cartProducts[i].product_id);
 
         product.update({
-            buy_counter: product.buy_counter + cartProducts[i].quantity,
-            stock_remaining: product.stock_remaining - cartProducts[i].quantity
+            buy_counter: product.buy_counter + quantities[i],
+            stock_remaining: product.stock_remaining - quantities[i]
         })
 
         var user = await db.users.findByPk(product.user_id)
 
         await user.update({
-            total_revenue: user.total_revenue + (product.unit_price * cartProducts[i].quantity),
-            total_sales: user.total_sales + cartProducts[i].quantity
+            total_revenue: user.total_revenue + (product.unit_price * quantities[i]),
+            total_sales: user.total_sales + quantities[i]
         })
     }
 
