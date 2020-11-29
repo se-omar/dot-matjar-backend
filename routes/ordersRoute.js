@@ -166,7 +166,8 @@ var orders =await  db.orders.findAll({
     order = await db.orders.findOne({
         where:{
             order_id : orders[orders.length-1].order_id
-        }
+        },
+        include:[{model:db.users}]
         
     })
     productsInOrder = await db.products_orders.findAll({
@@ -182,7 +183,8 @@ var orders =await  db.orders.findAll({
 order = await db.orders.findOne({
     where:{
         order_id : req.body.order_id
-    }
+    },
+    include:[{model:db.users}]
 })
 productsInOrder = await db.products_orders.findAll({
     where:{
