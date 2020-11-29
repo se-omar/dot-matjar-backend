@@ -40,7 +40,7 @@ db.shipping_companies.findOne({
         default : 'TRUE'
 
     })
-    res.json({mesage : "default Company updated"})
+    res.json({message : "default Company updated"})
 })
 })
 
