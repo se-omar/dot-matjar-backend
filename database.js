@@ -1,7 +1,7 @@
 const suppliers_items = require("./models/suppliers_items");
 
 const Seq = require("sequelize").Sequelize;
-const sequelize = new Seq("dot-matjar-db5", "root", "", {
+const sequelize = new Seq("dotmatjardb2", "root", "", {
   host: "localhost",
   dialect: "mysql",
   define: {

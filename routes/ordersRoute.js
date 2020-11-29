@@ -78,12 +78,12 @@ router.post('/api/createOrder', async (req, res) => {
             user_id: req.body.user_id
         }
     })
-if(!cart){
-    var cart = await db.cart.create({
-        user_id : req.body.user_id,
-        cart_activity : 1
-    })
-}
+    if (!cart) {
+        var cart = await db.cart.create({
+            user_id: req.body.user_id,
+            cart_activity: 1
+        })
+    }
     var cartProducts = await db.cart_products.findAll({
         where: {
             cart_id: cart.cart_id
@@ -110,7 +110,7 @@ if(!cart){
         country: req.body.governorate,
         city: req.body.region,
         address_line_1: req.body.address,
-        total_price : req.body.total_price
+        total_price: req.body.total_price
     })
 
     for (var i = 0; i < cartProducts.length; i++) {
@@ -159,53 +159,66 @@ router.put('/api/getCategoryItems', async (req, res) => {
 })
 
 
-router.put('/api/getOrder' , async(req,res)=>{
+router.put('/api/getOrder', async (req, res) => {
     var order;
     var productsInOrder;
 
 
-    console.log('idddddddddddd',req.body.user_id)
-    if (!req.body.order_id){
-        
-var orders =await  db.orders.findAll({
-    where:{
-        user_id : req.body.user_id
-    }
-   
-})
-   
-    order = await db.orders.findOne({
-        where:{
-            order_id : orders[orders.length-1].order_id
-        },
-        include:[{model:db.users}]
-        
-    })
-    productsInOrder = await db.products_orders.findAll({
-        where:{
-            order_id : order.order_id
-        },
-        include:[{model:db.products}]
-    })
- 
+    console.log('idddddddddddd', req.body.user_id)
+    if (!req.body.order_id) {
+
+        var orders = await db.orders.findAll({
+            where: {
+                user_id: req.body.user_id
+            }
+
+        })
+
+        order = await db.orders.findOne({
+            where: {
+                order_id: orders[orders.length - 1].order_id
+            },
+            include: [{ model: db.users }]
+
+        })
+        productsInOrder = await db.products_orders.findAll({
+            where: {
+                order_id: order.order_id
+            },
+            include: [{ model: db.products }]
+        })
+
 
     }
-    else if(req.body.order_id){
-order = await db.orders.findOne({
-    where:{
-        order_id : req.body.order_id
-    },
-    include:[{model:db.users}]
-})
-productsInOrder = await db.products_orders.findAll({
-    where:{
-        order_id : order.order_id
-    },
-    include:[{model:db.products}]
-})
+    else if (req.body.order_id) {
+        order = await db.orders.findOne({
+            where: {
+                order_id: req.body.order_id
+            },
+            include: [{ model: db.users }]
+        })
+        productsInOrder = await db.products_orders.findAll({
+            where: {
+                order_id: order.order_id
+            },
+            include: [{ model: db.products }]
+        })
 
     }
-res.json({order :order, productsInOrder : productsInOrder , message:'Order Found'})
+    res.json({ order: order, productsInOrder: productsInOrder, message: 'Order Found' })
+})
+
+router.post('/api/getShippingRateForCountry', (req, res) => {
+    db.shipping_rate.findOne({
+        where: {
+            shipping_companies_id: 1,
+            governorate: req.body.country ? req.body.country : "القاهرة"
+        }
+    }).then(row => {
+        res.json({
+            shippingRate: row.shipping_rate
+        })
+    })
 })
 
 

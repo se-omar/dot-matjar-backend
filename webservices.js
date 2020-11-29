@@ -81,9 +81,9 @@ app.use(function (req, res, next) {
   next();
 });
 
-app.post("/api/testapi1", (req, res) => {
+app.post("/api/testapidate", (req, res) => {
   res.json({
-    message: "sent message 1",
+    message: "date: 29/11/2020",
   });
 });
 
