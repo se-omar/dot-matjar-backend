@@ -56,13 +56,15 @@ var collectionTable = req.body.collectionTable
         company_address1 : req.body.company_address1,
         company_address2 : req.body.company_address2,
         company_address3 : req.body.company_address3
+        
     }).then (async company =>{
         for(let i=0 ; i<shippingTable.length ; i++){
             await db.shipping_rate.create({
                 country : shippingTable[i].country,
                 shipping_rate : shippingTable[i].shipping_rate , 
                 governorate : shippingTable[i].governorate,
-                shipping_companies_id : company.shipping_companies_id
+                shipping_companies_id : company.shipping_companies_id,
+                region:shippingTable[i].region
             })
         }
        for(let x=0 ; x<collectionTable.length; x++){
@@ -134,7 +136,7 @@ companyShippingRate.update({
     country : req.body.country,
     rate : req.body.shipping_rate , 
     governorate : req.body.governorate,
-   
+   region:req.body.region
 })
 res.json({message:"Updated Successfully"})
         })
@@ -171,7 +173,70 @@ else res.json({ Message:'No company FOUND'})
 })
 
 
+router.put('/api/addRemoveShipingRate' , async(req,res)=>{
+    console.log(req.body.shipping_companies_id)
+    var shippingTable=req.body.shippingTable
+   
+    //add shippnig rate
+    if(shippingTable){
+        var company = await db.shipping_companies.findOne({
+            where:{
+                shipping_companies_id:req.body.shipping_companies_id
+            }
+        })
+        for(let i=0 ; i<shippingTable.length ; i++){
+        
+            await db.shipping_rate.create({
+                country : shippingTable[i].country,
+                shipping_rate : shippingTable[i].shipping_rate , 
+                governorate : shippingTable[i].governorate,
+                shipping_companies_id : company.shipping_companies_id,
+                region:shippingTable[i].region
+            })
+        }
+    }
+   
+    //remove shipping Rate
+    else{
+db.shipping_rate.findOne({
+    where:{
+        rate_id : req.body.rate_id
+    }
+}).then(row=>{
+row.destroy();
+res.json({message:'Shipping rate deleted successfully'})
+})
+    }
+})
 
+
+router.put('/api/addRemoveCollectionRate',async(req,res)=>{
+    var collectionTable= req.body.collectionTable
+if(collectionsTable){
+    var company=await db.shipping_companies.findOne({
+        where:{
+            shipping_companies_id:req.body.shipping_companies_id
+        }
+    })
+    for(let x=0 ; x<collectionTable.length; x++){
+        await db.collection_rate.create({
+            amount  : collectionTable[x].amount,
+           collection_rate : collectionTable[x].collection_rate,
+            shipping_companies_id : company.shipping_companies_id
+    })
+}
+}
+else{
+    db.collection_rate.findOne({
+        where:{
+            collection_id:req.body.collection_id
+        }
+    }).then(row=>{
+        row.destroy();
+        res.json({message:"Collection data removed"})
+    })
+}
+})
 
 
 module.exports = router;
