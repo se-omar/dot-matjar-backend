@@ -127,6 +127,7 @@ router.put('/api/updateShippingCompany',async(req,res)=>{
     })
 }
 if(req.body.rate_id){
+    console.log('shipping data : ' ,req.body.shipping_rate ,req.body.governorate,req.body.region)
         await db.shipping_rate.findOne({
             where:{
                 rate_id : req.body.rate_id
@@ -134,9 +135,9 @@ if(req.body.rate_id){
         }).then(companyShippingRate =>{
 companyShippingRate.update({
     country : req.body.country,
-    rate : req.body.shipping_rate , 
+    shipping_rate : req.body.shipping_rate , 
     governorate : req.body.governorate,
-   region:req.body.region
+   region:req.body.region,
 })
 res.json({message:"Updated Successfully"})
         })
@@ -173,7 +174,7 @@ else res.json({ Message:'No company FOUND'})
 })
 
 
-router.put('/api/addRemoveShipingRate' , async(req,res)=>{
+router.post('/api/addOrRemoveShipingRate' , async(req,res)=>{
     console.log(req.body.shipping_companies_id)
     var shippingTable=req.body.shippingTable
    
@@ -210,9 +211,9 @@ res.json({message:'Shipping rate deleted successfully'})
 })
 
 
-router.put('/api/addRemoveCollectionRate',async(req,res)=>{
+router.post('/api/addOrRemoveCollectionRate',async(req,res)=>{
     var collectionTable= req.body.collectionTable
-if(collectionsTable){
+if(collectionTable){
     var company=await db.shipping_companies.findOne({
         where:{
             shipping_companies_id:req.body.shipping_companies_id
@@ -225,6 +226,7 @@ if(collectionsTable){
             shipping_companies_id : company.shipping_companies_id
     })
 }
+res.json({message:'Collection data added successfully'})
 }
 else{
     db.collection_rate.findOne({
