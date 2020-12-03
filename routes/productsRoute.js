@@ -1135,4 +1135,34 @@ router.post("/api/getProductColors", (req, res) => {
     })
 })
 
+
+router.put('/api/updateProductDiscount' , async (req,res)=>{
+    console.log(req.body.product_id)
+    var product = await db.products.findOne({
+        where:{
+            product_id : req.body.product_id
+        }
+    });
+    if(product){
+        product.update({
+            discount_amount:req.body.discountAmount
+        }).then(res.json({message:`Discount is added successully, ${product.product_name} new price is  ${product.unit_price-product.discount_amount}`}))
+    }
+    
+    else res.json({message: 'Something went wrong , try again '})
+
+})
+
+router.put('/api/removeProductDiscount',async(req,res)=>{
+    console.log(req.body.product_id)
+    var product = await db.products.findByPk(req.body.product_id)
+    if(product){
+        product.update({
+            discount_amount:null
+        }).then(res.json({message:'Discount removed successfully'}))
+    }
+})
+
+
+
 module.exports = router;
