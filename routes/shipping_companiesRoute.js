@@ -174,9 +174,8 @@ else res.json({ Message:'No company FOUND'})
 })
 
 
-router.post('/api/addOrRemoveShipingRate' , async(req,res)=>{
-    console.log(req.body.shipping_companies_id)
-    var shippingTable=req.body.shippingTable
+router.post('/api/addOrRemoveShippingRate' , async(req,res)=>{
+    var shippingTable=req.body.shippingTable?req.body.shippingTable:null 
    
     //add shippnig rate
     if(shippingTable){
@@ -194,6 +193,7 @@ router.post('/api/addOrRemoveShipingRate' , async(req,res)=>{
                 shipping_companies_id : company.shipping_companies_id,
                 region:shippingTable[i].region
             })
+            res.json({message:'Shipping row added successfully'})
         }
     }
    
@@ -212,7 +212,7 @@ res.json({message:'Shipping rate deleted successfully'})
 
 
 router.post('/api/addOrRemoveCollectionRate',async(req,res)=>{
-    var collectionTable= req.body.collectionTable
+    var collectionTable= req.body.collectionTable?req.body.collectionTable:null
 if(collectionTable){
     var company=await db.shipping_companies.findOne({
         where:{
