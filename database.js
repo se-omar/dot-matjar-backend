@@ -1,7 +1,7 @@
 const suppliers_items = require("./models/suppliers_items");
 
 const Seq = require("sequelize").Sequelize;
-const sequelize = new Seq("dot-matjar-db3", "root", "", {
+const sequelize = new Seq("dotmatjardb2", "root", "", {
   host: "localhost",
   dialect: "mysql",
   define: {
@@ -327,30 +327,35 @@ db.suppliers_items.belongsTo(db.category_items, {
   foreignKey: "category_items_id",
 });
 
-
-db.shipping_companies.hasMany(db.shipping_rate, {
-  foreignKey: "shipping_companies_id"
-},
+db.shipping_companies.hasMany(
+  db.shipping_rate,
   {
-    onDelete: 'CASCADE',
-    hooks: true
-  })
+    foreignKey: "shipping_companies_id",
+  },
+  {
+    onDelete: "CASCADE",
+    hooks: true,
+  }
+);
 
 db.shipping_rate.belongsTo(db.shipping_companies, {
-  foreignKey: "shipping_companies_id"
-})
+  foreignKey: "shipping_companies_id",
+});
 
-
-db.shipping_companies.hasMany(db.collection_rate, {
-  foreignKey: "shipping_companies_id"
-}, {
-  onDelete: 'CASCADE',
-  hooks: true
-})
+db.shipping_companies.hasMany(
+  db.collection_rate,
+  {
+    foreignKey: "shipping_companies_id",
+  },
+  {
+    onDelete: "CASCADE",
+    hooks: true,
+  }
+);
 
 db.collection_rate.belongsTo(db.shipping_companies, {
-  foreignKey: "shipping_companies_id"
-})
+  foreignKey: "shipping_companies_id",
+});
 
 // db.users.hasOne(db.supplier_page_info)
 
