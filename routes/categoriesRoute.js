@@ -194,8 +194,13 @@ router.post("/api/supplierPageAddCategories", async (req, res) => {
   var catId;
   var catCheck;
   var closure;
+  console.log('api entered')
+
   if (supplierCategories) {
+    console.log('if supplierCategories')
+
     for (var i = 0; i < supplierCategories.length; i++) {
+      console.log('loop entered' , i)
       catCheck = null;
       var cat = await db.product_categories.findByPk(supplierCategories[i]);
       parentId = cat.parent_id;
@@ -208,7 +213,8 @@ router.post("/api/supplierPageAddCategories", async (req, res) => {
       });
 
       do {
-        if (!catCheck) {
+    
+        
           closure = await db.suppliers_categories_closure.create({
             supplier_id: req.body.supplier_id,
             category_id: catId,
@@ -224,7 +230,7 @@ router.post("/api/supplierPageAddCategories", async (req, res) => {
             },
           });
           parentId = parentCat ? parentCat.parent_id : null;
-        }
+       
       } while (parentId != null);
 
       catCheck = await db.suppliers_categories_closure.findOne({

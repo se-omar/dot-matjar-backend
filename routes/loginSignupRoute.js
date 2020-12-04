@@ -326,7 +326,7 @@ router.post('/api/businessOwnerRegistration', async (req, res) => {
     else {
         const token = jwt.sign({ email: req.body.email }, process.env.JWT_KEY,)
         console.log('email Token from JWT', token)
-        var url = `http://localhost:8080/${req.body.siteLanguage}/activation/` + token;
+        var url = `http://localhost:8081/${req.body.siteLanguage}/activation/` + token;
 
         let transporter = nodemailer.createTransport({
             service: "gmail",
@@ -346,10 +346,10 @@ router.post('/api/businessOwnerRegistration', async (req, res) => {
 
 
         let mailoptions = {
-            from: ' dotmarketofficial@gmail.com', // sender address
+            from: ' dotmatjarfficial@gmail.com', // sender address
             to: req.body.email, // list of receivers
-            subject: "account almost DONE", // Subject line
-            text: "Please activate from here", // plain text body
+            subject: "Account almost DONE , ", // Subject line
+            text: "Please activate your account  from here...", // plain text body
             html: `  <a href="${url}">Click to ACTIVATE your Account</a> <br/>
    
     `
