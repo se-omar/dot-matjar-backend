@@ -1,357 +1,338 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const db = require('../database');
-const nodemailer = require('nodemailer');
-const path = require("path")
-const multer = require('multer')
-const bodyParser = require('body-parser');
-const cors = require('cors')
-const Sequelize = require('sequelize');
+const db = require("../database");
+const nodemailer = require("nodemailer");
+const path = require("path");
+const multer = require("multer");
+const bodyParser = require("body-parser");
+const cors = require("cors");
+const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
-const checkAuth = require('./check-auth');
-const { where } = require('sequelize');
-const jwt = require('jsonwebtoken')
-
+const checkAuth = require("./check-auth");
+const { where } = require("sequelize");
+const jwt = require("jsonwebtoken");
 
 router.use((req, res, next) => {
-    if (req.originalUrl === '/webhook') {
-        next();
-    } else {
-        bodyParser.json()(req, res, next);
-    }
+  if (req.originalUrl === "/webhook") {
+    next();
+  } else {
+    bodyParser.json()(req, res, next);
+  }
 });
 
 router.use(cors());
 
-
-
 const storage = multer.diskStorage({
-    destination: './allUploads/uploads/',
+  destination: "./allUploads/uploads/",
 
-    filename: function (req, file, cb) {
-        cb(null, file.originalname + Date.now() + '.jpg')
-    }
+  filename: function (req, file, cb) {
+    cb(null, file.originalname + Date.now() + ".jpg");
+  },
 });
 
-
-var imagedir = path.join(__dirname, '/allUploads/');
+var imagedir = path.join(__dirname, "/allUploads/");
 router.use(express.static(imagedir));
 
 const upload = multer({
-    storage: storage
-})
-
+  storage: storage,
+});
 
 //==============================================
 //USERS TABLE
 
-router.post('/api/profilePhoto', upload.single("profile"), async (req, res, next) => {
-    console.log("The Image is: ", req.file)
+router.post("/api/profilePhoto", upload.single("profile"), async (req, res, next) => {
+  console.log("The Image is: ", req.file);
 
-    var user = await db.users.findOne({
-        where: {
-            email: req.body.email
-        }
-    })
-    if (!user) {
-        console.log("User is not found ===================")
-        res.json({
-            message: "Error happened"
-        })
-    } else {
-        user.update({
-            profile_photo: req.file.path.substr(11)
-
-
-        })
-        console.log('User profile', user.profile_photo)
-        res.json({
-            data: user.profile_photo,
-            message: "Image Uploaded to database"
-        })
-
-        console.log("Image Path =======================", user.profile_photo)
-    }
-})
-
-router.post('/api/businessOwnerData', upload.array("file"), async (req, res, next) => {
-    console.log("The IMAGES are :", req.files)
-
-    db.business.create({
-        user_id: req.body.user_id,
-        enterprice_national_number: req.body.enterprice_national_number,
-        bussiness_name: req.body.bussiness_name,
-        bussiness_activity: req.body.bussiness_activity,
-        commercial_register: req.files[0] ? req.files[0].path.substr(11) : null,
-        tax_card: req.files[1] ? req.files[1].path.substr(11) : null,
-        operating_license: req.files[2] ? req.files[2].path.substr(11) : null
-
-    })
+  var user = await db.users.findOne({
+    where: {
+      email: req.body.email,
+    },
+  });
+  if (!user) {
+    console.log("User is not found ===================");
     res.json({
-        message: "You are now a Business owner",
-        data: req.files
-    })
-    var user = await db.users.findOne({
-        where: {
-            email: req.body.email
-        }
-
-    })
-
-    if (!user) res.json({
-        message2: "User not found"
-    })
-
+      message: "Error happened",
+    });
+  } else {
     user.update({
-        full_arabic_name: req.body.full_arabic_name,
-        national_number: req.body.national_number,
-        job: req.body.job,
-        fax: req.body.fax,
-        address: req.body.address,
-        website: req.body.website,
-        mobile_number: req.body.mobile_number,
-        user_type: "business"
-
-
-    })
+      profile_photo: req.file.path.substr(10),
+    });
+    console.log("User profile", user.profile_photo);
     res.json({
-        user: user
-    })
-    console.log(user)
+      data: user.profile_photo,
+      message: "Image Uploaded to database",
+    });
 
+    console.log("Image Path =======================", user.profile_photo);
+  }
+});
 
-})
+router.post("/api/businessOwnerData", upload.array("file"), async (req, res, next) => {
+  console.log("The IMAGES are :", req.files);
 
-router.post('/api/getSuppliers', (req, res) => {
-    console.log(req.body.user_id)
-    if (!req.body.user_id) {
-        db.users.findAll({
-            where: {
-                user_type: 'business'
-            },
-            limit: 10
-        }).then(users => {
-            res.json({
-                users: users
-            })
-        })
-    }
-    else {
-        console.log('entered here')
-        db.users.findAll({
-            where: {
-                user_id: {
-                    [Op.gt]: req.body.user_id
-                },
-                user_type: 'business'
-            },
-            limit: 10
-        }).then(users => {
-            res.json({
-                users: users
-            })
-        })
-    }
-})
+  db.business.create({
+    user_id: req.body.user_id,
+    enterprice_national_number: req.body.enterprice_national_number,
+    bussiness_name: req.body.bussiness_name,
+    bussiness_activity: req.body.bussiness_activity,
+    commercial_register: req.files[0] ? req.files[0].path.substr(10) : null,
+    tax_card: req.files[1] ? req.files[1].path.substr(10) : null,
+    operating_license: req.files[2] ? req.files[2].path.substr(10) : null,
+  });
+  res.json({
+    message: "You are now a Business owner",
+    data: req.files,
+  });
+  var user = await db.users.findOne({
+    where: {
+      email: req.body.email,
+    },
+  });
 
-router.post('/api/refreshCurrentUser', checkAuth, (req, res) => {
-    jwt.verify(req.token, 'secretdotmatjar4523', (err, data) => {
-        if (err) {
-            console.log(err)
-            res.status(403).send('forbidden 2 api')
-        }
-        else {
-            db.users.findOne({
-                where: {
-                    user_id: data.user_id
-                }
-            }).then(user => {
-                if (!user) {
-                    return res.json({
-                        message: 'user not found',
-                    })
-                }
+  if (!user)
+    res.json({
+      message2: "User not found",
+    });
 
-                res.json({
-                    message: 'user sent successfully',
-                    user: user
-                })
-            })
-        }
-    })
+  user.update({
+    full_arabic_name: req.body.full_arabic_name,
+    national_number: req.body.national_number,
+    job: req.body.job,
+    fax: req.body.fax,
+    address: req.body.address,
+    website: req.body.website,
+    mobile_number: req.body.mobile_number,
+    user_type: "business",
+  });
+  res.json({
+    user: user,
+  });
+  console.log(user);
+});
 
-})
-
-
-
-router.put('/api/changeSiteColor', async (req, res) => {
-    console.log(req.body.user_id)
-    db.users.findOne({
+router.post("/api/getSuppliers", (req, res) => {
+  console.log(req.body.user_id);
+  if (!req.body.user_id) {
+    db.users
+      .findAll({
         where: {
-            user_id: req.body.user_id
-        }
-    }).then(async user => {
-        if (user.user_type != 'admin') { res.json({ message: 'You have no access for this request' }) }
-        else {
-            var admins = await db.users.findAll({
-                where: {
-                    user_type: 'admin'
-                }
-            })
-
-            for (let i = 0; i < admins.length; i++) {
-                await db.users.findOne({
-                    where: {
-                        user_id: admins[i].user_id
-                    }
-                }).then(user => {
-                    user.update({
-                        site_color: req.body.site_color
-                    })
-                })
-            }
-            res.json({ message: 'site color changed' },
-
-            )
-        }
-
-    })
-})
-
-
-
-router.put('/api/getSiteColor', async (req, res) => {
-    db.site_colors.findOne({ where: { Id: 1 } })
-        .then(data => { res.json({ data: data, message: 'site data connected' }) })
-})
-
-
-
-
-
-
-router.post('/api/updateSiteColors', async (req, res) => {
-    var siteColor = await db.site_colors.findOne({
+          user_type: "business",
+        },
+        limit: 10,
+      })
+      .then((users) => {
+        res.json({
+          users: users,
+        });
+      });
+  } else {
+    console.log("entered here");
+    db.users
+      .findAll({
         where: {
-            id: 1
-        }
-    })
-    if (!siteColor) {
-        db.site_colors.create({
-            toolbar_color: req.body.toolBarColor,
-            footer_color: req.body.footerColor,
-            footer_text_color: req.body.footerTextColor,
-            button_color: req.body.buttonsColor,
-            button_text_color: req.body.buttonTextColor,
-            toolbar_text_color: req.body.toolBarTextColor
+          user_id: {
+            [Op.gt]: req.body.user_id,
+          },
+          user_type: "business",
+        },
+        limit: 10,
+      })
+      .then((users) => {
+        res.json({
+          users: users,
+        });
+      });
+  }
+});
+
+router.post("/api/refreshCurrentUser", checkAuth, (req, res) => {
+  jwt.verify(req.token, "secretdotmatjar4523", (err, data) => {
+    if (err) {
+      console.log(err);
+      res.status(403).send("forbidden 2 api");
+    } else {
+      db.users
+        .findOne({
+          where: {
+            user_id: data.user_id,
+          },
         })
+        .then((user) => {
+          if (!user) {
+            return res.json({
+              message: "user not found",
+            });
+          }
+
+          res.json({
+            message: "user sent successfully",
+            user: user,
+          });
+        });
     }
-    if (siteColor) {
-        db.site_colors.findOne({
-            where: {
-                id: 1
-            }
-        }).then(siteUpdates => {
-            siteUpdates.update({
-                toolbar_color: req.body.toolBarColor,
-                footer_color: req.body.footerColor,
-                footer_text_color: req.body.footerTextColor,
-                button_color: req.body.buttonsColor,
-                button_text_color: req.body.buttonsTextColor,
-                toolbar_text_color: req.body.toolBarTextColor
+  });
+});
+
+router.put("/api/changeSiteColor", async (req, res) => {
+  console.log(req.body.user_id);
+  db.users
+    .findOne({
+      where: {
+        user_id: req.body.user_id,
+      },
+    })
+    .then(async (user) => {
+      if (user.user_type != "admin") {
+        res.json({ message: "You have no access for this request" });
+      } else {
+        var admins = await db.users.findAll({
+          where: {
+            user_type: "admin",
+          },
+        });
+
+        for (let i = 0; i < admins.length; i++) {
+          await db.users
+            .findOne({
+              where: {
+                user_id: admins[i].user_id,
+              },
             })
-        })
-    }
-})
-
-
-
-
-
-router.put('/api/getAllUsers', (req, res) => {
-    if (!req.body.user_id) {
-        db.users.findAll({
-            limit: 10
-        }).then(users => {
-            res.json({ data: users })
-        })
-    }
-    else {
-
-        db.users.findAll({
-            where: {
-                user_id: {
-                    [Op.gt]: req.body.user_id
-                }
-
-            },
-            limit: 10
-        }).then(users => {
-            res.json({
-                data: users
-            })
-        })
-    }
-
-})
-
-router.put('/api/getUser', (req, res) => {
-    console.log(req.body.user_id)
-    db.users.findOne({
-        where: {
-            user_id: req.body.user_id
+            .then((user) => {
+              user.update({
+                site_color: req.body.site_color,
+              });
+            });
         }
-    }).then(user => {
-        res.json({ data: user })
-    })
+        res.json({ message: "site color changed" });
+      }
+    });
+});
 
-})
+router.put("/api/getSiteColor", async (req, res) => {
+  db.site_colors.findOne({ where: { Id: 1 } }).then((data) => {
+    res.json({ data: data, message: "site data connected" });
+  });
+});
 
-
-router.put('/api/updateUserInfoFromAdmin', (req, res) => {
-    db.users.findOne({
+router.post("/api/updateSiteColors", async (req, res) => {
+  var siteColor = await db.site_colors.findOne({
+    where: {
+      id: 1,
+    },
+  });
+  if (!siteColor) {
+    db.site_colors.create({
+      toolbar_color: req.body.toolBarColor,
+      footer_color: req.body.footerColor,
+      footer_text_color: req.body.footerTextColor,
+      button_color: req.body.buttonsColor,
+      button_text_color: req.body.buttonTextColor,
+      toolbar_text_color: req.body.toolBarTextColor,
+    });
+  }
+  if (siteColor) {
+    db.site_colors
+      .findOne({
         where: {
-            user_id: req.body.user_id
-        }
-    }).then(async user => {
-        await user.update({
-            national_number: req.body.national_number,
-            gender: req.body.gender,
-            full_arabic_name: req.body.full_arabic_name,
-            full_english_name: req.body.full_english_name,
-            birthdate: req.body.birthdate,
-            qualifications: req.body.qualifications,
-            job: req.body.job,
-            governorate: req.body.governorate,
+          id: 1,
+        },
+      })
+      .then((siteUpdates) => {
+        siteUpdates.update({
+          toolbar_color: req.body.toolBarColor,
+          footer_color: req.body.footerColor,
+          footer_text_color: req.body.footerTextColor,
+          button_color: req.body.buttonsColor,
+          button_text_color: req.body.buttonsTextColor,
+          toolbar_text_color: req.body.toolBarTextColor,
+        });
+      });
+  }
+});
 
-            region: req.body.region,
-            center: req.body.center,
-            phone_number: req.body.phone_number,
-            mobile_number: req.body.mobile_number,
-            fax: req.body.fax,
-            facebook_account: req.body.facebook_account,
-            linkedin: req.body.linkedin,
-            website: req.body.website,
-            address: req.body.address,
-            user_type: req.body.user_type
-        })
-        res.json({ message: 'User Updated successfully' })
+router.put("/api/getAllUsers", (req, res) => {
+  if (!req.body.user_id) {
+    db.users
+      .findAll({
+        limit: 10,
+      })
+      .then((users) => {
+        res.json({ data: users });
+      });
+  } else {
+    db.users
+      .findAll({
+        where: {
+          user_id: {
+            [Op.gt]: req.body.user_id,
+          },
+        },
+        limit: 10,
+      })
+      .then((users) => {
+        res.json({
+          data: users,
+        });
+      });
+  }
+});
+
+router.put("/api/getUser", (req, res) => {
+  console.log(req.body.user_id);
+  db.users
+    .findOne({
+      where: {
+        user_id: req.body.user_id,
+      },
     })
+    .then((user) => {
+      res.json({ data: user });
+    });
+});
+
+router.put("/api/updateUserInfoFromAdmin", (req, res) => {
+  db.users
+    .findOne({
+      where: {
+        user_id: req.body.user_id,
+      },
+    })
+    .then(async (user) => {
+      await user.update({
+        national_number: req.body.national_number,
+        gender: req.body.gender,
+        full_arabic_name: req.body.full_arabic_name,
+        full_english_name: req.body.full_english_name,
+        birthdate: req.body.birthdate,
+        qualifications: req.body.qualifications,
+        job: req.body.job,
+        governorate: req.body.governorate,
+
+        region: req.body.region,
+        center: req.body.center,
+        phone_number: req.body.phone_number,
+        mobile_number: req.body.mobile_number,
+        fax: req.body.fax,
+        facebook_account: req.body.facebook_account,
+        linkedin: req.body.linkedin,
+        website: req.body.website,
+        address: req.body.address,
+        user_type: req.body.user_type,
+      });
+      res.json({ message: "User Updated successfully" });
+    });
 }),
-    router.put('/api/deleteUser', (req, res) => {
-
-
-
-
-        db.users.findOne({
-            where: { user_id: req.body.user_id }
-        }).then(user => {
-            user.destroy()
-            res.json({ message: 'User Deleted Successfully' })
-        })
-    })
-
-
+  router.put("/api/deleteUser", (req, res) => {
+    db.users
+      .findOne({
+        where: { user_id: req.body.user_id },
+      })
+      .then((user) => {
+        user.destroy();
+        res.json({ message: "User Deleted Successfully" });
+      });
+  });
 
 // router.get('/api/users', async (req, res) => {
 //     await db.users.findAll({
@@ -453,7 +434,6 @@ router.put('/api/updateUserInfoFromAdmin', (req, res) => {
 //     res.send('row updated');
 // })
 
-
 // router.delete('/api/users/:user_id', async (req, res) => {
 //     var user = await db.users.findOne({
 //         where: {
@@ -463,7 +443,5 @@ router.put('/api/updateUserInfoFromAdmin', (req, res) => {
 //     user.destroy();
 //     res.send('row deleted')
 // })
-
-
 
 module.exports = router;
