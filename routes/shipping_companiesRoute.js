@@ -28,9 +28,10 @@ router.put('/api/updateDefaultShippingCompany',async (req,res)=>{
             default: 'TRUE'
         }
     })
-   def.update({
+  if(def){ def.update({
 default : null
     })
+}
 db.shipping_companies.findOne({
     where:{
         shipping_companies_id : req.body.shipping_companies_id
@@ -239,6 +240,9 @@ else{
     })
 }
 })
+
+
+
 
 
 module.exports = router;
