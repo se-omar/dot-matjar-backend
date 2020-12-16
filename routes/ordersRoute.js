@@ -25,7 +25,8 @@ router.put('/api/getUserOrders', (req, res) => {
         where: {
             user_id: req.body.user_id
         },
-        include: [{ model: db.products_orders }]
+        include: [{ model: db.products_orders}]
+           
     }).then(orders => {
         res.json({
             data: orders

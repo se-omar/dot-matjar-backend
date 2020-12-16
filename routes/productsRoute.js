@@ -271,6 +271,7 @@ router.post("/api/product", upload2.array("file", 12), async (req, res, next) =>
     extra_picture1: req.files[1] ? req.files[1].path.substr(10) : null,
     extra_picture2: req.files[2] ? req.files[2].path.substr(10) : null,
     currency: req.body.currency,
+    stock_remaining : req.body.inStock
   });
 
   var colors = req.body.colors.split(",");
