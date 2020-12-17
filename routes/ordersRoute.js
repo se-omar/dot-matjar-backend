@@ -21,19 +21,28 @@ router.use(cors());
 
 
 router.put('/api/getUserOrders', (req, res) => {
-    db.orders.findAll({
-        where: {
-            user_id: req.body.user_id
-        },
-        include: [{ model: db.products_orders}]
+    // db.orders.findAll({
+    //     where: {
+    //         user_id: req.body.user_id
+    //     },
+    //     include: [{ model: db.products_orders}]
            
-    }).then(orders => {
-        res.json({
-            data: orders
-        })
-    }).catch(err => {
-        console.log(err)
+    // }).then(orders => {
+    //     res.json({
+    //         data: orders
+    //     })
+    // }).catch(err => {
+    //     console.log(err)
+    // })
+    db.products_orders.findAll({
+        where:{
+            user_id:req.body.user_id
+        },
+        include:[{model:db.orders} , {model:db.products}]
+    }).then(orders=>{
+        res.json({data:orders})
     })
+
 })
 
 
@@ -408,6 +417,23 @@ productsInOrder = await db.products_orders.findAll({
 res.json({order :order, productsInOrder : productsInOrder , message:'Order Found'})
 })
 
+
+router.put('/api/removingProductfromOrder',async (req,res)=>{
+    console.log('iddddd',req.body.products_orders_id)
+    db.products_orders.findByPk(req.body.products_orders_id)
+    .then(async orderProduct=>{
+        var product = await db.products.findByPk(orderProduct.product_id);
+console.log('quanitytyyyyyy',orderProduct.quantity)
+product.update({
+    stock_remaining:product.stock_remaining+orderProduct.quantity
+})
+        orderProduct.destroy();
+        
+        res.json({message:'Product removed from order'})
+
+    })
+
+})
 
 
 module.exports = router;
