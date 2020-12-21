@@ -271,7 +271,7 @@ router.post("/api/product", upload2.array("file", 12), async (req, res, next) =>
     extra_picture1: req.files[1] ? req.files[1].path.substr(10) : null,
     extra_picture2: req.files[2] ? req.files[2].path.substr(10) : null,
     currency: req.body.currency,
-    stock_remaining : req.body.inStock
+    stock_remaining: req.body.inStock
   });
 
   var colors = req.body.colors.split(",");
@@ -667,27 +667,48 @@ router.put("/api/filterSuppliers", (req, res) => {
 });
 
 router.put("/api/updateProductStatus", async (req, res) => {
-  console.log(
-    "get data from frontend testing ",
-    req.body.status,
-    req.body.orderId,
-    req.body.productId
-  );
+
+  var product = await db.products.findByPk(req.body.productId)
   var orderedProduct = await db.products_orders.findOne({
     where: {
       order_id: req.body.orderId,
       product_id: req.body.productId,
-      product_color: req.body.productColor,
+
     },
   });
-  if (orderedProduct) {
-    orderedProduct.update({
-      status: req.body.status,
-    });
-    res.json({ message: "ordere status updated" });
-  } else {
-    res.json({ message: "Something went WRONG" });
+  var supplier = await db.users.findByPk(product.user_id)
+  var supplierRevenueForThisOrder = product.discount_amount ? (product.unit_price - product.discount_amount) * orderedProduct.quantity : product.unit_price * orderedProduct.quantity;
+  if (req.body.status == "Delivered" && !orderedProduct.supplier_got_money) {
+
+    await supplier.update({
+      total_revenue: supplier.total_revenue += supplierRevenueForThisOrder,
+      total_sales: supplier.total_sales + orderedProduct.quantity
+    })
+    await orderedProduct.update({
+      supplier_got_money: true
+    })
+
+
+
   }
+  if (req.body.status == "Rejected" && orderedProduct.supplier_got_money) {
+    await supplier.update({
+      total_revenue: supplier.total_revenue - supplierRevenueForThisOrder,
+      total_sales: supplier.total_sales - orderedProduct.quantity
+    })
+    orderedProduct.update({
+      supplier_got_money: null
+    })
+  }
+
+  orderedProduct.update({
+    status: req.body.status,
+  });
+  console.log('entered')
+  res.json({ message: "ordere status updated", data: orderedProduct, data2: supplier, data3: req.body.status });
+
+
+
 });
 router.post("/api/addProductReview", (req, res) => {
   db.products_reviews
@@ -1137,9 +1158,8 @@ router.put("/api/updateProductDiscount", async (req, res) => {
       })
       .then(
         res.json({
-          message: `Discount is added successully, ${
-            product.product_name
-          } new price is  ${product.unit_price - product.discount_amount}`,
+          message: `Discount is added successully, ${product.product_name
+            } new price is  ${product.unit_price - product.discount_amount}`,
         })
       );
   } else res.json({ message: "Something went wrong , try again " });
