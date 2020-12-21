@@ -23,7 +23,11 @@ return sequelize.define('shipping_rate',{
     shipping_companies_id:{
         type: DataTypes.INTEGER(11),
         allowNull:true
-    }
+    },
+    region:{
+        type: DataTypes.STRING(255),
+        allowNull:true
+    },
 
 },
 {

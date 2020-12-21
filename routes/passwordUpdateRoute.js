@@ -5,6 +5,7 @@ const crypto = require('crypto');
 const nodemailer = require('nodemailer');
 const bodyParser = require('body-parser');
 const cors = require('cors')
+var bcrypt = require('bcryptjs');
 
 router.use((req, res, next) => {
     if (req.originalUrl === '/webhook') {
@@ -92,22 +93,55 @@ router.post('/api/sendResetPassword/:token', (req, res) => {
     })
 })
 
-router.post('/api/updatePassword', (req, res) => {
-    db.users.findOne({
-        where: {
-            email: req.body.email,
-            password: req.body.password,
+router.put('/api/updatePassword',async (req, res) => {
+    console.log(req.body.password , req.body.newPassword , req.body.email)
+    var user = await db.users.findOne({
+        where:{
+            email:req.body.email
         }
-    }).then(user => {
-        if (!user) {
-            return res.send('user not found with this password')
-        }
-        console.log(user)
-        user.update({
-            password: req.body.newPassword
-        })
-        return res.send('password updated successfully')
     })
+    if(user){
+      
+        bcrypt.compare(req.body.password, user.password, function (err, isMatch) {
+            if (err) {
+                res.json({ message: 'error' })
+            } else if (!isMatch) {
+                res.json({ message: 'authentication failed' })
+            } else {
+
+                bcrypt.genSalt(10, function (err, salt) {
+                    if (err) {
+                        console.log(err)
+                    } else {
+                        bcrypt.hash(req.body.newPassword, salt, function (err, hash) {
+                            if (err) {
+                                console.log(err)
+                            } else {
+                                console.log(hash)
+                                
+                                                         console.log('new password',hash)
+                                user.update({
+                                  
+                                    password: hash,
+                                
+                                }).then(
+                                    res.json({ message: 'password updated successfully' })
+                                    
+                                   
+                                    
+                                    )
+                            }
+                        })
+                    }
+                })
+            }
+        })
+
+               
+      
+          
+       
+    }
 })
 
 
