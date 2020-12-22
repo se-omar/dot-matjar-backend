@@ -286,4 +286,31 @@ router.post("/api/addNewUser", profileUpload.single("file"), (req, res) => {
     });
 });
 
+router.put('/api/updateSupplierTotalRevenue', async (req, res) => {
+  var user = await db.users.findByPk(req.body.user_id)
+  await user.update({
+    total_revenue: req.body.totalRevenue
+  })
+  res.json({ message: 'Total Revenue updated' })
+})
+router.put('/api/updateSupplierAmountRecieved', async (req, res) => {
+  console.log(req.body.amountRecieved)
+  var user = await db.users.findByPk(req.body.user_id)
+  await user.update({
+    revenue_recieved: req.body.amountRecieved
+  })
+  res.json({ message: 'amount recieved updated' })
+})
+
+router.put('/api/getSupplierNewData', async (req, res) => {
+  var user = await db.users.findByPk(req.body.user_id)
+  if (user) {
+    console.log('user idd ', user.user_id)
+    res.json({ data: user })
+  }
+  else {
+    res.json({ data: [] })
+  }
+})
+
 module.exports = router;
