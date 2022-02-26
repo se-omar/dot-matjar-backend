@@ -1,0 +1,165 @@
+[33m7bf0720[m[33m ([m[1;36mHEAD -> [m[1;32mmaster[m[33m, [m[1;31morigin/master[m[33m, [m[1;31morigin/HEAD[m[33m)[m last update
+[33m7194a56[m supplier total revenue added with delivered order
+[33md92421d[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33maaf8af9[m get changes
+[33m9bd8931[m userOrders page completed
+[33m408f351[m user order Page updates un completed
+[33m05108e0[m supplier page updated
+[33mba89199[m supplier page updated
+[33m4e70493[m test
+[33m7002c3c[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m93d57a5[m supplier add cateogry was not working
+[33m6698998[m image src fix
+[33mdfeb299[m product discount
+[33m96f7385[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33me6a91cd[m ger updates
+[33m01362d4[m sending a message to supplier email if orderCreate
+[33m31aebfe[m shipping ckompanies in admin page updates
+[33mdfd00ea[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m7e46c20[m shipping companies updates
+[33m58680e2[m added shipping and collection rates in bill
+[33m5d9356f[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33mccf8e26[m order bill made
+[33m71fa684[m order bill
+[33mb8a47fd[m get updates
+[33md2c3358[m fixed quantity adding when creating order
+[33mbf4734a[m s
+[33m159c710[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m453222a[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m1b40fdf[m get changes
+[33mc5430eb[m product images fix
+[33m806a042[m product color appears in orderedProducts
+[33mea6744e[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m7fb4653[m added product_color in products_orders table
+[33m156bcba[m admin page udpate
+[33me1d3263[m admin page update
+[33m5ceb83c[m adminPage add company
+[33mfd75081[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m6710d16[m get updates
+[33m3ec93d6[m fixed the order placement process
+[33mb725454[m refactored names in cart route
+[33m1f2cae8[m products now have multiple colors
+[33mca3bbce[m admin page default company
+[33m154ce8f[m shipping companies
+[33me06a643[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33mbeac431[m Merge branches 'master' and 'master' of https://bitbucket.org/omarayman639/back-end
+[33mf0f08c7[m category requests pge updated
+[33m5e82d3d[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m3868c8a[m supplier category updated
+[33me44a0ac[m added api to fill product closure table
+[33mb3fa2ca[m admin can remove categories from admin page
+[33m0a027c3[m supplier can choose his categories and the categories are viewed in his page
+[33m5ad85d0[m added add category in admin page
+[33m963f6ed[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33mf3f0021[m fixed category adding in /api/product api
+[33m3f01aca[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33md2796a7[m homepage
+[33m5ea4cc3[m merge
+[33m49ea4e3[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33mc2f927b[m u
+[33m2700488[m subcategories language now is sent correctly
+[33me5f6cdd[m added categories tree api
+[33m6468fc7[m u
+[33m0eb3a26[m added categories filter in filter products
+[33m63862c9[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33m92e6830[m cateoryUpdates
+[33m94b6d8c[m Merge
+[33mabf0d25[m added filterProductsByCategory
+[33mcb4e661[m merge
+[33me2265ee[m categoryupdates
+[33m2911492[m fill closure table api added
+[33m3f9fb74[m category updates
+[33m4c58a90[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33m7215e8e[m complete testin
+[33m6d733b8[m j
+[33ma61c8c6[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33mf70c574[m added brand and condition to products
+[33me64e143[m pridcut details updated
+[33m01b2d9c[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33m7d3069c[m supplier register updated
+[33m4f428e0[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m02298cc[m u
+[33m6876548[m login form updated
+[33mb30a7de[m loadmorebutton
+[33m2fd83aa[m s
+[33m2831a99[m s
+[33m20878f8[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m6ae4bba[m fixed update carousel in admin adn supplier page
+[33mdea60b9[m update
+[33m14da252[m update
+[33m093e135[m updated forbidden message
+[33m257d05a[m updated jwt authentication code
+[33m484f8ac[m changed auth
+[33m45b8336[m last updateee
+[33mafdf5dd[m sitee
+[33m499fd5c[m sitee
+[33m3d1aa3f[m removed packages
+[33m59121c1[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m0426f47[m admin can add users
+[33md168893[m databse6
+[33mc9b53db[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33m23f59a4[m supplier requests update resume
+[33mf29ad41[m supplier can put quantity when adding products
+[33md0415aa[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m7e93835[m u
+[33m13b9f96[m home and supplier page tested
+[33mac44718[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33m245b68c[m category search updated
+[33mb64a9b3[m added change currency in add and edit product pages
+[33m6d6dbd9[m merge
+[33m16f079f[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33mc1e0084[m sdfa
+[33mea54a9d[m added price currency conversion in products
+[33mf5672f0[m merge
+[33md8b1b1e[m get supplier categories and items
+[33mb9066b1[m u
+[33m66e5ff8[m u
+[33mad26fba[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m03381e6[m added filter products by price
+[33mc38ab6e[m category and item requests
+[33mebb3174[m updaates befor testing
+[33mb8be050[m admins can change carousel and banner in home page
+[33m935f4b8[m refactored the remove carousel images code
+[33m472b760[m supplier request category
+[33m3c4f2da[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33m4885da2[m supplier request category
+[33mc321de6[m supplier can remove carousel images
+[33m361aaff[m supplier can add carousel images
+[33mf2170e1[m made banners optional in supplier page
+[33me51a1dc[m search box fixed in supplier page
+[33me9cd1ef[m seach box in supplier page
+[33m72b5987[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33md471c47[m store updated
+[33m518723f[m small include
+[33m1c1d450[m 123
+[33mdc42cda[m users can rate suppliers
+[33m5693fd3[m only users who ordered can rate product
+[33ma5b3520[m added text reviews
+[33m64e18f4[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m03a78e7[m added get a product's individual ratings
+[33m55e6b69[m fix
+[33md2193c0[m asd
+[33m0355021[m added average product rating
+[33m07b33a2[m user can review and rate products
+[33m2256cff[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33md379563[m u
+[33m7e9ff1a[m merguing
+[33m0e3a21e[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33m17748ab[m ii
+[33m21ad1a8[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33md932c36[m supplier can carousel widht and height
+[33m7db0eb8[m update
+[33m411d5ce[m getting orders updated
+[33m3277648[m testq23
+[33m80f9da4[m u
+[33me50c509[m site ends
+[33m18a9e55[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end
+[33m3301c94[m included users in /monthlySales
+[33md780918[m Merge branch 'master' of https://bitbucket.org/omarayman639/back-end into master
+[33m3d61569[m supplier page update
+[33md55be03[m added total sales
+[33m80fa307[m site color
+[33m7932a6a[m site color
+[33mfc83de3[m added years in dashboard
+[33m34f3868[m merge
+[33m7d53
